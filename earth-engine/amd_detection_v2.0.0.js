@@ -24,7 +24,7 @@
  * Sensing for Environmental Monitoring. GitHub. https://github.com/coodawy/AMD-Detection-Tool
  */
 
-var TOOL_VERSION = 'v2.0.0';
+var TOOL_VERSION = 'v2.0.1';
 
 // =============================================================================
 // STUDY AREAS
@@ -495,8 +495,19 @@ var settings = {
   // and the paper's adaptive std-dev thresholding (Tier 2). The old 1.15 was tuned
   // for the incorrect (B2+B4)/B1 index and is NOT valid for this signed index.
   ironSulfateThreshold: 0.10,
-  // "Strong iron" cutoff used by the road-bypass override (rescaled to new index)
-  strongIronThreshold: 0.35,
+  // "Strong iron" cutoff used by the road-bypass override.
+  // v2.0.1: lowered 0.35 -> 0.15. Silverton field check (2026-07): known jarosite
+  // talus at Red Mountain gives corrected index 0.19 with SWIR1 0.35-0.43, so a
+  // 0.35 bypass never fired and the road mask deleted real AMD. 0.15 sits between
+  // background p90 (-0.01) and the hotspot value (0.19).
+  strongIronThreshold: 0.15,
+  // v2.0.1: road mask OFF by default. Evidence: jarosite SWIR1 (0.35-0.43 measured)
+  // is HIGHER than asphalt, so "SWIR1>=0.20 = road" cannot separate roads from ore;
+  // it also contradicts the paper's dark mask (requires B6 > 0.2125), blocking ALL
+  // mineral classes. The corrected 2/1-5/4 index is naturally ~0.0-0.06 on asphalt
+  // (flat spectrum), so roads fall below the iron threshold without this mask.
+  // Rockwell 2021 uses no road mask and accepts roads as a known limitation.
+  useRoadMask: false,
   
   // Ferric iron thresholds
   ferricIron1Threshold: 1.4,
@@ -509,7 +520,12 @@ var settings = {
   claySulfateMicaThreshold: 0.12,
   
   // Vegetation thresholds
+  // v2.0.1: greenVegThreshold (B5/B4 > 1.5) marks ANY vegetation (sparse floor);
+  // denseVegThreshold (> 3.0) marks dense canopy. Class 13 uses the sparse range
+  // (1.5-3.0) + ferric; class 11 uses dense only. Prevents class 13 from
+  // blanketing whole scenes now that hasIron is no longer true everywhere.
   greenVegThreshold: 1.5,
+  denseVegThreshold: 3.0,
   ndviMax: 0.25,
   
   // NEW: Adaptive thresholding
@@ -794,8 +810,15 @@ function createBooleanClassification() {
     hasClay = clay.gt(settings.claySulfateMicaThreshold);
   }
 
-  var hasVeg = greenVeg.gt(settings.greenVegThreshold);
-  
+  // v2.0.1 (Silverton regression): with the corrected index, hasIron is no longer
+  // true almost everywhere, so hasIron.not() stopped suppressing the veg classes
+  // and unconstrained "greenVeg > 1.5" let class 13 blanket entire scenes.
+  // Split into disjoint sparse (1.5-3.0, needs ferric) and dense (>3.0) ranges,
+  // and exclude water.
+  var hasSparseVeg = greenVeg.gt(settings.greenVegThreshold)
+    .and(greenVeg.lte(settings.denseVegThreshold));
+  var hasDenseVeg = greenVeg.gt(settings.denseVegThreshold);
+
   // Water detection
   var waterMasks = createContaminatedWaterMask();
   
@@ -822,7 +845,10 @@ function createBooleanClassification() {
   // Road detection: low NDVI + high SWIR1 + weak iron signal
   // BYPASS road detection if Iron Sulfate > strongIronThreshold (strong detection = real minerals)
   // CRITICAL: Iron oxide minerals (jarosite, goethite) naturally have HIGH SWIR1
-  var isRoad = ndvi.lt(0.25).and(b6.gte(0.20)).and(strongIronSignal.not());
+  // v2.0.1: road mask now optional (default OFF) - see useRoadMask comment in settings.
+  var isRoad = settings.useRoadMask
+    ? ndvi.lt(0.25).and(b6.gte(0.20)).and(strongIronSignal.not())
+    : ee.Image(0);
   var hasHighIron = iron.gt(settings.ironSulfateThreshold);
   
   // Vegetation/road exclusion mask for ALL classifications
@@ -899,10 +925,11 @@ function createBooleanClassification() {
   assignClass(hasFerric1.and(hasFerric2.not()).and(hasClay.not()).and(hasIron.not()).and(standardLandMask), 1);
   // Class 4: Ferrous/Chlorite (Ferrous only, no Fe1, no Clay, no Iron)  [v2.0: added hasIron.not()]
   assignClass(hasFerrous.and(hasClay.not()).and(hasFerric1.not()).and(hasIron.not()).and(standardLandMask), 4);
-  // Class 13: Sparse Veg + Ferric - only if no iron sulfate detected
-  assignClass(hasVeg.and(hasFerric1).and(hasIron.not()), 13);
-  // Class 11: Dense Green Vegetation - only if no iron/ferric detected
-  assignClass(hasVeg.and(hasIron.not()).and(hasFerric1.not()), 11);
+  // Class 13: Sparse Veg + Ferric - sparse range (1.5-3.0) + ferric, no iron, not water
+  assignClass(hasSparseVeg.and(hasFerric1).and(hasIron.not()).and(unifiedWater.not()), 13);
+  // Class 11: Dense Green Vegetation - dense canopy (>3.0) dominates the spectrum,
+  // so no ferric exclusion needed (B4/B2 on canopy can exceed 1.4 spuriously)
+  assignClass(hasDenseVeg.and(hasIron.not()).and(unifiedWater.not()), 11);
 
   // REMOVED: Old water classes (20, 21) - now handled by separate Water Quality module
   // Land AMD Classification no longer classifies water pixels at all
@@ -1202,8 +1229,11 @@ function updateDetection() {
   
   // Road detection: low NDVI + high SWIR1 + weak iron signal
   // BYPASS road detection if Iron Sulfate > strongIronThreshold (strong detection = real minerals)
-  var isRoad = ndvi.lt(0.25).and(b6.gte(0.20)).and(strongIronSignal.not());
-  
+  // v2.0.1: road mask now optional (default OFF) - see useRoadMask comment in settings.
+  var isRoad = settings.useRoadMask
+    ? ndvi.lt(0.25).and(b6.gte(0.20)).and(strongIronSignal.not())
+    : ee.Image(0);
+
   // A pixel passes if ALL of:
   //   1. Green/Red ≤ 1.0 (ALWAYS required - no green peak)
   //   2. NOT a road (unless strong iron signal bypasses road check)
@@ -1609,7 +1639,7 @@ Map.onClick(function(coords) {
 
     // Road detection: BYPASS if Iron Sulfate > strongIronThreshold (strong detection = real iron minerals)
     // CRITICAL: Iron oxide minerals (jarosite, goethite) naturally have HIGH SWIR1
-    var isRoad = ndvi < 0.25 && b6Val >= 0.20 && !strongIronSignal;
+    var isRoad = settings.useRoadMask && ndvi < 0.25 && b6Val >= 0.20 && !strongIronSignal;
     
     // New logic: ALWAYS require noGreenPeak AND not a road (unless strong iron bypasses)
     var passesNDVIMask = noGreenPeak && !isRoad && (ndvi < settings.ndviMax || (hasIron && lowSWIR1 && notDenseVeg));
@@ -1791,8 +1821,9 @@ Map.onClick(function(coords) {
       '  --- REQUIRED: No Green Peak ---\n' +
       '  Green/Red: ' + greenRedRatio.toFixed(3) + ' ≤1.0? ' + (noGreenPeak ? 'PASS' : 'FAIL ← VEGETATION EXCLUDED') + '\n' +
       '  --- Road Detection ---\n' +
-      '  Strong Iron (>2.5)? ' + (strongIronSignal ? 'YES → BYPASS road check (real minerals)' : 'NO') + '\n' +
-      '  Is Road? (NDVI<0.25 AND SWIR1≥0.20 AND Iron≤2.5): ' + (isRoad ? 'YES ← ROAD EXCLUDED' : 'NO') + '\n' +
+      '  Road mask: ' + (settings.useRoadMask ? 'ENABLED' : 'DISABLED (v2.0.1 default - SWIR1 cannot separate roads from jarosite)') + '\n' +
+      '  Strong Iron (>' + settings.strongIronThreshold + ')? ' + (strongIronSignal ? 'YES → BYPASS road check (real minerals)' : 'NO') + '\n' +
+      '  Is Road? (mask on AND NDVI<0.25 AND SWIR1≥0.20 AND Iron≤' + settings.strongIronThreshold + '): ' + (isRoad ? 'YES ← ROAD EXCLUDED' : 'NO') + '\n' +
       '  --- Additional Criteria: ---\n' +
       '  NDVI: ' + ndvi.toFixed(3) + ' <' + settings.ndviMax + '? ' + (ndvi < settings.ndviMax ? 'PASS' : 'needs iron soil check') + '\n' +
       '  SWIR1 (B6): ' + b6Val.toFixed(3) + ' <0.20? ' + (lowSWIR1 ? 'PASS' : (strongIronSignal ? 'N/A (strong iron bypasses)' : 'FAIL (road/impervious)')) + '\n' +

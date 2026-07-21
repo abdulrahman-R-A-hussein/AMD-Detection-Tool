@@ -24,7 +24,7 @@
  * Sensing for Environmental Monitoring. GitHub. https://github.com/coodawy/AMD-Detection-Tool
  */
 
-var TOOL_VERSION = 'v2.0.1';
+var TOOL_VERSION = 'v2.1.0';
 
 // =============================================================================
 // STUDY AREAS
@@ -2869,18 +2869,79 @@ function exportIndices() {
   print('Export started: ' + name);
 }
 
-// Add export buttons to the UI (hidden by default)
+// v2.0.1: Export a per-pixel CSV for the VPCA spectral-library validator
+// (python/vpca_validation.py). Produces one row per sampled pixel with the 7
+// surface-reflectance bands the validator expects, the classifier's land class
+// and water-quality class, and lon/lat - exactly the columns documented in
+// specs/amd-v2/validation-protocol.md.
+function exportForVPCA() {
+  if (!settings.currentComposite) { print('No composite loaded.'); return; }
+
+  // 7 SR bands (validator input), renamed exactly as the CSV expects.
+  var bands = settings.currentComposite.select(
+    ['SR_B1','SR_B2','SR_B3','SR_B4','SR_B5','SR_B6','SR_B7']);
+
+  // Classifier outputs, unmasked to sentinels so every pixel gets a label:
+  //   class      : 0 = not land-AMD, 1..19 = land mineral class
+  //   water_class: -1 = not water, 0 = clean, 1 = moderate, 2 = severe
+  var landClass = createBooleanClassification().unmask(0).rename('class');
+  var wq = createWaterQualityClassification();
+  var waterClass = (wq && wq.classification)
+    ? wq.classification.unmask(-1).rename('water_class')
+    : ee.Image(-1).rename('water_class');
+
+  var stack = bands.addBands(landClass).addBands(waterClass);
+
+  // Native scale per sensor so we sample real (not resampled) pixels.
+  var scale = (settings.currentSensor === 'Sentinel-2') ? 20 : 30;
+
+  // Sample the region. geometries:true keeps coordinates so we can attach
+  // lon/lat. Cap the pixel count so the CSV stays small and VPCA runs fast.
+  var samples = stack.sample({
+    region: settings.currentRegion,
+    scale: scale,
+    numPixels: 20000,
+    seed: 42,
+    geometries: true,
+    dropNulls: true
+  }).map(function(f) {
+    var c = f.geometry().coordinates();
+    return f.set('lon', c.get(0), 'lat', c.get(1));
+  });
+
+  var name = 'VPCA_' + settings.currentSensor.replace(/\s+/g, '') + '_' +
+    settings.currentAreaName.replace(/[^a-zA-Z0-9]/g, '_') + '_' +
+    ee.Date(Date.now()).format('yyyyMMdd').getInfo();
+
+  Export.table.toDrive({
+    collection: samples,
+    description: name,
+    fileFormat: 'CSV',
+    folder: 'GEE_Exports',
+    fileNamePrefix: name,
+    selectors: ['SR_B1','SR_B2','SR_B3','SR_B4','SR_B5','SR_B6','SR_B7',
+                'class','water_class','lon','lat']
+  });
+
+  print('VPCA export queued: ' + name +
+        '  -> run in Tasks tab, then: python vpca_validation.py --scene ' +
+        name + '.csv --sensor ' +
+        (settings.currentSensor === 'Sentinel-2' ? 'S2' : 'L8'));
+}
+
+// Add export buttons to the UI
 var exportPanel = ui.Panel({
   widgets: [
     ui.Button('Export Classification', exportClassification, false, {stretch: 'horizontal'}),
-    ui.Button('Export Indices', exportIndices, false, {stretch: 'horizontal'})
+    ui.Button('Export Indices', exportIndices, false, {stretch: 'horizontal'}),
+    ui.Button('Export VPCA CSV', exportForVPCA, false, {stretch: 'horizontal'})
   ],
   layout: ui.Panel.Layout.Flow('vertical'),
   style: {position: 'top-right', margin: '10px 10px 0 0', width: '200px'}
 });
 
-// Uncomment to enable export buttons
-// Map.add(exportPanel);
+// v2.0.1: export panel enabled so the VPCA CSV can be produced from the UI.
+Map.add(exportPanel);
 
 // =============================================================================
 // END OF SCRIPT

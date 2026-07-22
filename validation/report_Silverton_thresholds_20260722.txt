@@ -1,0 +1,17 @@
+
+Loaded 573 labelled pixels (126 AMD, 447 clean) from Thresh_Landsat8_Silverton__CO_20260722-v2.csv
+
+==============================================================================
+THRESHOLD DERIVATION  (two-population separability, plan section 4)
+==============================================================================
+             index    AUC    thresh   sens   spec      Otsu    quality
+       IronSulfate  0.769    -0.732   1.00   0.71    -1.738       good
+       FerricIron1  0.992     1.983   0.98   0.95     2.577  excellent
+       FerricIron2  0.997     3.758   0.98   0.97     5.397  excellent
+       FerrousIron  0.983     0.959   0.96   0.91     0.949  excellent
+   ClaySulfateMica  0.999     0.021   0.97   1.00    -1.595  excellent
+------------------------------------------------------------------------------
+  Rule: predict AMD if index > threshold. AUC: 0.5=random, 1.0=perfect.
+  Use the Youden threshold as the tool's setting; Otsu is a label-free check.
+==============================================================================
+

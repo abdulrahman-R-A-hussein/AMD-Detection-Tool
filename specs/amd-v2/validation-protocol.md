@@ -42,7 +42,7 @@ crossover at 0.100.
 **Goal:** the corrected index `IronSulfate = (B2/B1) − (B5/B4)` reproduces
 Rockwell's San Juan map more faithfully than the old `(B2+B4)/B1` heuristic.
 
-1. Open `earth-engine/amd_detection_v2.2.0.js` in the GEE Code Editor, Run.
+1. Open `earth-engine/amd_detection_v2.3.0.js` in the GEE Code Editor, Run.
 2. Select **Silverton, CO** (the paper's own area). Sensor **Landsat 8**,
    season **Summer**.
 3. Read the console STATISTICS SUMMARY: note the **iron-sulfate area %** and the
@@ -136,7 +136,7 @@ fraction ≈ 0. A ferric match at a clean control = false-positive signal to fix
   threshold to the Youden value.
 - AUC ~0.5 → the index does not separate AMD from clean here; do not rely on it.
 - Update `IronSulfate` (currently provisional 0.10) and the ferric/clay
-  thresholds in `earth-engine/amd_detection_v2.2.0.js` `settings` to the derived
+  thresholds in `earth-engine/amd_detection_v2.3.0.js` `settings` to the derived
   Youden values, and record AUC + sens/spec in the methodology.
 
 ---
@@ -171,7 +171,7 @@ multi-site (Ganau + Dukan + a clean control) makes it a real regression.
   against ground truth. Not the detector — the check on the detector.
 - **`derive_thresholds.py`** — turns confirmed AMD/clean samples into ROC-AUC
   and Youden thresholds so every threshold in the tool has a provenance.
-- **`amd_detection_v2.2.0.js`** — the detector, with the corrected index,
+- **`amd_detection_v2.3.0.js`** — the detector, with the corrected index,
   first-match-wins classification, and the **Export VPCA CSV** button that feeds
   the two scripts above.
 

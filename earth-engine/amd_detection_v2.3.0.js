@@ -2,7 +2,7 @@
  * Acid Mine Drainage (AMD) and Coal Mine Drainage (CMD) Detection System
  * Advanced Remote Sensing for Environmental Monitoring
  * 
- * Version: 2.2.0
+ * Version: 2.3.0
  * Author: Abdulrahman Hussein
  * Affiliation: Kent State University, Department of Earth Sciences
  * Lab: Environmental Remote Sensing Laboratory
@@ -24,7 +24,7 @@
  * Sensing for Environmental Monitoring. GitHub. https://github.com/coodawy/AMD-Detection-Tool
  */
 
-var TOOL_VERSION = 'v2.2.0';
+var TOOL_VERSION = 'v2.3.0';
 
 // =============================================================================
 // STUDY AREAS
@@ -491,9 +491,13 @@ var settings = {
   seasonFilter: 'Summer (Jul-Sep)',  // Default to summer to avoid snow
   
   // Iron sulfate threshold for the corrected (2/1 - 5/4) index.
-  // PROVISIONAL v2.0 value pending empirical ROC derivation (plan.md section 4)
-  // and the paper's adaptive std-dev thresholding (Tier 2). The old 1.15 was tuned
-  // for the incorrect (B2+B4)/B1 index and is NOT valid for this signed index.
+  // v2.3.0 Test C RESULT (Silverton, 126 AMD / 447 clean px incl. bare-rock
+  // hard negatives): AUC 0.769 — FAILS the protocol's >=0.8 pass criterion.
+  // The index separates AMD from vegetation but NOT from non-AMD bare rock
+  // (spec 0.71); its Youden cut (-0.732) is below scene background (p90 -0.01)
+  // and would flood the scene. Discrimination at Silverton is carried by the
+  // ferric indices. KEPT at the provisional 0.10 — do not treat as derived.
+  // The old 1.15 was tuned for the incorrect (B2+B4)/B1 index and is NOT valid.
   ironSulfateThreshold: 0.10,
   // "Strong iron" cutoff used by the road-bypass override.
   // v2.0.1: lowered 0.35 -> 0.15. Silverton field check (2026-07): known jarosite
@@ -510,14 +514,24 @@ var settings = {
   useRoadMask: false,
   
   // Ferric iron thresholds
-  ferricIron1Threshold: 1.4,
-  ferricIron2Threshold: 2.5,
-  
+  // v2.3.0: ROC-derived Youden values (Test C, Silverton L8, 126 AMD / 447
+  // clean px with bare-rock hard negatives; derive_thresholds.py; see
+  // validation/report_Silverton_thresholds_20260722.txt).
+  // FerricIron1: AUC 0.992, sens 0.98 / spec 0.95 (was hand-set 1.4)
+  // FerricIron2: AUC 0.997, sens 0.98 / spec 0.97 (was hand-set 2.5)
+  ferricIron1Threshold: 1.983,
+  ferricIron2Threshold: 3.758,
+
   // Ferrous iron threshold
-  ferrousIronThreshold: 1.05,
-  
-  // Clay/mica/sulfate threshold (balanced for desert and humid regions)
-  claySulfateMicaThreshold: 0.12,
+  // v2.3.0 Test C: AUC 0.983, sens 0.96 / spec 0.91 (was hand-set 1.05)
+  ferrousIronThreshold: 0.959,
+
+  // Clay/mica/sulfate threshold
+  // v2.3.0 Test C: AUC 0.999, sens 0.97 / spec 1.00 (was hand-set 0.12).
+  // NOTE: label-free Otsu disagrees (-1.595) because the clean population is
+  // bimodal (vegetation + bare rock); the labelled Youden value is the one
+  // with provenance. Derived at Silverton — re-check on desert/humid scenes.
+  claySulfateMicaThreshold: 0.021,
   
   // Vegetation thresholds
   // v2.0.1: greenVegThreshold (B5/B4 > 1.5) marks ANY vegetation (sparse floor);
@@ -2080,9 +2094,10 @@ var ironSlider = ui.Slider({
 });
 
 // Ferric Iron 1 threshold
-var ferric1Label = ui.Label('Ferric 1: 1.40', {margin: '6px 0 2px 0', fontSize: '9px'});
+// v2.3.0: default = ROC-derived Youden value (Test C Silverton, AUC 0.992)
+var ferric1Label = ui.Label('Ferric 1: 1.98', {margin: '6px 0 2px 0', fontSize: '9px'});
 var ferric1Slider = ui.Slider({
-  min: 1.0, max: 2.5, value: 1.4, step: 0.05,
+  min: 1.0, max: 2.5, value: 1.983, step: 0.001,
   style: {stretch: 'horizontal'},
   onChange: function(value) {
     settings.ferricIron1Threshold = value;
@@ -2092,9 +2107,10 @@ var ferric1Slider = ui.Slider({
 });
 
 // Clay-Sulfate-Mica threshold
-var clayLabel = ui.Label('Clay: 0.12', {margin: '6px 0 2px 0', fontSize: '9px'});
+// v2.3.0: default = ROC-derived Youden value (Test C Silverton, AUC 0.999)
+var clayLabel = ui.Label('Clay: 0.02', {margin: '6px 0 2px 0', fontSize: '9px'});
 var claySlider = ui.Slider({
-  min: 0.0, max: 0.5, value: 0.12, step: 0.02,
+  min: 0.0, max: 0.5, value: 0.021, step: 0.001,
   style: {stretch: 'horizontal'},
   onChange: function(value) {
     settings.claySulfateMicaThreshold = value;
@@ -2448,10 +2464,10 @@ var resetButton = ui.Button({
   label: 'Reset Defaults',
   style: {stretch: 'horizontal', margin: '8px 0 6px 0', fontSize: '10px'},
   onClick: function() {
-    // Land AMD defaults
+    // Land AMD defaults (v2.3.0: ferric1/clay = Test C ROC-derived values)
     ironSlider.setValue(0.10);
-    ferric1Slider.setValue(1.4);
-    claySlider.setValue(0.12);
+    ferric1Slider.setValue(1.983);
+    claySlider.setValue(0.021);
     waterCheckbox.setValue(true);
     waterSlider.setValue(0.3);
     

@@ -30,11 +30,41 @@ The pair is the validation figure:
 High agreement where AMD exists, none where it doesn't = sensitivity and
 specificity demonstrated with an independent method.
 
+## Test C — Threshold derivation (2026-07-22, Silverton, Landsat 8)
+
+Labelled pixels: **126 AMD / 447 clean** (`amdPolygons` = Red Mountain gossans;
+`cleanPolygons` redrawn to include bare-rock **hard negatives** after a first
+attempt with vegetation-only negatives gave inflated AUC = 1.0 across the
+board). Data: `Thresh_Landsat8_Silverton__CO_20260722-v2.csv` ·
+Report: [report_Silverton_thresholds_20260722.txt](report_Silverton_thresholds_20260722.txt)
+
+| Index | AUC | Youden thresh | sens | spec | Adopted? |
+|---|---|---|---|---|---|
+| IronSulfate | 0.769 | -0.732 | 1.00 | 0.71 | **NO — fails ≥0.8** (kept provisional 0.10) |
+| FerricIron1 | 0.992 | **1.983** | 0.98 | 0.95 | yes (was 1.4) |
+| FerricIron2 | 0.997 | **3.758** | 0.98 | 0.97 | yes (was 2.5) |
+| FerrousIron | 0.983 | **0.959** | 0.96 | 0.91 | yes (was 1.05) |
+| ClaySulfateMica | 0.999 | **0.021** | 0.97 | 1.00 | yes (was 0.12) |
+
+**Findings:**
+- The corrected IronSulfate (2/1 − 5/4) index separates AMD from vegetation
+  but **not from non-AMD bare rock** (spec 0.71); its Youden cut sits below
+  scene background (p90 ≈ -0.01) and is unusable as a scene-wide threshold.
+  At Silverton the discrimination is carried by the ferric indices. Report
+  this as a finding, not a defect.
+- Methodological note: with vegetation-only clean polygons every index scored
+  AUC ≈ 1.0 and `lon` alone scored 0.974 — a spatial-confounding red flag.
+  Hard negatives are mandatory for honest AUCs; recorded here so the pitfall
+  isn't repeated.
+- Adopted values are Silverton/L8-derived; re-derive before trusting on
+  desert/humid scenes (esp. ClaySulfateMica 0.021, which is site-tight).
+
 ## Still to do
 - H2 note: the four ferric minerals are not separable at 7 bands (they identify
   as one "ferric" group); distinguishing them needs hyperspectral.
-- Threshold derivation (Test C): draw AMD/clean polygons, run
-  `derive_thresholds.py` to finalize the provisional iron threshold (0.10).
+- ~~Threshold derivation (Test C)~~ **done 2026-07-22** (see above). Open
+  follow-up: IronSulfate failed vs bare rock — either accept ferric-led
+  detection or design a better iron-sulfate discriminator.
 - Water Fe³⁺ regression (Test D): Ganau / Dukan vs 675 mg/L ground truth.
 - Swap embedded end-members for the lab's Sentinel spectral library (exact
   spectra) via `convolve_splib07()`.

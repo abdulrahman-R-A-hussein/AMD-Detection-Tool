@@ -16,6 +16,17 @@ AMD and is reference-only.
 |------|------|------|--------|--------|--------------|--------------|-----|---------|--------|
 | 2026-07-22 | Silverton, CO | known AMD | Landsat 8 | 20000 | yes (jarosite, \|r\|=0.96) | 1.12% | **0.961** | sensitivity ✓ | [report](report_Silverton_AMD_20260722.txt) |
 | 2026-07-22 | Atwood Lake, OH | clean control | Landsat 8 | 20000 | **none** | — | n/a | specificity ✓ | [report](report_AtwoodLake_control_20260722.txt) |
+| 2026-07-22 | Silverton, CO **(v2.3.0 re-baseline)** | known AMD | Landsat 8 | 20000 | yes (jarosite, \|r\|=0.96) | 1.12% | **0.961** | sensitivity ✓ | [report](report_Silverton_AMD_v230_20260722.txt) |
+| 2026-07-22 | Atwood Lake, OH **(v2.3.0 re-baseline)** | clean control | Landsat 8 | 20000 | **none** | — | n/a | specificity ✓ | [report](report_AtwoodLake_control_v230_20260722.txt) |
+
+**Re-baseline note (v2.3.0):** after adopting the Test C thresholds the closure
+AUC is *identical* (0.961, same 225 iron-sulfate px) — verified not-stale by
+diffing class distributions: the scene classification changed heavily (Major
+Ferric class 2: 942→79 px; SparseVeg+Ferric class 13: 5118→698; unclassified
+1863→6345), but iron-sulfate **group** membership is gated only by the
+unchanged provisional iron threshold (0.10), so the same pixels redistribute
+among subclasses 9/12/14/18/19. The closure metric is invariant to the four
+adopted thresholds by construction — headline figures are valid for v2.3.0.
 
 ## Interpretation
 

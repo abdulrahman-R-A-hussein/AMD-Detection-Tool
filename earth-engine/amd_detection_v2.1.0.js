@@ -2583,6 +2583,18 @@ scrollPanel.add(scoreSevLabel);
 scrollPanel.add(scoreSevSlider);
 scrollPanel.add(resetButton);
 scrollPanel.add(accuracyButton);
+// v2.1.0: VPCA export controls INSIDE the scrollable settings panel so they are
+// always visible (the separate floating panel was hidden behind this one).
+// Scroll to the bottom of this panel to find them. exportForVPCA/exportIndices/
+// exportClassification are hoisted function declarations defined lower in file.
+scrollPanel.add(ui.Label('VALIDATION EXPORT', {
+  fontWeight: 'bold', fontSize: '13px', margin: '14px 8px 2px 8px'}));
+scrollPanel.add(ui.Label(
+  'Click, then open the Tasks tab (top-right) and press RUN to save a CSV to Google Drive/GEE_Exports.',
+  {fontSize: '11px', color: '666666', margin: '0 8px 4px 8px'}));
+scrollPanel.add(ui.Button('Export VPCA CSV', exportForVPCA, false, {stretch: 'horizontal'}));
+scrollPanel.add(ui.Button('Export Classification (GeoTIFF)', exportClassification, false, {stretch: 'horizontal'}));
+scrollPanel.add(ui.Button('Export Indices (GeoTIFF)', exportIndices, false, {stretch: 'horizontal'}));
 scrollPanel.add(statsPanel);
 scrollPanel.add(instructions);
 

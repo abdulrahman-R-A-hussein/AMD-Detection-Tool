@@ -371,35 +371,52 @@ def _otsu_threshold(x, nbins=256):
     return centers[idx]
 
 
-def closure(scores, comps, classes, amd_classes=range(1, 20)):
-    """Spatial agreement between the AMD-matched VPCA component and the
-    classifier's iron-sulfate classes.
+# The tool's IRON-SULFATE / AMD indicator classes (legend "AMD Indicator
+# Classes"): 9 Argillic, 12 Major Iron Sulfate, 14 Oxidizing Sulfides,
+# 17 Proximal Jarosite, 18 Distal Jarosite, 19 Clay+Ferrous+Iron. These - NOT
+# all classes 1-19 (which include vegetation 11/13 and clay-only) - are what the
+# ferric VPCA component should co-locate with.
+AMD_CLASSES = (9, 12, 14, 17, 18, 19)
 
-    Picks the rotated component whose best match is an AMD mineral, thresholds
-    its per-pixel score (Otsu), and compares the resulting AMD/not-AMD map to
-    the classifier's AMD/not-AMD map.
 
-    Returns dict {component, agreement, kappa, n, vpca_amd_frac, clf_amd_frac}
-    or None if no component matched an AMD mineral.
+def _auc(score, label):
+    """Mann-Whitney ROC-AUC of `score` ranking positive `label` pixels highest.
+    Prevalence- and threshold-free: 0.5 = no relation, 1.0 = perfect."""
+    score = np.asarray(score, float)
+    label = np.asarray(label, int)
+    pos, neg = score[label == 1], score[label == 0]
+    if len(pos) == 0 or len(neg) == 0:
+        return float("nan")
+    order = np.argsort(score, kind="mergesort")
+    ranks = np.empty(len(score), float)
+    ranks[order] = np.arange(1, len(score) + 1)
+    return float((ranks[label == 1].sum() - len(pos) * (len(pos) + 1) / 2)
+                 / (len(pos) * len(neg)))
+
+
+def closure(scores, comps, classes, amd_classes=AMD_CLASSES):
+    """Agreement between the ferric VPCA component and the classifier's
+    IRON-SULFATE classes.
+
+    Primary metric is AUC: does the ferric component score rank the classifier's
+    iron-sulfate pixels above the rest? (threshold-free, robust to the small AMD
+    prevalence). Also reports an Otsu-thresholded binary agreement/kappa for
+    reference. Returns None if no ferric component was found.
     """
     from sklearn.metrics import cohen_kappa_score
 
-    amd_comp = None
-    for m in comps:
-        if m["group"] == "ferric":
-            amd_comp = m
-            break
+    amd_comp = next((m for m in comps if m["group"] == "ferric"), None)
     if amd_comp is None:
         return None
 
     c = amd_comp["comp"]
     score = scores[:, c] * amd_comp["sign"]   # orient so high = ferric-rich
-    thr = _otsu_threshold(score)
-    vpca_amd = (score > thr).astype(int)
-
     classes = np.asarray(classes)
     clf_amd = np.isin(classes, list(amd_classes)).astype(int)
 
+    auc = _auc(score, clf_amd)
+    thr = _otsu_threshold(score)
+    vpca_amd = (score > thr).astype(int)
     agreement = float(np.mean(vpca_amd == clf_amd))
     try:
         kappa = float(cohen_kappa_score(clf_amd, vpca_amd))
@@ -408,9 +425,11 @@ def closure(scores, comps, classes, amd_classes=range(1, 20)):
     return {
         "component": c,
         "matched_mineral": amd_comp["best"],
+        "auc": auc,
         "agreement": agreement,
         "kappa": kappa,
         "n": len(classes),
+        "n_amd": int(clf_amd.sum()),
         "vpca_amd_frac": float(vpca_amd.mean()),
         "clf_amd_frac": float(clf_amd.mean()),
         "threshold": float(thr),
@@ -479,10 +498,13 @@ def print_report(vpca, comps, clo=None, wreg=None):
         print("-" * 66)
         print(f"  Matched mineral       : {clo['matched_mineral']} "
               f"(component {clo['component']})")
-        print(f"  Pixels compared       : {clo['n']}")
-        print(f"  VPCA AMD fraction     : {clo['vpca_amd_frac']*100:.2f}%")
-        print(f"  Classifier AMD frac.  : {clo['clf_amd_frac']*100:.2f}%")
-        print(f"  Pixel agreement       : {clo['agreement']*100:.2f}%")
+        print(f"  Pixels compared       : {clo['n']}  "
+              f"(classifier iron-sulfate: {clo['n_amd']} = "
+              f"{clo['clf_amd_frac']*100:.2f}%)")
+        print(f"  AUC (ferric score vs  : {clo['auc']:.3f}   "
+              f"({_auc_label2(clo['auc'])})")
+        print(f"       iron-sulfate class)  <- primary, threshold-free metric")
+        print(f"  Otsu binary agreement : {clo['agreement']*100:.2f}%")
         print(f"  Cohen's kappa         : {clo['kappa']:.3f}   "
               f"({_kappa_label(clo['kappa'])})")
 
@@ -495,6 +517,16 @@ def print_report(vpca, comps, clo=None, wreg=None):
         print(f"  R^2            : {wreg['r2']:.3f}")
         print(f"  RMSE           : {wreg['rmse']:.2f} mg/L")
     print("=" * 66 + "\n")
+
+
+def _auc_label2(a):
+    if a != a:
+        return "n/a"
+    if a < 0.6: return "no agreement"
+    if a < 0.7: return "weak"
+    if a < 0.8: return "moderate"
+    if a < 0.9: return "strong"
+    return "excellent"
 
 
 def _kappa_label(k):

@@ -2,7 +2,7 @@
  * Acid Mine Drainage (AMD) and Coal Mine Drainage (CMD) Detection System
  * Advanced Remote Sensing for Environmental Monitoring
  * 
- * Version: 1.5.4
+ * Version: 2.2.0
  * Author: Abdulrahman Hussein
  * Affiliation: Kent State University, Department of Earth Sciences
  * Lab: Environmental Remote Sensing Laboratory
@@ -24,7 +24,7 @@
  * Sensing for Environmental Monitoring. GitHub. https://github.com/coodawy/AMD-Detection-Tool
  */
 
-var TOOL_VERSION = 'v2.1.0';
+var TOOL_VERSION = 'v2.2.0';
 
 // =============================================================================
 // STUDY AREAS
@@ -2593,6 +2593,7 @@ scrollPanel.add(ui.Label(
   'Click, then open the Tasks tab (top-right) and press RUN to save a CSV to Google Drive/GEE_Exports.',
   {fontSize: '11px', color: '666666', margin: '0 8px 4px 8px'}));
 scrollPanel.add(ui.Button('Export VPCA CSV', exportForVPCA, false, {stretch: 'horizontal'}));
+scrollPanel.add(ui.Button('Export Threshold CSV', exportForThresholds, false, {stretch: 'horizontal'}));
 scrollPanel.add(ui.Button('Export Classification (GeoTIFF)', exportClassification, false, {stretch: 'horizontal'}));
 scrollPanel.add(ui.Button('Export Indices (GeoTIFF)', exportIndices, false, {stretch: 'horizontal'}));
 scrollPanel.add(statsPanel);
@@ -2941,12 +2942,80 @@ function exportForVPCA() {
         (settings.currentSensor === 'Sentinel-2' ? 'S2' : 'L8'));
 }
 
+// v2.2.0: Export labelled index samples for honest threshold derivation
+// (python/derive_thresholds.py — Test C in specs/amd-v2/validation-protocol.md).
+// Needs two geometry-import layers drawn in the Code Editor, named exactly
+// amdPolygons (confirmed-AMD ground) and cleanPolygons (confirmed-clean
+// ground). Samples the 5 mineral-index bands inside each, tags label 1/0,
+// exports one CSV that derive_thresholds.py reads directly.
+function exportForThresholds() {
+  if (!settings.currentComposite) { print('No composite loaded.'); return; }
+
+  // Geometry imports are plain globals injected by the Code Editor; typeof is
+  // the only safe existence test. Print instructions instead of erroring.
+  var haveAmd = (typeof amdPolygons !== 'undefined');
+  var haveClean = (typeof cleanPolygons !== 'undefined');
+  if (!haveAmd || !haveClean) {
+    print('THRESHOLD EXPORT - polygon layer(s) missing:' +
+          (haveAmd ? '' : ' amdPolygons') + (haveClean ? '' : ' cleanPolygons'));
+    print('Using the geometry tools (top-left of the map): hover "Geometry ' +
+          'Imports" -> "+ new layer", click the gear icon to rename it, then ' +
+          'draw polygons.');
+    print('  amdPolygons   = CONFIRMED AMD ground (e.g. Red Mountain gossans)');
+    print('  cleanPolygons = CONFIRMED clean ground (vegetated valley, clean lake)');
+    print('Then click this button again.');
+    return;
+  }
+
+  var indices = settings.currentComposite.select(
+    ['IronSulfate', 'FerricIron1', 'FerricIron2', 'FerrousIron',
+     'ClaySulfateMica']);
+  var scale = (settings.currentSensor === 'Sentinel-2') ? 20 : 30;
+
+  // Same sampling recipe as exportForVPCA; label tags which polygon set the
+  // pixel fell in (1 = AMD, 0 = clean), the two-population input Test C needs.
+  function sampleWith(label, geom) {
+    return indices.sample({
+      region: geom,
+      scale: scale,
+      numPixels: 5000,
+      seed: 42,
+      geometries: true,
+      dropNulls: true
+    }).map(function(f) {
+      var c = f.geometry().coordinates();
+      return f.set('label', label, 'lon', c.get(0), 'lat', c.get(1));
+    });
+  }
+
+  var samples = sampleWith(1, amdPolygons).merge(sampleWith(0, cleanPolygons));
+
+  var name = 'Thresh_' + settings.currentSensor.replace(/\s+/g, '') + '_' +
+    settings.currentAreaName.replace(/[^a-zA-Z0-9]/g, '_') + '_' +
+    ee.Date(Date.now()).format('yyyyMMdd').getInfo();
+
+  Export.table.toDrive({
+    collection: samples,
+    description: name,
+    fileFormat: 'CSV',
+    folder: 'GEE_Exports',
+    fileNamePrefix: name,
+    selectors: ['label', 'IronSulfate', 'FerricIron1', 'FerricIron2',
+                'FerrousIron', 'ClaySulfateMica', 'lon', 'lat']
+  });
+
+  print('Threshold export queued: ' + name +
+        '  -> run in Tasks tab, then: python derive_thresholds.py --csv ' +
+        name + '.csv');
+}
+
 // Add export buttons to the UI
 var exportPanel = ui.Panel({
   widgets: [
     ui.Button('Export Classification', exportClassification, false, {stretch: 'horizontal'}),
     ui.Button('Export Indices', exportIndices, false, {stretch: 'horizontal'}),
-    ui.Button('Export VPCA CSV', exportForVPCA, false, {stretch: 'horizontal'})
+    ui.Button('Export VPCA CSV', exportForVPCA, false, {stretch: 'horizontal'}),
+    ui.Button('Export Threshold CSV', exportForThresholds, false, {stretch: 'horizontal'})
   ],
   layout: ui.Panel.Layout.Flow('vertical'),
   style: {position: 'top-right', margin: '10px 10px 0 0', width: '200px'}

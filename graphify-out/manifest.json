@@ -4,11 +4,6 @@
     "ast_hash": "8b84fe8c85f48df04e8b13c5b5fa1cda",
     "semantic_hash": "8b84fe8c85f48df04e8b13c5b5fa1cda"
   },
-  "earth-engine/amd_detection_v2.1.0.js": {
-    "mtime": 1784653142.455209,
-    "ast_hash": "d9acd12f5127e598c345cac19726b19a",
-    "semantic_hash": "d9acd12f5127e598c345cac19726b19a"
-  },
   "python/amd_detection.py": {
     "mtime": 1767578360.0,
     "ast_hash": "cfb27a03b56b8333cba0bd464f6661c1",
@@ -20,8 +15,168 @@
     "semantic_hash": "66d98ee6d8090241e4d3ec22aaa8b59b"
   },
   "python/vpca_validation.py": {
-    "mtime": 1784652735.67318,
-    "ast_hash": "f333dc71fe06dad4448b1ae8c9292a1d",
-    "semantic_hash": "f333dc71fe06dad4448b1ae8c9292a1d"
+    "mtime": 1784744786.7895772,
+    "ast_hash": "c25153379b8e213878fe6204533b9279",
+    "semantic_hash": ""
+  },
+  "earth-engine/amd_detection_v2.2.0.js": {
+    "mtime": 1784746278.7085617,
+    "ast_hash": "55919aaf713c4ea8521e8d14c6e12b07",
+    "semantic_hash": ""
+  },
+  "CHANGELOG.md": {
+    "mtime": 1775349415.0,
+    "ast_hash": "8286b570b4ef8650169f02769bc874f0",
+    "semantic_hash": ""
+  },
+  "CONTRIBUTING.md": {
+    "mtime": 1775323675.0,
+    "ast_hash": "cb83269093019e6ee75b5a0716ffef47",
+    "semantic_hash": ""
+  },
+  "DOI_UPDATE_SUMMARY.md": {
+    "mtime": 1775484309.0,
+    "ast_hash": "e7fd9136c43c91b59793dec9cb3ed03e",
+    "semantic_hash": ""
+  },
+  "FINAL_UPDATE_SUMMARY.md": {
+    "mtime": 1775356459.0,
+    "ast_hash": "8e47d1e4899c38f0f9def4b3130497bf",
+    "semantic_hash": ""
+  },
+  "PROJECT_OVERVIEW.md": {
+    "mtime": 1775484258.0,
+    "ast_hash": "ad7c155c1e54f26f9274f267c016e812",
+    "semantic_hash": ""
+  },
+  "PUBLIC_RELEASE_SUMMARY.md": {
+    "mtime": 1775349419.0,
+    "ast_hash": "db1de1525102b1161b08aef78a3e8f57",
+    "semantic_hash": ""
+  },
+  "PUBLISHING_CHECKLIST.md": {
+    "mtime": 1775356395.0,
+    "ast_hash": "fdfdd1401e1dd1175d526adbab90affb",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1775484241.0,
+    "ast_hash": "bc42e033879ef2317c5f6ae96485c437",
+    "semantic_hash": ""
+  },
+  "TEST_SOCIAL_PREVIEW.md": {
+    "mtime": 1775345535.0,
+    "ast_hash": "ec7ab85374fff32e791c267f51af0963",
+    "semantic_hash": ""
+  },
+  "docs/ACADEMIC_IDENTITY_GUIDE.md": {
+    "mtime": 1775354204.0,
+    "ast_hash": "16bc08f9026a9125c04f72c934803936",
+    "semantic_hash": ""
+  },
+  "docs/AUTHORSHIP_STRATEGY.md": {
+    "mtime": 1775347391.0,
+    "ast_hash": "1f0245626a3c328538d2fc14e54e41b8",
+    "semantic_hash": ""
+  },
+  "docs/AUTHOR_UPDATE_SUMMARY.md": {
+    "mtime": 1775323737.0,
+    "ast_hash": "d2f8d7e2b5cda2ec7cd93c025f69e7dc",
+    "semantic_hash": ""
+  },
+  "docs/METHODOLOGY.md": {
+    "mtime": 1775321989.0,
+    "ast_hash": "cc708f11eab4754d2116667b77c5a0ec",
+    "semantic_hash": ""
+  },
+  "docs/SOCIAL_MEDIA_GUIDE.md": {
+    "mtime": 1775343409.0,
+    "ast_hash": "fea9af34b5a1b641b4d33b7fe21eeb80",
+    "semantic_hash": ""
+  },
+  "earth-engine/FINAL_LOGIC_VERIFICATION.md": {
+    "mtime": 1764285729.0,
+    "ast_hash": "8a0b5f5505685bb19c3e076784da5e45",
+    "semantic_hash": ""
+  },
+  "earth-engine/LAYER_STRUCTURE.md": {
+    "mtime": 1764272199.0,
+    "ast_hash": "80a819554c8c7def64240137eb8e02fe",
+    "semantic_hash": ""
+  },
+  "earth-engine/MASKING_LOGIC_FIX.md": {
+    "mtime": 1764274761.0,
+    "ast_hash": "faf9d605af54a616be9c8a6e06c6b295",
+    "semantic_hash": ""
+  },
+  "earth-engine/USAGE_GUIDE.md": {
+    "mtime": 1764272143.0,
+    "ast_hash": "53d997da3fe925c0078822c7bc0ddcc5",
+    "semantic_hash": ""
+  },
+  "earth-engine/validation_results.md": {
+    "mtime": 1764266390.0,
+    "ast_hash": "16ce7b8ac7803b452b3d20a3b1d11516",
+    "semantic_hash": ""
+  },
+  "earth-engine/water_quality_module_guide.md": {
+    "mtime": 1764271031.0,
+    "ast_hash": "c2e4d35e98291970fccff1a5c029cc65",
+    "semantic_hash": ""
+  },
+  "python/README.md": {
+    "mtime": 1767555424.0,
+    "ast_hash": "909fa90055783e597fc2cccaa675905f",
+    "semantic_hash": ""
+  },
+  "python/requirements.txt": {
+    "mtime": 1784653098.1592567,
+    "ast_hash": "690bfeecbd5b82fa9f9c26d8bc3179fd",
+    "semantic_hash": ""
+  },
+  "social-preview.txt": {
+    "mtime": 1775344542.0,
+    "ast_hash": "3680342edd59f58baa97cede337a4ab0",
+    "semantic_hash": ""
+  },
+  "specs/amd-v2/audit.md": {
+    "mtime": 1784420267.5329976,
+    "ast_hash": "748bad3b29e68132ced424565586c7d9",
+    "semantic_hash": ""
+  },
+  "specs/amd-v2/plan.md": {
+    "mtime": 1784419472.611714,
+    "ast_hash": "ee02f684aabd93c01e6ff84b589c2c0b",
+    "semantic_hash": ""
+  },
+  "specs/amd-v2/validation-protocol.md": {
+    "mtime": 1784746338.5014017,
+    "ast_hash": "092b278349881c067d8a20a202fea5a0",
+    "semantic_hash": ""
+  },
+  "validation/README.md": {
+    "mtime": 1784744830.0630162,
+    "ast_hash": "d2ea4f88e9b247417cf7dcef16e29774",
+    "semantic_hash": ""
+  },
+  "validation/report_AtwoodLake_control_20260722.txt": {
+    "mtime": 1784744794.5536985,
+    "ast_hash": "e4c6f3358e9b5d9aff1d921e182ee2a9",
+    "semantic_hash": ""
+  },
+  "validation/report_Silverton_AMD_20260722.txt": {
+    "mtime": 1784744795.8852057,
+    "ast_hash": "b6c8bc7d0c18f79cd237ec01c25392fe",
+    "semantic_hash": ""
+  },
+  "paper.pdf": {
+    "mtime": 1763066388.0,
+    "ast_hash": "cd6a5bb22f45f7f50fba4c5b9de515a7",
+    "semantic_hash": ""
+  },
+  "social-preview.png": {
+    "mtime": 1773083391.0,
+    "ast_hash": "bd82cff7f80f35694d6d0d9bf23b2428",
+    "semantic_hash": ""
   }
 }

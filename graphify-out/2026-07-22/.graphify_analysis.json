@@ -1,0 +1,335 @@
+{
+  "communities": {
+    "0": [
+      "amd_detection_v1_0_0_js",
+      "audit_md",
+      "derive_thresholds_py",
+      "earth_engine_amd_detection_v1_0_0_addaccuracylayers",
+      "earth_engine_amd_detection_v1_0_0_calculateallindices",
+      "earth_engine_amd_detection_v1_0_0_calculatestats",
+      "earth_engine_amd_detection_v1_0_0_createbooleanclassification",
+      "earth_engine_amd_detection_v1_0_0_createbuiltupmask",
+      "earth_engine_amd_detection_v1_0_0_createcontaminatedwatermask",
+      "earth_engine_amd_detection_v1_0_0_createlegenditem",
+      "earth_engine_amd_detection_v1_0_0_createunifiedwatermask",
+      "earth_engine_amd_detection_v1_0_0_exportclassification",
+      "earth_engine_amd_detection_v1_0_0_exportindices",
+      "earth_engine_amd_detection_v1_0_0_loadimagecollection",
+      "earth_engine_amd_detection_v1_0_0_maskcs",
+      "earth_engine_amd_detection_v1_0_0_maskcscdf",
+      "earth_engine_amd_detection_v1_0_0_maskhybrid",
+      "earth_engine_amd_detection_v1_0_0_maskhybridstrict",
+      "earth_engine_amd_detection_v1_0_0_maskscl_prob",
+      "earth_engine_amd_detection_v1_0_0_performinternalvalidation",
+      "earth_engine_amd_detection_v1_0_0_processlandsat",
+      "earth_engine_amd_detection_v1_0_0_processsentinel2",
+      "earth_engine_amd_detection_v1_0_0_setcloudpreset",
+      "earth_engine_amd_detection_v1_0_0_updatecomposite",
+      "earth_engine_amd_detection_v1_0_0_updatedetection",
+      "earth_engine_amd_detection_v1_0_0_updateeverything",
+      "methodology_md",
+      "plan_md",
+      "python_amd_detection_create_water_quality_classification",
+      "python_amd_detection_rationale_1152",
+      "rockwell_2021",
+      "usgs_splib07",
+      "validation_protocol_md",
+      "vpca_validation_py"
+    ],
+    "1": [
+      "python_vpca_validation",
+      "python_vpca_validation_closure",
+      "python_vpca_validation_component_spectrum",
+      "python_vpca_validation_convolve_splib07",
+      "python_vpca_validation_endmember_matrix",
+      "python_vpca_validation_group_of",
+      "python_vpca_validation_kappa_label",
+      "python_vpca_validation_l2norm_rows",
+      "python_vpca_validation_load_scene",
+      "python_vpca_validation_main",
+      "python_vpca_validation_match_components",
+      "python_vpca_validation_otsu_threshold",
+      "python_vpca_validation_print_report",
+      "python_vpca_validation_rationale_1",
+      "python_vpca_validation_rationale_114",
+      "python_vpca_validation_rationale_119",
+      "python_vpca_validation_rationale_126",
+      "python_vpca_validation_rationale_160",
+      "python_vpca_validation_rationale_189",
+      "python_vpca_validation_rationale_200",
+      "python_vpca_validation_rationale_265",
+      "python_vpca_validation_rationale_280",
+      "python_vpca_validation_rationale_291",
+      "python_vpca_validation_rationale_306",
+      "python_vpca_validation_rationale_359",
+      "python_vpca_validation_rationale_375",
+      "python_vpca_validation_rationale_424",
+      "python_vpca_validation_rationale_514",
+      "python_vpca_validation_run_vpca",
+      "python_vpca_validation_self_test",
+      "python_vpca_validation_shape_similarity",
+      "python_vpca_validation_spectral_angle_deg",
+      "python_vpca_validation_varimax",
+      "python_vpca_validation_water_regression"
+    ],
+    "2": [
+      "earth_engine_amd_detection_v2_1_0",
+      "earth_engine_amd_detection_v2_1_0_addaccuracylayers",
+      "earth_engine_amd_detection_v2_1_0_applyindexclipping",
+      "earth_engine_amd_detection_v2_1_0_applystddevthresholding",
+      "earth_engine_amd_detection_v2_1_0_calculateallindices",
+      "earth_engine_amd_detection_v2_1_0_calculatestats",
+      "earth_engine_amd_detection_v2_1_0_createbooleanclassification",
+      "earth_engine_amd_detection_v2_1_0_createbuiltupmask",
+      "earth_engine_amd_detection_v2_1_0_createcomposite",
+      "earth_engine_amd_detection_v2_1_0_createcontaminatedwatermask",
+      "earth_engine_amd_detection_v2_1_0_createlegenditem",
+      "earth_engine_amd_detection_v2_1_0_createunifiedwatermask",
+      "earth_engine_amd_detection_v2_1_0_createwaterqualityclassification",
+      "earth_engine_amd_detection_v2_1_0_exportclassification",
+      "earth_engine_amd_detection_v2_1_0_exportforvpca",
+      "earth_engine_amd_detection_v2_1_0_exportindices",
+      "earth_engine_amd_detection_v2_1_0_loadimagecollection",
+      "earth_engine_amd_detection_v2_1_0_maskcs",
+      "earth_engine_amd_detection_v2_1_0_maskcscdf",
+      "earth_engine_amd_detection_v2_1_0_maskhybrid",
+      "earth_engine_amd_detection_v2_1_0_maskhybridstrict",
+      "earth_engine_amd_detection_v2_1_0_maskscl_prob",
+      "earth_engine_amd_detection_v2_1_0_performinternalvalidation",
+      "earth_engine_amd_detection_v2_1_0_processlandsat",
+      "earth_engine_amd_detection_v2_1_0_processsentinel2",
+      "earth_engine_amd_detection_v2_1_0_setcloudpreset",
+      "earth_engine_amd_detection_v2_1_0_updatecomposite",
+      "earth_engine_amd_detection_v2_1_0_updatedetection",
+      "earth_engine_amd_detection_v2_1_0_updateeverything"
+    ],
+    "3": [
+      "python_derive_thresholds",
+      "python_derive_thresholds_analyze_index",
+      "python_derive_thresholds_auc_label",
+      "python_derive_thresholds_main",
+      "python_derive_thresholds_otsu_threshold",
+      "python_derive_thresholds_print_results",
+      "python_derive_thresholds_rationale_1",
+      "python_derive_thresholds_rationale_152",
+      "python_derive_thresholds_rationale_43",
+      "python_derive_thresholds_rationale_65",
+      "python_derive_thresholds_rationale_93",
+      "python_derive_thresholds_roc_auc",
+      "python_derive_thresholds_self_test",
+      "python_derive_thresholds_youden_threshold"
+    ],
+    "4": [
+      "python_amd_detection",
+      "python_amd_detection_create_road_mask",
+      "python_amd_detection_initialize_gee",
+      "python_amd_detection_mask_sentinel2_clouds",
+      "python_amd_detection_print_class_legend",
+      "python_amd_detection_print_version",
+      "python_amd_detection_rationale_1",
+      "python_amd_detection_rationale_1792",
+      "python_amd_detection_rationale_1840",
+      "python_amd_detection_rationale_43",
+      "python_amd_detection_rationale_449",
+      "python_amd_detection_rationale_470",
+      "python_amd_detection_rationale_876"
+    ],
+    "5": [
+      "image",
+      "python_amd_detection_create_buildup_mask",
+      "python_amd_detection_create_land_classification",
+      "python_amd_detection_create_vegetation_mask",
+      "python_amd_detection_create_water_mask",
+      "python_amd_detection_mask_landsat8_clouds",
+      "python_amd_detection_rationale_1001",
+      "python_amd_detection_rationale_409",
+      "python_amd_detection_rationale_689",
+      "python_amd_detection_rationale_727",
+      "python_amd_detection_rationale_791",
+      "python_amd_detection_rationale_831"
+    ],
+    "6": [
+      "geometry",
+      "python_amd_detection_apply_index_clipping",
+      "python_amd_detection_apply_std_dev_thresholding",
+      "python_amd_detection_export_to_drive",
+      "python_amd_detection_get_study_area",
+      "python_amd_detection_rationale_1713",
+      "python_amd_detection_rationale_1766",
+      "python_amd_detection_rationale_918",
+      "python_amd_detection_rationale_959",
+      "task"
+    ],
+    "7": [
+      "imagecollection",
+      "python_amd_detection_analyze_region",
+      "python_amd_detection_create_composite",
+      "python_amd_detection_get_landsat8_collection",
+      "python_amd_detection_get_sentinel2_collection",
+      "python_amd_detection_rationale_1321",
+      "python_amd_detection_rationale_517",
+      "python_amd_detection_rationale_557",
+      "python_amd_detection_rationale_600",
+      "python_amd_detection_rationale_638"
+    ],
+    "8": [
+      "map",
+      "python_amd_detection_add_legend_to_map",
+      "python_amd_detection_add_results_to_map",
+      "python_amd_detection_add_water_legend_to_map",
+      "python_amd_detection_create_map",
+      "python_amd_detection_rationale_1410",
+      "python_amd_detection_rationale_1440",
+      "python_amd_detection_rationale_1629",
+      "python_amd_detection_rationale_1673"
+    ],
+    "9": [
+      "amd_detection_js",
+      "amd_detection_py",
+      "changelog_v1_5_0",
+      "changelog_v1_5_4",
+      "methodology_rockwell_2021",
+      "methodology_water_quality",
+      "social_preview_png"
+    ],
+    "10": [
+      "project_overview_doc",
+      "zenodo_doi"
+    ],
+    "11": [
+      "python_amd_detection_calculate_spectral_indices",
+      "python_amd_detection_rationale_237"
+    ],
+    "12": [
+      "changelog_v1_0_0"
+    ]
+  },
+  "cohesion": {
+    "0": 0.10160427807486631,
+    "1": 0.09982174688057041,
+    "2": 0.14039408866995073,
+    "3": 0.24175824175824176,
+    "4": 0.15384615384615385,
+    "5": 0.21212121212121213,
+    "6": 0.2,
+    "7": 0.24444444444444444,
+    "8": 0.2222222222222222,
+    "9": 0.2857142857142857,
+    "10": 1.0,
+    "11": 1.0,
+    "12": 1.0
+  },
+  "gods": [
+    {
+      "id": "amd_detection_v1_0_0_js",
+      "label": "AMD Detection v1.0.0 Script",
+      "degree": 31
+    },
+    {
+      "id": "image",
+      "label": "Image",
+      "degree": 13
+    },
+    {
+      "id": "earth_engine_amd_detection_v2_1_0_createbooleanclassification",
+      "label": "createBooleanClassification()",
+      "degree": 12
+    },
+    {
+      "id": "earth_engine_amd_detection_v1_0_0_createbooleanclassification",
+      "label": "createBooleanClassification()",
+      "degree": 11
+    },
+    {
+      "id": "python_amd_detection_create_water_quality_classification",
+      "label": "create_water_quality_classification()",
+      "degree": 10
+    },
+    {
+      "id": "python_vpca_validation_match_components",
+      "label": "match_components()",
+      "degree": 9
+    },
+    {
+      "id": "python_vpca_validation_self_test",
+      "label": "self_test()",
+      "degree": 9
+    },
+    {
+      "id": "python_vpca_validation_main",
+      "label": "main()",
+      "degree": 9
+    },
+    {
+      "id": "geometry",
+      "label": "Geometry",
+      "degree": 8
+    },
+    {
+      "id": "python_amd_detection_create_composite",
+      "label": "create_composite()",
+      "degree": 8
+    }
+  ],
+  "surprises": [
+    {
+      "source": "AMD Detection Python Module",
+      "target": "AMD Detection GEE Script",
+      "source_files": [
+        "python/amd_detection.py",
+        "earth-engine/amd_detection_v1.0.0.js"
+      ],
+      "confidence": "INFERRED",
+      "relation": "semantically_similar_to",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories; semantically similar concepts with no structural link; peripheral node `AMD Detection Python Module` unexpectedly reaches hub `AMD Detection GEE Script`"
+    },
+    {
+      "source": "AMD Detection v1.0.0 Script",
+      "target": "Rockwell, McDougal & Gent 2021 (USGS SIM 3466)",
+      "source_files": [
+        "earth-engine/amd_detection_v1.0.0.js",
+        "paper.pdf"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "crosses file types (code \u2194 paper); connects across different repos/directories; peripheral node `Rockwell, McDougal & Gent 2021 (USGS SIM 3466)` unexpectedly reaches hub `AMD Detection v1.0.0 Script`"
+    },
+    {
+      "source": "v1.5.4 Audit Rationale",
+      "target": "AMD Detection v1.0.0 Script",
+      "source_files": [
+        "specs/amd-v2/audit.md",
+        "earth-engine/amd_detection_v1.0.0.js"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "crosses file types (code \u2194 doc); connects across different repos/directories; peripheral node `v1.5.4 Audit Rationale` unexpectedly reaches hub `AMD Detection v1.0.0 Script`"
+    },
+    {
+      "source": "AMD Detection GEE Script",
+      "target": "Version 1.5.4",
+      "source_files": [
+        "earth-engine/amd_detection_v1.0.0.js",
+        "CHANGELOG.md"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "crosses file types (doc \u2194 code); connects across different repos/directories; peripheral node `Version 1.5.4` unexpectedly reaches hub `AMD Detection GEE Script`"
+    },
+    {
+      "source": "AMD Detection GEE Script",
+      "target": "Rockwell et al. (2021) USGS SIM 3466",
+      "source_files": [
+        "earth-engine/amd_detection_v1.0.0.js",
+        "docs/METHODOLOGY.md"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "implements",
+      "why": "crosses file types (doc \u2194 code); connects across different repos/directories; peripheral node `Rockwell et al. (2021) USGS SIM 3466` unexpectedly reaches hub `AMD Detection GEE Script`"
+    }
+  ],
+  "tokens": {
+    "input": 51454,
+    "output": 3326
+  }
+}

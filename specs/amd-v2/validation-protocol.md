@@ -42,7 +42,7 @@ crossover at 0.100.
 **Goal:** the corrected index `IronSulfate = (B2/B1) − (B5/B4)` reproduces
 Rockwell's San Juan map more faithfully than the old `(B2+B4)/B1` heuristic.
 
-1. Open `earth-engine/amd_detection_v2.1.0.js` in the GEE Code Editor, Run.
+1. Open `earth-engine/amd_detection_v2.2.0.js` in the GEE Code Editor, Run.
 2. Select **Silverton, CO** (the paper's own area). Sensor **Landsat 8**,
    season **Summer**.
 3. Read the console STATISTICS SUMMARY: note the **iron-sulfate area %** and the
@@ -108,18 +108,26 @@ fraction ≈ 0. A ferric match at a clean control = false-positive signal to fix
 
 **Goal:** replace guessed thresholds with ROC-derived ones that carry an AUC.
 
-1. In GEE, draw polygons over **confirmed-AMD** ground (e.g., Red Mountain
-   gossans) and **confirmed-clean** ground (vegetated valley, clean lake).
-2. Sample the index bands inside them and export a CSV with an added `label`
-   column (1 = AMD polygon, 0 = clean polygon) and the index columns
-   (`IronSulfate, FerricIron1, FerricIron2, ClaySulfateMica`). (A small helper
-   for this labelled export can be added on request; for now, tag the exported
-   pixels by which polygon they fell in.)
-3. Run:
+1. Load the tool over the study area and let the composite build (the
+   threshold export needs `settings.currentComposite`).
+2. In the Code Editor, hover **Geometry Imports** (top-left of the map) →
+   **+ new layer**; click the layer's **gear icon** and rename it exactly
+   `amdPolygons`; draw polygons over **confirmed-AMD** ground (e.g., Red
+   Mountain gossans). Repeat for a second layer named exactly `cleanPolygons`
+   over **confirmed-clean** ground (vegetated valley, clean lake). Avoid
+   shadows, roads, snow, and anything ambiguous — polygon purity is the
+   experiment.
+3. Click **Export Threshold CSV** (settings panel, VALIDATION EXPORT section).
+   It samples the 5 index bands (`IronSulfate, FerricIron1, FerricIron2,
+   FerrousIron, ClaySulfateMica`) inside each polygon set, tags `label`
+   (1 = AMD, 0 = clean), and queues `Thresh_<sensor>_<area>_<date>.csv`. If a
+   layer is missing/misnamed, the Console prints instructions instead.
+4. **Tasks** tab (top-right) → **RUN** → CSV lands in Drive `GEE_Exports`.
+5. Run:
    ```bash
-   .venv/Scripts/python python/derive_thresholds.py --csv labelled_pixels.csv
+   .venv/Scripts/python python/derive_thresholds.py --csv Thresh_<...>.csv
    ```
-4. Read the table: per index, **AUC** (separability), the **Youden threshold**
+6. Read the table: per index, **AUC** (separability), the **Youden threshold**
    (use this as the tool's setting), sensitivity/specificity, and the label-free
    **Otsu** cross-check.
 
@@ -128,7 +136,7 @@ fraction ≈ 0. A ferric match at a clean control = false-positive signal to fix
   threshold to the Youden value.
 - AUC ~0.5 → the index does not separate AMD from clean here; do not rely on it.
 - Update `IronSulfate` (currently provisional 0.10) and the ferric/clay
-  thresholds in `earth-engine/amd_detection_v2.1.0.js` `settings` to the derived
+  thresholds in `earth-engine/amd_detection_v2.2.0.js` `settings` to the derived
   Youden values, and record AUC + sens/spec in the methodology.
 
 ---
@@ -163,7 +171,7 @@ multi-site (Ganau + Dukan + a clean control) makes it a real regression.
   against ground truth. Not the detector — the check on the detector.
 - **`derive_thresholds.py`** — turns confirmed AMD/clean samples into ROC-AUC
   and Youden thresholds so every threshold in the tool has a provenance.
-- **`amd_detection_v2.1.0.js`** — the detector, with the corrected index,
+- **`amd_detection_v2.2.0.js`** — the detector, with the corrected index,
   first-match-wins classification, and the **Export VPCA CSV** button that feeds
   the two scripts above.
 

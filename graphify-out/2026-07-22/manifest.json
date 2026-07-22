@@ -1,0 +1,27 @@
+{
+  "earth-engine/amd_detection_v1.0.0.js": {
+    "mtime": 1775356272.0,
+    "ast_hash": "8b84fe8c85f48df04e8b13c5b5fa1cda",
+    "semantic_hash": "8b84fe8c85f48df04e8b13c5b5fa1cda"
+  },
+  "earth-engine/amd_detection_v2.1.0.js": {
+    "mtime": 1784653142.455209,
+    "ast_hash": "d9acd12f5127e598c345cac19726b19a",
+    "semantic_hash": "d9acd12f5127e598c345cac19726b19a"
+  },
+  "python/amd_detection.py": {
+    "mtime": 1767578360.0,
+    "ast_hash": "cfb27a03b56b8333cba0bd464f6661c1",
+    "semantic_hash": "cfb27a03b56b8333cba0bd464f6661c1"
+  },
+  "python/derive_thresholds.py": {
+    "mtime": 1784652961.7184339,
+    "ast_hash": "66d98ee6d8090241e4d3ec22aaa8b59b",
+    "semantic_hash": "66d98ee6d8090241e4d3ec22aaa8b59b"
+  },
+  "python/vpca_validation.py": {
+    "mtime": 1784652735.67318,
+    "ast_hash": "f333dc71fe06dad4448b1ae8c9292a1d",
+    "semantic_hash": "f333dc71fe06dad4448b1ae8c9292a1d"
+  }
+}

@@ -507,6 +507,14 @@ def print_report(vpca, comps, clo=None, wreg=None):
         print(f"  Otsu binary agreement : {clo['agreement']*100:.2f}%")
         print(f"  Cohen's kappa         : {clo['kappa']:.3f}   "
               f"({_kappa_label(clo['kappa'])})")
+    elif not any(m["group"] == "ferric" for m in comps):
+        print("\n" + "-" * 66)
+        print("SPATIAL CLOSURE  (VPCA AMD component vs classifier AMD classes)")
+        print("-" * 66)
+        print("  NO ferric / iron-sulfate component recovered by VPCA.")
+        print("  The scene contains no independent iron-sulfate spectral")
+        print("  signal. For a clean control site this is the EXPECTED, correct")
+        print("  result (specificity): the tool is not inventing AMD here.")
 
     if wreg is not None:
         print("\n" + "-" * 66)

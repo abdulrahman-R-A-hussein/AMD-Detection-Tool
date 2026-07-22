@@ -1,0 +1,23 @@
+Loaded 20000 pixels from VPCA_Landsat8_Atwood_Lake__OH_20260722.csv (sensor L8)
+
+==================================================================
+VPCA SPECTRAL-LIBRARY VALIDATION REPORT
+==================================================================
+Retained components: 3
+Variance explained (rotated): 54.7%, 28.0%, 16.0%  (cumulative 98.6%)
+
+Component -> best-matching library end-member (group):
+  comp  variance       end-member         group    |r|  SAM(deg)
+     0     54.7%        clay_mont  clay_alunite  0.952     16.45
+     1     28.0%        green_veg    vegetation  0.741     41.95
+     2     16.0%        clay_mont  clay_alunite  0.963     14.23
+
+------------------------------------------------------------------
+SPATIAL CLOSURE  (VPCA AMD component vs classifier AMD classes)
+------------------------------------------------------------------
+  NO ferric / iron-sulfate component recovered by VPCA.
+  The scene contains no independent iron-sulfate spectral
+  signal. For a clean control site this is the EXPECTED, correct
+  result (specificity): the tool is not inventing AMD here.
+==================================================================
+

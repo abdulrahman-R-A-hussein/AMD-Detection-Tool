@@ -1,0 +1,25 @@
+Loaded 20000 pixels from VPCA_Landsat8_Silverton__CO_20260722.csv (sensor L8)
+
+==================================================================
+VPCA SPECTRAL-LIBRARY VALIDATION REPORT
+==================================================================
+Retained components: 3
+Variance explained (rotated): 57.3%, 32.7%, 7.0%  (cumulative 97.1%)
+
+Component -> best-matching library end-member (group):
+  comp  variance       end-member         group    |r|  SAM(deg)
+     0     57.3%        green_veg    vegetation  0.951     16.47
+     1     32.7%        green_veg    vegetation  0.976     13.34
+     2      7.0%         jarosite        ferric  0.962     18.22  <-- AMD
+
+------------------------------------------------------------------
+SPATIAL CLOSURE  (VPCA AMD component vs classifier AMD classes)
+------------------------------------------------------------------
+  Matched mineral       : jarosite (component 2)
+  Pixels compared       : 20000  (classifier iron-sulfate: 225 = 1.12%)
+  AUC (ferric score vs  : 0.961   (excellent)
+       iron-sulfate class)  <- primary, threshold-free metric
+  Otsu binary agreement : 73.78%
+  Cohen's kappa         : 0.059   (poor)
+==================================================================
+

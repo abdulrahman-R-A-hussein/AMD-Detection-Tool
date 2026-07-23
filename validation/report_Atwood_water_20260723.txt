@@ -1,0 +1,25 @@
+Loaded 20000 pixels from VPCA_Landsat8_Atwood_Lake__OH_20260723.csv (sensor L8)
+
+==================================================================
+VPCA SPECTRAL-LIBRARY VALIDATION REPORT
+==================================================================
+Retained components: 3
+Variance explained (rotated): 66.4%, 27.8%, 3.9%  (cumulative 98.1%)
+
+Component -> best-matching library end-member (group):
+  comp  variance       end-member         group    |r|  SAM(deg)
+     0     66.4%        green_veg    vegetation  0.881     17.88
+     1     27.8%      clear_water         water  0.990     14.68
+     2      3.9%        green_veg    vegetation  0.775     24.09
+
+------------------------------------------------------------------
+WATER VERDICT  (VPCA end-member evidence)
+------------------------------------------------------------------
+  Only clear-water / non-ferric end-members recovered.
+  No optical Fe3+ signature in this scene. Correct for clean
+  water - but NOTE: sulfate without dissolved Fe3+ is
+  optically invisible in VNIR (method limitation), so this
+  alone cannot rule out sulfate loading.
+  For R2/RMSE vs lab data, add a conc_mgL column (--conc).
+==================================================================
+

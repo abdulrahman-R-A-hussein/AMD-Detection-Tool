@@ -70,13 +70,42 @@ Report: [report_Silverton_thresholds_20260722.txt](report_Silverton_thresholds_2
 - Adopted values are Silverton/L8-derived; re-derive before trusting on
   desert/humid scenes (esp. ClaySulfateMica 0.021, which is site-tight).
 
+## Test D — Water contamination (2026-07-23, Landsat 8, v2.3.0 tool)
+
+First water-path validation (`vpca_validation.py --water`, raw-reflectance
+matching). No `conc_mgL` ground-truth column yet, so end-member evidence only:
+
+| Site | Type | Pixels | Water match | Verdict | Report |
+|---|---|---|---|---|---|
+| Ganau Pond, Iraq | known AMD (675 mg/L Fe³⁺) | 4284 | **fe3_water** 3/3 comps, \|r\|≈0.99, SAM 3.3–5.8°, 99.5% var | **contamination ✓ (sensitivity)** | [report](report_Ganau_water_20260723.txt) |
+| Piedmont Lake, OH | documented sulfate | 20000 | clear_water \|r\|=0.994 | optically clear — see note | [report](report_Piedmont_water_20260723.txt) |
+| Atwood Lake, OH | clean control | 20000 | clear_water \|r\|=0.990 | clean ✓ (specificity) | [report](report_Atwood_water_20260723.txt) |
+
+**Findings:**
+- Ganau: VPCA independently recovers the Fe³⁺-stained-water end-member as the
+  scene's dominant signature — the water sensitivity case holds at the one
+  site with known contamination.
+- Piedmont reads as clear water. This is a **method limitation, not
+  (necessarily) a miss**: SO₄²⁻ has no VNIR absorption; only dissolved or
+  colloidal Fe³⁺, turbidity, and color are optically visible. Adjudication
+  needs Piedmont water chemistry (dissolved Fe, not just sulfate) — if iron
+  is low there, "clear" is the physically correct answer.
+- Validator fix shipped with this run: water mode previously fell through to
+  the LAND "clean control" closure message even when every component matched
+  fe3_water (it mislabeled the Ganau detection as a non-detection). Water
+  scenes now print their own WATER VERDICT block; self-test passes.
+- Regression (R²/RMSE) still open: needs ≥3 sites with lab values via a
+  `conc_mgL` column (Ganau 675 mg/L + Piedmont/Dukan chemistry + clean ≈ 0).
+
 ## Still to do
 - H2 note: the four ferric minerals are not separable at 7 bands (they identify
   as one "ferric" group); distinguishing them needs hyperspectral.
 - ~~Threshold derivation (Test C)~~ **done 2026-07-22** (see above). Open
   follow-up: IronSulfate failed vs bare rock — either accept ferric-led
   detection or design a better iron-sulfate discriminator.
-- Water Fe³⁺ regression (Test D): Ganau / Dukan vs 675 mg/L ground truth.
+- ~~Water end-member validation (Test D)~~ **first pass done 2026-07-23** (see
+  above). Open: obtain dissolved-Fe lab values for Piedmont (Ohio EPA / USGS
+  NWIS) and Dukan, then run the `conc_mgL` regression for R²/RMSE.
 - Swap embedded end-members for the lab's Sentinel spectral library (exact
   spectra) via `convolve_splib07()`.
 

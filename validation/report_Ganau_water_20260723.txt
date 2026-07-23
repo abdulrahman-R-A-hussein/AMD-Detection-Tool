@@ -1,0 +1,23 @@
+Loaded 4284 pixels from VPCA_Landsat8_Ganau_Pond__Iraq_20260723.csv (sensor L8)
+
+==================================================================
+VPCA SPECTRAL-LIBRARY VALIDATION REPORT
+==================================================================
+Retained components: 3
+Variance explained (rotated): 50.6%, 48.1%, 0.8%  (cumulative 99.5%)
+
+Component -> best-matching library end-member (group):
+  comp  variance       end-member         group    |r|  SAM(deg)
+     0     50.6%        fe3_water         water  0.994      3.55  <-- Fe3+ WATER
+     1     48.1%        fe3_water         water  0.993      3.27  <-- Fe3+ WATER
+     2      0.8%        fe3_water         water  0.988      5.80  <-- Fe3+ WATER
+
+------------------------------------------------------------------
+WATER VERDICT  (VPCA end-member evidence)
+------------------------------------------------------------------
+  Fe3+-WATER component(s) recovered: 3 of 3 (99.5% of scene variance).
+  Water spectra match the ferric-stained AMD end-member ->
+  independent CONTAMINATION signature present (sensitivity).
+  For R2/RMSE vs lab data, add a conc_mgL column (--conc).
+==================================================================
+

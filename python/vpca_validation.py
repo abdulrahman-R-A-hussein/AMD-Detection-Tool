@@ -477,7 +477,7 @@ def water_regression(scores, comps, conc):
 # ---------------------------------------------------------------------------
 # 7. REPORTING
 # ---------------------------------------------------------------------------
-def print_report(vpca, comps, clo=None, wreg=None):
+def print_report(vpca, comps, clo=None, wreg=None, water=False):
     print("\n" + "=" * 66)
     print("VPCA SPECTRAL-LIBRARY VALIDATION REPORT")
     print("=" * 66)
@@ -488,7 +488,8 @@ def print_report(vpca, comps, clo=None, wreg=None):
     print("\nComponent -> best-matching library end-member (group):")
     print(f"  {'comp':>4} {'variance':>9} {'end-member':>16} {'group':>13} {'|r|':>6} {'SAM(deg)':>9}")
     for m, v in zip(comps, vpca["var_ratio"]):
-        flag = "  <-- AMD" if m["group"] == "ferric" else ""
+        flag = "  <-- AMD" if m["group"] == "ferric" else (
+            "  <-- Fe3+ WATER" if m["best"] == "fe3_water" else "")
         print(f"  {m['comp']:>4} {v*100:>8.1f}% {m['best']:>16} {m['group']:>13} "
               f"{abs(m['r']):>6.3f} {m['sam_deg']:>9.2f}{flag}")
 
@@ -507,6 +508,28 @@ def print_report(vpca, comps, clo=None, wreg=None):
         print(f"  Otsu binary agreement : {clo['agreement']*100:.2f}%")
         print(f"  Cohen's kappa         : {clo['kappa']:.3f}   "
               f"({_kappa_label(clo['kappa'])})")
+    elif water:
+        # v2.3.2: water mode previously fell through to the LAND specificity
+        # message below, calling a scene whose components matched fe3_water a
+        # "clean control" - the exact opposite of what the table showed
+        # (Ganau 2026-07-23). Water scenes get their own verdict.
+        fe3 = [m for m in comps if m["best"] == "fe3_water"]
+        print("\n" + "-" * 66)
+        print("WATER VERDICT  (VPCA end-member evidence)")
+        print("-" * 66)
+        if fe3:
+            tot = sum(float(vpca["var_ratio"][m["comp"]]) for m in fe3)
+            print(f"  Fe3+-WATER component(s) recovered: {len(fe3)} of "
+                  f"{len(comps)} ({tot*100:.1f}% of scene variance).")
+            print("  Water spectra match the ferric-stained AMD end-member ->")
+            print("  independent CONTAMINATION signature present (sensitivity).")
+        else:
+            print("  Only clear-water / non-ferric end-members recovered.")
+            print("  No optical Fe3+ signature in this scene. Correct for clean")
+            print("  water - but NOTE: sulfate without dissolved Fe3+ is")
+            print("  optically invisible in VNIR (method limitation), so this")
+            print("  alone cannot rule out sulfate loading.")
+        print("  For R2/RMSE vs lab data, add a conc_mgL column (--conc).")
     elif not any(m["group"] == "ferric" for m in comps):
         print("\n" + "-" * 66)
         print("SPATIAL CLOSURE  (VPCA AMD component vs classifier AMD classes)")
@@ -671,7 +694,7 @@ def main(argv=None):
     if args.water and args.conc in df.columns:
         wreg = water_regression(vpca["scores"], comps, df[args.conc].to_numpy())
 
-    print_report(vpca, comps, clo, wreg)
+    print_report(vpca, comps, clo, wreg, water=args.water)
 
 
 if __name__ == "__main__":

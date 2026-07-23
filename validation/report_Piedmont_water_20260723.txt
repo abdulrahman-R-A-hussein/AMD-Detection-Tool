@@ -1,0 +1,25 @@
+Loaded 20000 pixels from VPCA_Landsat8_Piedmont_Lake__OH_20260723.csv (sensor L8)
+
+==================================================================
+VPCA SPECTRAL-LIBRARY VALIDATION REPORT
+==================================================================
+Retained components: 3
+Variance explained (rotated): 56.6%, 27.5%, 14.1%  (cumulative 98.2%)
+
+Component -> best-matching library end-member (group):
+  comp  variance       end-member         group    |r|  SAM(deg)
+     0     56.6%        green_veg    vegetation  0.931     13.28
+     1     27.5%      clear_water         water  0.994     13.77
+     2     14.1%        green_veg    vegetation  0.928     13.36
+
+------------------------------------------------------------------
+WATER VERDICT  (VPCA end-member evidence)
+------------------------------------------------------------------
+  Only clear-water / non-ferric end-members recovered.
+  No optical Fe3+ signature in this scene. Correct for clean
+  water - but NOTE: sulfate without dissolved Fe3+ is
+  optically invisible in VNIR (method limitation), so this
+  alone cannot rule out sulfate loading.
+  For R2/RMSE vs lab data, add a conc_mgL column (--conc).
+==================================================================
+

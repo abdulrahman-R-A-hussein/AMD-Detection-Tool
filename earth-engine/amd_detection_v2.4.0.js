@@ -51,6 +51,25 @@ var studyAreas = {
   'Tab-Simco, IL': ee.Geometry.Point([-89.1, 37.7]).buffer(3000),
   'Dukan Lake, Iraq': ee.Geometry.Point([44.921183, 36.125888]).buffer(20000),
   'Monday Creek, OH': ee.Geometry.Point([-82.20948,39.48279]).buffer(15000),
+
+  // -- v2.5.1: southeastern Ohio AMD lakes with PUBLISHED water chemistry --
+  // Selected 2026-07-25 from the Water Quality Portal (USGS NWIS + EPA STORET
+  // + Ohio EPA). Unlike Piedmont/Atwood these carry measurable IRON, giving a
+  // 0.05-8.5 mg/L calibration gradient with no fieldwork. Fe values are
+  // ug/L (median / max) from in-lake stations 2013-2023; chemistry lives in
+  // data/chemistry/, matched to imagery by python/match_scenes.py.
+  // CAUTION: WQP station coordinates sit on shore access points and dams, not
+  // open water - sample lake water near them, not the station pixel itself.
+  'Somerset Reservoir, OH': ee.Geometry.Point([-82.2919, 39.7839]).buffer(1500),   // Fe 1440/8510 - highest; small
+  'Burr Oak Reservoir, OH': ee.Geometry.Point([-82.0572, 39.5422]).buffer(5000),   // Fe 205/6860; 2.7 km2 - best size/signal
+  'Lake Logan, OH': ee.Geometry.Point([-82.4494, 39.5361]).buffer(3000),           // Fe 290/6050; 1.6 km2
+  'Lake Hope, OH': ee.Geometry.Point([-82.3544, 39.3206]).buffer(2000),            // Fe 348/5780; Carbondale AMD legacy
+  'New Lexington Res 1, OH': ee.Geometry.Point([-82.2158, 39.7336]).buffer(1500),  // Fe 318/3600; small
+  'Lake Rupert, OH': ee.Geometry.Point([-82.5203, 39.1775]).buffer(3000),          // Fe 146/2550; 1.3 km2
+  'St Joseph Lake, OH': ee.Geometry.Point([-82.2889, 39.7700]).buffer(1500),       // Fe 345/1230; small
+  'Leesville Lake, OH': ee.Geometry.Point([-81.1897, 40.4586]).buffer(4000),       // Fe 80/603; Muskingum district
+  'Lake Alma, OH': ee.Geometry.Point([-82.4767, 39.1717]).buffer(1500),            // SO4 63 mg/L; Fe low
+
   'Lake Superior, Oh': ee.Geometry.Point([-87.060472,47.548672]).buffer(5000),
   'Lake Toshka, Egypt': ee.Geometry.Point([31.27994, 23.09845]).buffer(100000),
   'Lake Naser, Egypt': ee.Geometry.Point([32.21471, 22.73580]).buffer(100000)

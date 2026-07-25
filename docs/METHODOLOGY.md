@@ -53,7 +53,12 @@ Water = MNDWI > 0.3
     AND NDWI > -0.1
 ```
 
-**Key innovation:** AWEINSH > 0.20 threshold separates true water bodies (depth) from wet bare soil (surface moisture).
+**⚠️ Known defect (2026-07-25):** the `AWEINSH > 0.20` cut was tuned on Ganau
+Pond and does **not** generalize. AWEInsh is an absolute-magnitude index, so
+the threshold scales with scene brightness: dark temperate reservoir water
+(Piedmont and Atwood, median AWEINSH ≈ 0.07) fails it entirely, yielding zero
+analysable water pixels and a false "clean" reading. Under repair — see
+`validation/README.md` (Test D retraction).
 
 #### Contamination Scoring System
 
@@ -88,7 +93,12 @@ Water = MNDWI > 0.3
 ### Validation Strategy
 
 **Ground Truth:**
-- Ganau Lake, Iraq: 675 mg/L sulfate → Correctly classified as severe
+- Ganau Lake, Iraq: 675 mg/L sulfate. ⚠️ This is a **tuning anchor, not a
+  validation**: the contamination thresholds were adjusted until Ganau scored
+  severe, so "correctly classified as severe" is circular. Note also that
+  SO₄²⁻ has **no VNIR absorption** — sulfate itself is optically invisible.
+  What the scoring can detect is dissolved/colloidal iron, turbidity and
+  colour that co-vary with sulfate at this site.
 - USGS reference sites: Colorado, Nevada, Utah validation
 
 **Spectral Validation:**

@@ -2,7 +2,7 @@
  * Acid Mine Drainage (AMD) and Coal Mine Drainage (CMD) Detection System
  * Advanced Remote Sensing for Environmental Monitoring
  * 
- * Version: 2.3.0
+ * Version: 2.4.0
  * Author: Abdulrahman Hussein
  * Affiliation: Kent State University, Department of Earth Sciences
  * Lab: Environmental Remote Sensing Laboratory
@@ -24,7 +24,7 @@
  * Sensing for Environmental Monitoring. GitHub. https://github.com/coodawy/AMD-Detection-Tool
  */
 
-var TOOL_VERSION = 'v2.3.0';
+var TOOL_VERSION = 'v2.4.0';
 
 // =============================================================================
 // STUDY AREAS
@@ -687,21 +687,31 @@ function createUnifiedWaterMask() {
   var ndwi = settings.currentComposite.select('NDWI');
   var nir = settings.currentComposite.select('SR_B5');
   
-  // Multi-criteria water detection - prevents land from entering water classification
-  // Each criterion removes a different type of false positive:
-  // - brightness.lt(0.30): Excludes bright land surfaces
-  // - ndvi.lt(0.2): Excludes vegetation
-  // - ndwi.gt(-0.1): Additional water confirmation
-  // - aweinsh.gt(0.20): CRITICAL - Excludes wet bare soil (raised from 0.0)
-  //   Real water: AWEINSH > 0.20-0.25
-  //   Wet soil: AWEINSH < 0.20 (lacks water column depth)
-  //   Ganau Lake testing: Real water AWEINSH=0.249, Wet soil AWEINSH=0.18-0.19
+  // v2.4.0 REBUILD (see validation/README.md, Test D retraction).
+  // The previous mask required AWEINSH > 0.20, a value tuned on Ganau Pond
+  // ("Real water AWEINSH=0.249"). AWEInsh = B2 + 2.5*B3 - 1.5*B5 - 0.25*B7 is an
+  // ABSOLUTE-MAGNITUDE index, so that cut scales with scene brightness and
+  // silently excluded all dark temperate water:
+  //   Ganau    230/230 optically-water px passed (median AWEINSH 0.229)
+  //   Piedmont   0/497 passed (median 0.070)   <- 0 analysable water pixels
+  //   Atwood     0/466 passed (median 0.072)   <- "clean" was an artifact
+  // Every criterion below is now magnitude-free (normalized differences or
+  // band comparisons), EXCEPT the brightness ceiling, which is retained
+  // deliberately: snow/ice satisfies all four spectral tests (high MNDWI,
+  // negative NDVI, NIR < Green, AWEInsh >> 0) and is separable only by albedo.
+  // Counts under this mask - Ganau 230 (unchanged), Piedmont 255, Atwood 365,
+  // Silverton land control 11/20000 all class 0 (no mineral pixels stolen).
+  var green = settings.currentComposite.select('SR_B3');
   var isWater = mndwi.gt(settings.waterThreshold)     // mNDWI > 0.3 (main criterion)
-    .and(aweinsh.gt(0.20))                            // CRITICAL FIX: AWEINSH > 0.20 (excludes wet soil)
-    .and(brightness.lt(0.30))                         // Excludes bright land surfaces
-    .and(ndvi.lt(0.2))                                // Excludes vegetation
-    .and(ndwi.gt(-0.1));                              // Additional water confirmation
-  
+    .and(aweinsh.gt(0.0))                             // Feyisa et al. 2014 intended cut
+    .and(ndvi.lt(0.0))                                // rejects vegetation AND wet bare soil
+    .and(nir.lt(green))                               // water absorbs NIR; wet soil does not
+    .and(brightness.lt(0.30));                        // rejects snow/ice and bright land
+
+  // KNOWN LIMIT: ndvi.lt(0.0) could reject water so particle-laden that NIR
+  // exceeds Red. Checked against the positive control - Ganau water is NDVI
+  // <= -0.12 at the 95th percentile, so contaminated water is not at risk here.
+  // Re-check this cut before trusting the mask on heavily sediment-laden water.
   return isWater;
 }
 
@@ -1057,7 +1067,18 @@ function createWaterQualityClassification() {
   // (turbidity B4/B2, yellow B3/B2) are numerically unstable and were scoring false
   // "contamination" (the Atwood failure mode, one criterion over); validBrightness
   // gates them all.
-  var validBrightness = brightness.gt(0.05).and(brightness.lt(0.20));
+  // v2.4.0: renamed from validBrightness. This is a RELIABILITY gate, not a
+  // contamination criterion: criteria 3-5 are band RATIOS (B4/B2, B3/B2) whose
+  // denominator is the blue band, and on dark water (rho ~ 0.02) they are
+  // noise-dominated and meaningless.
+  // VERIFIED, do not widen: relaxing this gate to a sensor noise floor makes the
+  // ATWOOD CLEAN CONTROL read 244/365 px "moderate contamination" and 6 "severe",
+  // while degrading Ganau from 98 severe px to 0. The bound stays.
+  // What changes in v2.4.0 is the CONSEQUENCE of failing it - water below this
+  // limit is now reported as INDETERMINATE (class 3) instead of silently
+  // scoring 0 and being labelled "clean water".
+  var ratiosReliable = brightness.gt(0.05).and(brightness.lt(0.20));
+  var validBrightness = ratiosReliable;
 
   // Criterion 1: Iron Sulfate Index (PRIMARY)
   score = score.where(ironSulfateIndex.gt(settings.contaminatedWaterThreshold).and(validBrightness), score.add(2));
@@ -1086,9 +1107,15 @@ function createWaterQualityClassification() {
   // STEP 5: Three-Class Water Quality Classification
   // ───────────────────────────────────────────────────────────────────────
   
+  // v2.4.0: 4 states. Class 3 (INDETERMINATE) is the honesty fix - previously,
+  // water too dark for the ratio indices had every criterion gated off, scored
+  // 0, and was reported as "clean water". That produced a false negative
+  // indistinguishable from a real measurement (the Piedmont/Atwood failure).
+  // Absence of evidence is now reported as such, not as evidence of absence.
   var classification = ee.Image(0)  // 0 = Clean water
     .where(contaminationScore.gte(settings.scoreThresholdModerate), 1)  // 1 = Moderate contamination
     .where(contaminationScore.gte(settings.scoreThresholdSevere), 2)   // 2 = Severe contamination
+    .where(ratiosReliable.not(), 3)   // 3 = INDETERMINATE: signal below reliable optical limit
     .updateMask(deepWaterMask)
     .rename('WaterQuality');
   
@@ -1157,14 +1184,18 @@ function updateDetection() {
   // 1. LAND AMD CLASSIFICATION (19 classes)
   Map.addLayer(classification, classVis, '🏔️ Land AMD Classification', true);
   
-  // 2. WATER QUALITY CLASSIFICATION (3 classes) - Separate from land
+  // 2. WATER QUALITY CLASSIFICATION (4 classes) - Separate from land
   if (settings.enableWaterQualityModule) {
     var waterQualityResult = createWaterQualityClassification();
-    
+
+    // v2.4.0: 4th class. GREY = indeterminate (water too dark for the ratio
+    // indices to be reliable). Grey deliberately does NOT read as "clean" -
+    // it means "not measured", and such pixels must not be counted as clean
+    // water in any statistic or claim.
     Map.addLayer(waterQualityResult.classification, {
       min: 0,
-      max: 2,
-      palette: ['1E90FF', 'FFA500', 'FF0000']  // Blue (clean), Orange (moderate), Red (severe)
+      max: 3,
+      palette: ['1E90FF', 'FFA500', 'FF0000', '9E9E9E']  // clean, moderate, severe, indeterminate
     }, '🌊 Water Quality Classification', true);  // VISIBLE by default
     
     // ─────────────────────────────────────────────────────────────────────
@@ -1708,6 +1739,7 @@ Map.onClick(function(coords) {
         '🌊 Water Quality Classification layer.\n\n' +
         'Toggle the Water Quality layer ON to see:\n' +
         '  • Blue = Clean water\n' +
+        '  • Grey = INDETERMINATE (too dark to measure - not "clean")\n' +
         '  • Orange = Moderate contamination\n' +
         '  • Red = Severe contamination\n\n' +
         'Water Quality uses multi-criteria scoring (0-9):\n' +
@@ -2912,7 +2944,9 @@ function exportForVPCA() {
 
   // Classifier outputs, unmasked to sentinels so every pixel gets a label:
   //   class      : 0 = not land-AMD, 1..19 = land mineral class
-  //   water_class: -1 = not water, 0 = clean, 1 = moderate, 2 = severe
+  //   water_class: -1 = not water, 0 = clean, 1 = moderate, 2 = severe,
+  //                 3 = INDETERMINATE (v2.4.0; water below the reliable optical
+  //                 limit - MUST NOT be pooled with 0/clean in any analysis)
   var landClass = createBooleanClassification().unmask(0).rename('class');
   var wq = createWaterQualityClassification();
   var waterClass = (wq && wq.classification)

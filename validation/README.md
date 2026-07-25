@@ -70,32 +70,100 @@ Report: [report_Silverton_thresholds_20260722.txt](report_Silverton_thresholds_2
 - Adopted values are Silverton/L8-derived; re-derive before trusting on
   desert/humid scenes (esp. ClaySulfateMica 0.021, which is site-tight).
 
-## Test D — Water contamination (2026-07-23, Landsat 8, v2.3.0 tool)
+## Test D — Water contamination — ⚠️ RETRACTED 2026-07-25
 
-First water-path validation (`vpca_validation.py --water`, raw-reflectance
-matching). No `conc_mgL` ground-truth column yet, so end-member evidence only:
+> **The 2026-07-23 Test D result below is withdrawn. Do not cite it.**
+> Neither the Ganau "detection" nor the Piedmont/Atwood "clean" readings were
+> valid measurements. Reports `report_{Ganau,Piedmont,Atwood}_water_20260723.txt`
+> are retained only as a record of the retracted run.
 
-| Site | Type | Pixels | Water match | Verdict | Report |
+**Original (invalid) claim:** Ganau matched an Fe³⁺-stained-water end-member
+(3/3 components, 99.5% variance) = water sensitivity confirmed; Piedmont and
+Atwood matched clear water.
+
+**Why it is invalid — three independent defects:**
+
+1. **No water pixels were analysed.** The run decomposed whole scenes instead
+   of filtering to `water_class >= 0` as §D of the protocol requires. Piedmont
+   and Atwood carry **zero** water-classified pixels, so their "clear water"
+   verdict was computed from ~20,000 mostly-*land* pixels.
+2. **The tool's water mask is calibrated to a single site.** `AWEINSH > 0.20`
+   in `createUnifiedWaterMask()` was tuned on Ganau (see the code comment
+   citing "Ganau Lake testing: Real water AWEINSH=0.249"). AWEInsh is an
+   absolute-magnitude index, so it scales with brightness:
+
+   | Scene | optically water (MNDWI>0.3) | pass AWEINSH>0.20 | median AWEINSH | median brightness |
+   |---|---|---|---|---|
+   | Ganau | 230 | **230** | 0.229 | 0.076 |
+   | Piedmont | 497 | **0** | 0.070 | 0.022 |
+   | Atwood | 466 | **0** | 0.072 | 0.020 |
+
+   Dark temperate reservoir water can never pass. Two further Ganau-tuned
+   gates (`brightness ∈ (0.05, 0.20)` on every scoring criterion, and
+   `DepthProxy < 1.3`) each independently exclude the Ohio lakes as well.
+   **Piedmont's "no contamination" was an artifact of the mask, not a
+   measurement.**
+3. **The water end-members are invented.** `fe3_water` / `clear_water` in
+   `vpca_validation.py` are hand-written vectors, not library spectra —
+   splib07 is a *mineral* library and contains no water-column optics. Run on
+   water pixels only, the matching is degenerate: Ganau returns `fe3_water`
+   for all three components at weak r = 0.46–0.89, while Piedmont/Atwood
+   return `green_veg` dominant (i.e. `MNDWI > 0.3` alone admits mixed
+   shoreline pixels).
+
+**Also corrected:** Ganau's ground truth is **675 mg/L sulfate**
+([METHODOLOGY.md](../docs/METHODOLOGY.md)), not Fe³⁺ as the retracted table
+stated. The distinction is physical, not cosmetic: SO₄²⁻ has **no VNIR
+absorption**. No optical sensor can see sulfate. Any optical detection is of
+iron, turbidity or colour that happens to *co-vary* with sulfate, and must be
+worded that way.
+
+### Water mask rebuild — v2.4.0 (2026-07-25)
+
+The mask is now magnitude-free: `MNDWI > 0.3 ∧ AWEInsh > 0 ∧ NDVI < 0 ∧
+NIR < Green ∧ Brightness < 0.30`. The brightness **ceiling** is kept on purpose
+— snow/ice passes all four spectral tests and is separable only by albedo.
+
+| scene | water px before | water px after |
+|---|---|---|
+| Ganau (AMD+) | 230 | **230** (no regression) |
+| Piedmont | **0** | **255** |
+| Atwood (clean control) | **0** | **365** |
+| Silverton (land control) | 2 | 11 / 20000, all class 0 (no mineral pixels stolen) |
+
+`NDVI < 0` was checked against the positive control before adoption: Ganau
+water is NDVI ≤ −0.12 at the 95th percentile, so the strict cut costs the
+contaminated site nothing, while looser cuts increase land leakage at
+Silverton (11 → 20 px).
+
+**New class 3 = INDETERMINATE.** The reliability gate (`brightness ∈
+(0.05, 0.20)`) is retained — testing showed relaxing it makes the **Atwood
+clean control read 244/365 px "moderate"** and drops Ganau from 98 severe px
+to 0, because `B4/B2` and `B3/B2` are noise-dominated at ρ ≈ 0.02. What
+changed is the consequence of failing it: such water is now reported as
+INDETERMINATE rather than silently scoring 0 and being labelled "clean".
+
+| scene | water | clean | mod | severe | INDETERMINATE |
 |---|---|---|---|---|---|
-| Ganau Pond, Iraq | known AMD (675 mg/L Fe³⁺) | 4284 | **fe3_water** 3/3 comps, \|r\|≈0.99, SAM 3.3–5.8°, 99.5% var | **contamination ✓ (sensitivity)** | [report](report_Ganau_water_20260723.txt) |
-| Piedmont Lake, OH | documented sulfate | 20000 | clear_water \|r\|=0.994 | optically clear — see note | [report](report_Piedmont_water_20260723.txt) |
-| Atwood Lake, OH | clean control | 20000 | clear_water \|r\|=0.990 | clean ✓ (specificity) | [report](report_Atwood_water_20260723.txt) |
+| Ganau (AMD+) | 230 | 0 | 132 | 98 | **0%** |
+| Piedmont | 255 | 0 | 0 | 0 | **100%** |
+| Atwood (clean ctl) | 365 | 0 | 0 | 3 | **99%** |
+| Silverton (land ctl) | 11 | 0 | 0 | 0 | 100% |
 
-**Findings:**
-- Ganau: VPCA independently recovers the Fe³⁺-stained-water end-member as the
-  scene's dominant signature — the water sensitivity case holds at the one
-  site with known contamination.
-- Piedmont reads as clear water. This is a **method limitation, not
-  (necessarily) a miss**: SO₄²⁻ has no VNIR absorption; only dissolved or
-  colloidal Fe³⁺, turbidity, and color are optically visible. Adjudication
-  needs Piedmont water chemistry (dissolved Fe, not just sulfate) — if iron
-  is low there, "clear" is the physically correct answer.
-- Validator fix shipped with this run: water mode previously fell through to
-  the LAND "clean control" closure message even when every component matched
-  fe3_water (it mislabeled the Ganau detection as a non-detection). Water
-  scenes now print their own WATER VERDICT block; self-test passes.
-- Regression (R²/RMSE) still open: needs ≥3 sites with lab values via a
-  `conc_mgL` column (Ganau 675 mg/L + Piedmont/Dukan chemistry + clean ≈ 0).
+**Honest limitation:** no pixel in any of these four scenes now classifies as
+"clean" — the only water bright enough to measure is Ganau's contaminated
+water. Optical **specificity is therefore untested**, not passing, under
+v2.4.0. Atwood's 3 residual "severe" px (0.8%) are likely mixed shoreline.
+Resolving specificity is what the VPCA material-identification path is for.
+
+**Replacement approach** (see `specs/amd-v2/validation-protocol.md`): water
+validation moves to the Ortiz-lab VPCA + stepwise pipeline
+(`D:\dev\VPCA+STEPWISE-REGRESSION`), which works on z-scored **derivative**
+spectra — brightness-invariant by construction, so dark water is not a special
+case — and matches against the real splib07 library that already contains
+`Acid Mine Dr Assemb2-Fe3+`, `Jarosite GDS24 Na`, ferrihydrite and goethite.
+Deliverable is **material identification per lake**, not concentration: no
+measured water chemistry exists for these sites beyond Ganau's single number.
 
 ## Still to do
 - H2 note: the four ferric minerals are not separable at 7 bands (they identify
@@ -103,9 +171,12 @@ matching). No `conc_mgL` ground-truth column yet, so end-member evidence only:
 - ~~Threshold derivation (Test C)~~ **done 2026-07-22** (see above). Open
   follow-up: IronSulfate failed vs bare rock — either accept ferric-led
   detection or design a better iron-sulfate discriminator.
-- ~~Water end-member validation (Test D)~~ **first pass done 2026-07-23** (see
-  above). Open: obtain dissolved-Fe lab values for Piedmont (Ohio EPA / USGS
-  NWIS) and Dukan, then run the `conc_mgL` regression for R²/RMSE.
+- **Test D water validation: RETRACTED and being rebuilt** (see above). Work:
+  (a) make the tool's water mask scene-independent so Piedmont/Atwood water is
+  analysed at all; (b) re-run all three lakes on Sentinel-2 through the
+  Ortiz-lab VPCA + stepwise pipeline for material identification. Concentration
+  regression is **out of scope** — no lab chemistry exists for these sites
+  beyond Ganau's single published sulfate value.
 - Swap embedded end-members for the lab's Sentinel spectral library (exact
   spectra) via `convolve_splib07()`.
 

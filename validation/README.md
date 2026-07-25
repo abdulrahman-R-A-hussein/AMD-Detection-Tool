@@ -156,6 +156,83 @@ water. Optical **specificity is therefore untested**, not passing, under
 v2.4.0. Atwood's 3 residual "severe" px (0.8%) are likely mixed shoreline.
 Resolving specificity is what the VPCA material-identification path is for.
 
+### Finding W1 — the water contamination indices are inverted (2026-07-25)
+
+Computed on v2.4.0 water pixels (Ganau 230, Piedmont 255, Atwood 365):
+
+| site | yellow (G/B) | turbidity (R/B) | iron idx | NIR | red/blue |
+|---|---|---|---|---|---|
+| Ganau — 675 mg/L sulfate | 1.25 | 0.85 | 0.53 | 0.044 | **0.85** |
+| Piedmont | 1.93 | 1.21 | 0.55 | 0.016 | 1.13 |
+| **Atwood — clean control** | **2.39** | **1.48** | **1.09** | 0.012 | **1.35** |
+
+**Every ratio-based contamination index is highest at the clean control and
+lowest at the contaminated site.** The ranking is inverted. Only NIR anomaly
+orders correctly, and NIR is raised by suspended sediment and atmospheric path
+radiance as much as by dissolved iron.
+
+**Physical check:** Fe³⁺ absorbs strongly in the blue, so ferric-stained water
+must *rise* from blue to red. Ganau's red/blue = **0.85 — it falls.** Ganau
+water shows **no ferric signature**. The only scene showing a ferric-like rise
+is Atwood, the clean control (and at ρ≈0.014 its ratios are noise-dominated,
+which is why the reliability gate exists).
+
+**Consequence:** Ganau scores "severe" not because its indices indicate iron,
+but because it is bright enough to pass the reliability gate while Atwood and
+Piedmont are silenced by it. The module is responding to **brightness and
+turbidity, not contamination**. Combined with the fact that the thresholds
+were tuned until Ganau scored severe, the v1.5.4–v2.4.0 water claim is
+**circular and unsupported**.
+
+This is not necessarily a physics failure at Ganau: its ground truth is
+**sulfate**, which is optically invisible. A site can carry 675 mg/L SO₄²⁻ with
+little dissolved Fe³⁺ and correctly show no ferric colour. What is unsupported
+is the inference *from* the optical indices *to* "severe contamination".
+
+### Finding W2 — 5-band material ID does not discriminate
+
+Reproduced the lab pipeline's stepwise identification
+(`D:\dev\VPCA+STEPWISE-REGRESSION`) on its own reference loadings:
+
+| site | expected | curated-12 result |
+|---|---|---|
+| Vaal Dam (Witwatersrand mining) | AMD | VPC6 → `Acid Mine Dr Assemb2-Fe3+`; VPC2/3 → jarosite ✓ |
+| **Indian River Lagoon (FL, no mining)** | **no AMD** | **VPC2 → Jarosite R²=0.96; VPC4/5 → Ohio Fe concretions** ✗ |
+
+A Florida coastal lagoon returning jarosite is a false positive. With **N = 5
+observations** (5 water-penetrating S2 bands) any single library spectrum
+reaches R² ≈ 0.9 by chance, with or without curation — consistent with the
+lab's own caveat in `docs/REAL_GEE_RUN_RESULTS.md`. Per-component material ID
+at 5 bands is a **hypothesis generator, not a discriminative test**, and must
+not be used to certify a lake as AMD-positive.
+Curated candidate set retained at `python/library_s2_amd_curated.csv`.
+Note: **schwertmannite is absent from both lab libraries.**
+
+### Finding W3 — the only defensible comparison so far
+
+Albedo-normalised band fractions (magnitude removed), ROC AUC vs the Atwood
+clean control:
+
+| feature | Ganau vs Atwood | **Piedmont vs Atwood** |
+|---|---|---|
+| fB1 (443 nm) | 0.986 | **0.780** |
+| fB2 (482 nm) | 0.996 | **0.731** |
+| fB3 (561 nm) | 0.005 | 0.270 |
+
+**Ganau vs Atwood is confounded** — different continent, atmosphere (Iraqi
+dust inflates blue), water type and depth. Its AUC ≈ 0.99 cannot be attributed
+to contamination.
+
+**Piedmont vs Atwood is the fair test**: same region, same sensor, same date
+range, same atmospheric correction. It shows a real but *moderate* difference
+(AUC ≈ 0.78 in the coastal/blue fraction) — enough to say the two lakes differ
+spectrally, not enough to attribute the difference to AMD rather than to
+turbidity, depth, or algae.
+
+**What would settle it:** dissolved-iron measurements (not sulfate) for
+Piedmont and Atwood, from USGS NWIS / Ohio EPA. That is the missing input, and
+no amount of reprocessing substitutes for it.
+
 **Replacement approach** (see `specs/amd-v2/validation-protocol.md`): water
 validation moves to the Ortiz-lab VPCA + stepwise pipeline
 (`D:\dev\VPCA+STEPWISE-REGRESSION`), which works on z-scored **derivative**

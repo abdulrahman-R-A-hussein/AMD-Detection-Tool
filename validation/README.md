@@ -208,6 +208,35 @@ not be used to certify a lake as AMD-positive.
 Curated candidate set retained at `python/library_s2_amd_curated.csv`.
 Note: **schwertmannite is absent from both lab libraries.**
 
+### Finding W4 — ground truth resolves it (2026-07-25)
+
+From the **Water Quality Portal** (USGS NWIS + EPA STORET + Ohio EPA), in-lake
+stations, 2013 onward:
+
+| lake | sulfate median | range | iron median | iron max |
+|---|---|---|---|---|
+| **Piedmont** (n=26) | **462 mg/L** | 374–560 | **162 µg/L** | 1,530 |
+| **Atwood** control (n=101 SO₄ / 86 Fe) | **18.3 mg/L** | 10.6–23.1 | **302 µg/L** | 2,750 |
+| Ganau (published) | 675 mg/L | — | never measured | — |
+
+1. **Piedmont IS contaminated** — 462 mg/L sulfate, 25× the control and the
+   same order as Ganau. The site selection was right; the CMD legacy is real.
+2. **Atwood is a valid control for sulfate but NOT for iron** — its iron is
+   *higher* than Piedmont's (though 80/86 values are Total Recoverable, so
+   partly suspended sediment). Iron-phrased specificity claims are invalid.
+3. **Neither lake is optically detectable.** Sulfate has no VNIR absorption at
+   any concentration; 0.16–0.30 mg/L iron is 1–2 orders of magnitude below
+   visible ferric colouring.
+
+**The complete answer to "why does Piedmont show nothing":** it is
+sulfate-contaminated, sulfate is invisible, and its iron has already
+precipitated out of the water column (circumneutral CMD). The negative is
+physically correct — but it was reached for the wrong reason, because the mask
+had excluded the lake entirely.
+
+Full write-up, next steps and PhD field-campaign design:
+[WATER_VALIDATION_REPORT_2026-07-25.md](WATER_VALIDATION_REPORT_2026-07-25.md)
+
 ### Finding W3 — the only defensible comparison so far
 
 Albedo-normalised band fractions (magnitude removed), ROC AUC vs the Atwood

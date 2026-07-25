@@ -128,3 +128,7 @@ output/
 
 # Large Reference Files (keep paper.pdf in repo)
 # *.pdf
+
+# Rockwell reference rasters (309MB zip + extracted .img/.ige) - redownloadable
+data/rockwell/*.zip
+data/rockwell/L8_US_Southwest/

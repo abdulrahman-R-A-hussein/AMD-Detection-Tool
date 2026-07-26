@@ -580,7 +580,19 @@ var settings = {
   // blanketing whole scenes now that hasIron is no longer true everywhere.
   greenVegThreshold: 1.5,
   denseVegThreshold: 3.0,
-  ndviMax: 0.25,
+  // v3.0.1: 0.25 -> 0.35. The NDVI ceiling is the BINDING term of the land
+  // mask - it uniquely removes 22-29% of a scene and costs 42-46% of
+  // Rockwell's AMD pixels before the cascade runs (finding L2). Rockwell has
+  // no such hard gate; they carry mixed vegetation+mineral classes instead.
+  // Swept 0.25-1.01 over three sites (validation/REPLICA_AUDIT_2026-07-26.md):
+  //   0.25  MIN J 0.262   mean J 0.313   <- v2.x / v3.0.0
+  //   0.35  MIN J 0.317   mean J 0.393   <- adopted
+  //   0.45  MIN J 0.300   mean J 0.399
+  //   0.55+ declines; saturates because notDark (SWIR1 > 0.2125) already
+  //         excludes vegetated pixels, NOT because of the green-peak gate.
+  // The gain is concentrated at Summitville (recall 0.26 -> 0.51) and does
+  // NOT amplify the Silverton over-call (J 0.369 -> 0.371).
+  ndviMax: 0.35,
   
   // SCENE-RELATIVE (STANDARD-DEVIATION) THRESHOLDING - v3.0.0 DEFAULT ON.
   //

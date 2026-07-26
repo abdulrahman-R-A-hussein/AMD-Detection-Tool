@@ -380,10 +380,12 @@ without fieldwork.
   the iron criterion and judge candidates by *recall stability across sites*,
   not within-site AUC.
 - ~~Re-derive thresholds on **pooled** sites~~ **done 2026-07-26, finding L4.**
-- Reconsider `NDVI < 0.25` (finding L2, departure D7): Rockwell instead carries
-  mixed vegetation-plus-mineral classes. Costs 42–46% of Rockwell's AMD pixels
-  before the cascade runs. Any relaxation must be re-checked at Silverton so it
-  does not amplify the 7.11× over-call there. **Highest-value open item.**
+- ~~Reconsider `NDVI < 0.25`~~ **done 2026-07-26 (v3.0.1): relaxed to 0.35.**
+  Swept 0.25-1.01 over 36,391 px / 3 sites: worst-case J 0.262 -> 0.317 (+21%),
+  mean 0.313 -> 0.393 (+26%). Summitville recall 0.26 -> 0.51; Silverton and
+  RMP unharmed - the only change so far that improves all three sites. The
+  green-peak ceiling was swept jointly and moves worst-case J by <=0.001 at
+  every combination, re-confirming L2 across a 2-D grid rather than one point.
 - **Explain the Red Mountain Pass regression** (J 0.642→0.452 under v3.0.0). It
   is the only site where the paper-faithful configuration is worse, and it sits
   3 km from Silverton, so climate is not the explanation. Prime suspect is

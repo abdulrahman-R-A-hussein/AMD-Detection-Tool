@@ -181,6 +181,37 @@ In `earth-engine/amd_detection_v2.4.0.js`:
 result stays reproducible; `iron_fallback=False` selects the new behaviour. The
 NumPy port self-test still passes at its documented 94.95% ceiling.
 
+## 3b. D7 measured — the NDVI gate (added same day, v3.0.1)
+
+D7 was flagged as the highest-value open item, and it is now measured. The
+land mask's `NDVI < 0.25` ceiling was swept over all valid pixels (36,391 across
+three sites, May–Jul), rebuilding every other mask term per pixel and varying
+only this one. AMD rule = v3.0.0 scene-relative iron AND clay. Recall here is
+over **all** Rockwell AMD pixels in the scene, including those our mask drops,
+so rows are directly comparable.
+
+| NDVI ceiling | eligible px | MIN J | mean J |
+|---|---|---|---|
+| 0.25 (v2.x / v3.0.0) | 8.0% | 0.262 | 0.313 |
+| **0.35 — adopted** | **11.1%** | **0.317** | **0.393** |
+| 0.45 | 16.5% | 0.300 | 0.399 |
+| 0.55 | 22.2% | 0.271 | 0.379 |
+| ≥0.65 (gate off) | 23.5% | 0.266 | 0.373 |
+
+Worst-case J improves **+21%** and mean J **+26%**. The gain is concentrated
+where we were failing — Summitville recall 0.26 → 0.51, J 0.262 → 0.491 — and it
+does **not** amplify the Silverton over-call (J 0.369 → 0.371) or harm Red
+Mountain Pass (0.309 → 0.317). This is the first change in this audit that
+improves all three sites at once.
+
+**Finding L2 re-confirmed over a 2-D grid.** The green-peak ceiling was swept
+jointly (1.0 / 1.1 / 1.2 / 1.4 / off) against the NDVI ceiling: it changes
+worst-case J by **at most 0.001 at every combination**. It is not merely
+redundant at the shipped NDVI cut — it is irrelevant across the whole
+operating range. The saturation beyond NDVI 0.55 is caused by `notDark`
+(`SWIR1 > 0.2125`), which already removes vegetated pixels, not by the
+green-peak term.
+
 ## 4. What can and cannot be claimed
 
 **Supported:**
@@ -221,17 +252,21 @@ NumPy port self-test still passes at its documented 94.95% ceiling.
 
 ## 6. Next steps
 
-1. **Measure the remaining departures**, in cost order: D7 (`NDVI < 0.25` gate,
-   which costs 42–46% of Rockwell's AMD pixels before the cascade runs),
-   D8 (median composite vs single scenes — the pamphlet analyses single scenes,
-   and compositing is the most likely source of the Red Mountain Pass
+1. ~~Measure D7 (`NDVI < 0.25` gate)~~ **done — see §3b. Relaxed to 0.35 in
+   v3.0.1; worst-case J +21%, and the only change so far that helps all three
+   sites.** Remaining departures in cost order: **D8** (median composite vs the
+   pamphlet's single scenes — the most likely source of the Red Mountain Pass
    regression), then D4, D6, D5.
 2. **Calibrate the ferric and ferrous multipliers.** Only `ironStdMult` and
    `clayStdMult` were LOSO-fitted; the ferric/ferrous multipliers are set to
    0.5 by assumption and drive classes 1–8, which nothing here validates.
 3. **Investigate the Red Mountain Pass regression** (J 0.642 → 0.452). It is
-   the one site where the paper-faithful configuration is worse, and it is
-   3 km from Silverton — so it is not a climate effect.
+   the one site where the paper-faithful configuration is worse, and it sits
+   ~3 km from Silverton, so climate is not the explanation. D8 is the prime
+   suspect: a 2013–2020 median composite is not what SIM 3466 analyses, and
+   RMP is the smallest AOI (10 km) with the fewest AMD positives (19–23 px),
+   so it is also the noisiest estimate. Re-run on single scenes to separate
+   a real regression from small-sample noise.
 4. **Add a fourth and fifth site outside Colorado** (Marysvale UT, Goldfield NV
    are already in `SITES`) to test the pamphlet's own claim that behaviour
    varies by climate.

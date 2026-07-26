@@ -88,11 +88,17 @@ Per-site, configuration A → D:
 | **Summitville** | **0.107** | **0.440** | **0.120** | **0.483** |
 | Red Mountain Pass | 0.642 | 0.452 | 0.128 | 0.101 |
 
-**The fixes are not free.** Summitville — the site we were failing — improves
-enormously (J 0.107→0.440, κ 0.120→0.483) and Silverton improves slightly, but
-**Red Mountain Pass degrades** (J 0.642→0.452). Worst-case across all three
-still improves 4.1×, which is why the change is adopted, but the RMP regression
-is real and should be watched.
+**The fixes may not be free.** Summitville — the site we were failing —
+improves enormously (J 0.107→0.440, κ 0.120→0.483) and Silverton improves
+slightly, but **Red Mountain Pass appears to degrade** (J 0.642→0.452).
+Worst-case across all three still improves 4.1×, which is why the change is
+adopted.
+
+Treat the RMP number cautiously: that site carries only **19–23 AMD positive
+pixels**, the fewest of any site here, so its J is the least stable estimate in
+this audit. §3c tested and largely ruled out the leading mechanistic
+explanation (compositing). Increase the RMP sample before concluding the
+regression is real — see §6.
 
 **MIN κ does not improve** (0.120 → 0.101). κ is prevalence-sensitive and at
 RMP/Silverton the AMD base rate is under 2.5%, which suppresses it structurally.
@@ -315,3 +321,49 @@ site to get adequate positives. That is the correct next experiment.
 6. **Field verification remains the only route to an accuracy claim.** The
    Silverton "ours-only" and Summitville "Rockwell-only" AMD pixels are two
    oppositely-signed, mapped, ready-made ground-truthing lists.
+
+---
+
+## 7. Session state, 2026-07-26 — where to pick up
+
+Shipped this session: **v2.9.0 → v3.0.2**. Every claim below is reproducible
+from committed code; `data/` is gitignored but all pipelines are deterministic
+(fixed seed, fixed dates) — see §6 for the exact commands.
+
+### Settled (do not re-derive)
+
+| | |
+|---|---|
+| Green-peak gate `Green/Red ≤ 1.0` | **irrelevant.** Moves worst-case J by ≤0.001 at every point of a 2-D NDVI × green-peak grid. Not the cause of anything. |
+| Root cause of the v2.8.0 inversion | Three departures from SIM 3466: absolute thresholds (D1), wrong season (D2), clay-free iron fallback (D3). |
+| Index formulas | All six match the pamphlet **exactly**. The replica is faithful at the index level. |
+| `FerrousIron` index | **AUC 0.437 pooled, at or below chance at all three sites.** No AMD discriminative power. Test C's 0.983 does not reproduce. |
+| EE memory limit | Solved by tiled reducers/sampling. No async `Export.table.toDrive` needed. |
+| Summitville under-call | 5.6× (paired), not the 8× first reported. |
+
+### Open, in priority order
+
+1. **Increase the Red Mountain Pass sample** (19–23 positives). Everything about
+   the one apparent regression under v3.0.x rests on that thin estimate.
+2. **Calibrate `ferric1StdMult`, `ferric2StdMult`, `ferrousStdMult`.** v3.0.0
+   sets all three to 0.5 *by assumption*; only iron and clay were LOSO-fitted.
+   They drive classes 1–8, which nothing here validates.
+3. **Re-derive `clayStdMult`** — did not transfer (per-fold fits −0.5, −0.5,
+   +1.0). Weakest adopted constant.
+4. **D8 properly**: select scenes by clear-pixel count *inside the AOI*, not
+   scene-level `CLOUD_COVER`, and pool several scenes per site.
+5. **D4, D6, D5** unmeasured (class 9/17 split; water mask; atmospheric
+   correction).
+6. **Sites outside Colorado** — Marysvale UT and Goldfield NV are already in
+   `SITES`. All three current sites are Colorado alpine; the pamphlet warns
+   behaviour varies most by climate.
+7. **Field verification** is the only route to an accuracy claim. Two mapped,
+   oppositely-signed ground-truthing lists already exist: Silverton
+   "ours-only" AMD pixels and Summitville "Rockwell-only" AMD pixels.
+
+### The one thing to keep straight
+
+Every number in this audit is **agreement with Rockwell's published automated
+map**, not accuracy. The supportable claim is that restoring the published
+specification improves cross-site agreement 4.1×. The claim that this tool is
+*better than* Rockwell's remains unsupported and requires fieldwork.

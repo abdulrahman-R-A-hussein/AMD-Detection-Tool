@@ -114,13 +114,84 @@ detections from false positives.** That is a direct, fundable question — and
 one the drone/ASD campaign answers, since the disputed pixels are mapped and
 can be visited.
 
+## GENERALIZATION TEST — Summitville (added same day, and it reverses the above)
+
+Silverton is where the Test C thresholds were **derived**. Evaluating there is
+circular, so the comparison was repeated at **Summitville, CO** — a Superfund
+acid-mine-drainage site inside Rockwell's coverage that we have never tuned
+against. Our classification was recomputed **inside Earth Engine**
+(`python/gee_classify.py`) so the per-image-index ordering is preserved; the
+NumPy port could not be used for this (see its 94.95% ceiling).
+
+45 Landsat 8 summer scenes 2013–2020, same 8 km AOI for both maps.
+
+| site | Rockwell AMD | ours | direction |
+|---|---|---|---|
+| Silverton — **thresholds tuned here** | 0.54% | **2.07%** | we flag **3.8× more** |
+| **Summitville — never tuned** | **2.40%** | **0.30%** | Rockwell flags **8× more** |
+
+**The over-call does not generalize. It inverts.** At an independent AMD site
+we detect roughly an eighth of what the published map does.
+
+**This retires the "greater sensitivity" reading of the Silverton result.** The
+most parsimonious explanation is that the Test C thresholds — ROC-derived at
+Silverton against Silverton polygons, then evaluated at Silverton — are locally
+overfitted, exactly the risk flagged in that section above. They do not transfer.
+
+### Contributing mechanism
+
+Our Summitville classification is **83% dense vegetation** (class 11: 230,368 of
+278,607 px) against Rockwell's 58%. That matters because the land mask requires
+`noGreenPeak` (Green/Red ≤ 1.0): **any pixel with a green peak is excluded from
+every mineral class before the cascade runs**. Heavy vegetation in a
+summer-median composite therefore suppresses mineral detection wholesale.
+Rockwell's map also shows 38,904 px of class 1 (minor ferric/hematite) where we
+show almost none.
+
+Two candidate causes, both testable:
+1. **Compositing/date selection.** A 2013–2020 summer median over 45 scenes may
+   be greener than whatever scene selection Rockwell used. Their product is
+   multi-year with different masking.
+2. **The vegetation gate is too aggressive** for partially-vegetated alpine
+   terrain, discarding mixed pixels that carry a real mineral signal.
+
+### What this changes for the thesis
+
+The defensible claim from §"What this supports" above **must be withdrawn**. The
+honest statement is now:
+
+> Reimplementing the Rockwell method reproduces the published map at 87.9%
+> agreement (κ = 0.55) over Silverton. However, AMD-indicator agreement is poor
+> (κ = 0.21) and the direction of disagreement **reverses between sites**: we
+> over-detect 3.8× where our thresholds were derived and under-detect 8× at an
+> independent site. The empirically-derived thresholds are therefore
+> site-specific and do not currently generalize.
+
+That is a stronger contribution than an unexamined win: it identifies a concrete
+failure mode of ROC-derived thresholds in this application, and it is precisely
+the problem multi-site field calibration would solve.
+
 ## Next steps
 
-1. Export the disagreement pixels as a point layer for field targeting — the
-   157 "ours-only" AMD pixels are a ready-made ground-truthing list.
-2. Repeat on an independent area within Rockwell's coverage that we never tuned
-   against (Summitville or Red Mountain Pass) to test whether the higher
-   sensitivity transfers or is Silverton-specific.
-3. Sentinel-2 rerun: Rockwell used Landsat 8 only. S2's red-edge bands and 10 m
+1. ~~Repeat at an independent site~~ **done — it inverted (see above).** The
+   thresholds are site-specific.
+2. **Diagnose the vegetation gate.** Test `noGreenPeak` (Green/Red ≤ 1.0) on
+   Summitville pixels that Rockwell calls ferric and we call vegetation. If the
+   gate is the cause, relaxing it for partially-vegetated terrain is the fix —
+   and it must then be re-checked at Silverton so the fix does not simply
+   restore the over-call.
+3. **Re-derive thresholds across multiple sites, not one.** Test C used
+   Silverton polygons only. Pooling labelled polygons from Silverton +
+   Summitville + Red Mountain Pass would produce thresholds that at least
+   attempt to generalize, and the ROC machinery in `derive_thresholds.py`
+   already supports it.
+4. Export the Silverton disagreement pixels as a point layer for field
+   targeting — the 157 "ours-only" AMD pixels remain a ready-made
+   ground-truthing list, now with a sharper question attached: are they real
+   detections, or the same overfitting seen here?
+5. Sentinel-2 rerun: Rockwell used Landsat 8 only. S2's red-edge bands and 10 m
    pixels are the clearest methodological advance available, and a gap this
    comparison cannot address.
+6. Silverton and Red Mountain Pass both exceeded the Earth Engine synchronous
+   memory limit at 15 km / 10 km buffers; those need `Export.table.toDrive`
+   (async) rather than `getInfo`.

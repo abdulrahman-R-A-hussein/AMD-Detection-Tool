@@ -250,10 +250,21 @@ def mode_terms(ee, site, n_tiles):
     return total
 
 
-def mode_pixels(ee, site, n_pixels, seed, out, n_tiles=3, months=None):
-    """Export the gate variables per pixel, for the Rockwell join."""
+def mode_pixels(ee, site, n_pixels, seed, out, n_tiles=3, months=None,
+                single_scene=False):
+    """Export the gate variables per pixel, for the Rockwell join.
+
+    single_scene tests departure D8: SIM 3466 analyses INDIVIDUAL scenes, while
+    this tool composites a 2013-2020 summer median. A median over many dates
+    mixes illumination, phenology and snow state, and median(ratio) is not
+    ratio(median), so the composited indices are not the quantity the published
+    thresholds were designed for. Picks the least-cloudy scene in the window.
+    """
     region, col, n_scenes = composite(ee, site, months)
-    comp = col.median().clip(region)
+    if single_scene:
+        comp = ee.Image(col.sort("CLOUD_COVER").first()).clip(region)
+    else:
+        comp = col.median().clip(region)
     b3, b4 = comp.select("SR_B3"), comp.select("SR_B4")
     stack = (comp.select(["SR_B1", "SR_B2", "SR_B3", "SR_B4", "SR_B5",
                           "SR_B6", "SR_B7"])
@@ -448,6 +459,8 @@ def main(argv=None):
     ap.add_argument("--csv")
     ap.add_argument("--label")
     ap.add_argument("--months", help="inclusive month range, e.g. 5,7")
+    ap.add_argument("--single-scene", action="store_true",
+                    help="use the least-cloudy single scene (tests D8)")
     ap.add_argument("--raster",
                     default=os.path.join(ROOT, "data", "rockwell",
                                          "L8_US_Southwest", "SouthWest",
@@ -477,7 +490,7 @@ def main(argv=None):
         months = ([int(x) for x in args.months.split(",")]
                   if args.months else None)
         mode_pixels(ee, args.site, args.pixels_n, args.seed, out, args.tiles,
-                    months)
+                    months, args.single_scene)
 
 
 if __name__ == "__main__":

@@ -386,10 +386,16 @@ without fieldwork.
   RMP unharmed - the only change so far that improves all three sites. The
   green-peak ceiling was swept jointly and moves worst-case J by <=0.001 at
   every combination, re-confirming L2 across a 2-D grid rather than one point.
-- **Explain the Red Mountain Pass regression** (J 0.642→0.452 under v3.0.0). It
-  is the only site where the paper-faithful configuration is worse, and it sits
-  3 km from Silverton, so climate is not the explanation. Prime suspect is
-  departure D8 (multi-year median composite vs the pamphlet's single scenes).
+- **Explain the Red Mountain Pass regression** (J 0.642→0.452 under v3.0.0).
+  Only site where the paper-faithful config is worse. D8 (compositing) was the
+  prime suspect and is now partly ruled out — see REPLICA_AUDIT §3c. Leading
+  explanation is now small-sample noise (RMP has only 19–23 AMD positives).
+  **Increase the RMP sample before treating the regression as real.**
+- **D8 cannot be tested naively**: at 3,400 m the least-cloudy single May–Jul
+  scene yields ZERO usable pixels at Red Mountain Pass and costs Silverton 60%
+  of its land pixels. Compositing is a necessity here, not a gratuitous
+  deviation. Proper test = select scenes by clear-pixel count INSIDE the AOI,
+  and pool several scenes per site.
 - **Calibrate `ferric1/2StdMult` and `ferrousStdMult`.** v3.0.0 sets them to 0.5
   by assumption; only iron and clay were LOSO-fitted. They drive classes 1–8,
   which nothing has validated.

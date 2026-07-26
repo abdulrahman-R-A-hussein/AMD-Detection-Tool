@@ -212,6 +212,43 @@ operating range. The saturation beyond NDVI 0.55 is caused by `notDark`
 (`SWIR1 > 0.2125`), which already removes vegetated pixels, not by the
 green-peak term.
 
+## 3c. D8 attempted — compositing vs single scenes (inconclusive, and why)
+
+D8 was the prime suspect for the Red Mountain Pass regression. SIM 3466 analyses
+**individual scenes**; this tool builds a 2013–2020 median composite, and
+`median(ratio) ≠ ratio(median)`, so the composited indices are not the quantity
+the published thresholds describe. Tested by re-exporting each site from the
+least-cloudy single scene in the May–Jul window
+(`diagnose_veg_gate.py --single-scene`).
+
+| site | input | land px | n_pos | Iron AUC | Clay AUC | v3.0 J |
+|---|---|---|---|---|---|---|
+| Silverton | median composite | 1,349 | 28 | 0.939 | 0.898 | 0.664 |
+| Silverton | single scene | 532 | **6** | 0.943 | 0.957 | 0.719 |
+| Summitville | median composite | 487 | 128 | **0.810** | 0.777 | **0.431** |
+| Summitville | single scene | 439 | 114 | 0.750 | 0.756 | 0.416 |
+| Red Mountain Pass | median composite | 1,147 | 19 | 0.858 | 0.894 | 0.704 |
+| Red Mountain Pass | single scene | — | — | — | — | **blocked** |
+
+**Verdict: inconclusive, and compositing is not obviously the culprit.** The two
+usable sites disagree in direction, and the site that favours single scenes
+(Silverton) rests on **6 positive pixels**. Summitville, with 114 positives, is
+slightly *worse* on a single scene. Nothing here supports blaming D8 for the
+RMP regression.
+
+**The attempt produced a more useful finding than the test.** Red Mountain Pass
+returned **0 usable pixels** from its least-cloudy May–Jul scene, and Silverton
+lost 60% of its land pixels. At 3,400 m in late spring, single Landsat scenes
+are routinely unusable — snow, terrain shadow and cloud remove the AOI even when
+scene-level `CLOUD_COVER` metadata looks acceptable. **Compositing is therefore
+a necessity at these sites, not a gratuitous deviation**, and the tool cannot
+simply "become faithful" on this point. The honest position is that D8 is a
+*justified* divergence whose cost is still unquantified.
+
+To test it properly one would select scenes by **clear-pixel count inside the
+AOI** rather than scene-level cloud metadata, and pool several single scenes per
+site to get adequate positives. That is the correct next experiment.
+
 ## 4. What can and cannot be claimed
 
 **Supported:**
@@ -254,19 +291,22 @@ green-peak term.
 
 1. ~~Measure D7 (`NDVI < 0.25` gate)~~ **done — see §3b. Relaxed to 0.35 in
    v3.0.1; worst-case J +21%, and the only change so far that helps all three
-   sites.** Remaining departures in cost order: **D8** (median composite vs the
-   pamphlet's single scenes — the most likely source of the Red Mountain Pass
-   regression), then D4, D6, D5.
+   sites.** ~~D8~~ **attempted — inconclusive, see §3c; single scenes are
+   frequently unusable at these altitudes, so compositing is a justified
+   divergence.** Remaining, in cost order: **D4** (class 9/17 split uses
+   brightness where Rockwell uses ferrous), **D6** (water mask), **D5**
+   (atmospheric correction).
 2. **Calibrate the ferric and ferrous multipliers.** Only `ironStdMult` and
    `clayStdMult` were LOSO-fitted; the ferric/ferrous multipliers are set to
    0.5 by assumption and drive classes 1–8, which nothing here validates.
 3. **Investigate the Red Mountain Pass regression** (J 0.642 → 0.452). It is
    the one site where the paper-faithful configuration is worse, and it sits
    ~3 km from Silverton, so climate is not the explanation. D8 is the prime
-   suspect: a 2013–2020 median composite is not what SIM 3466 analyses, and
-   RMP is the smallest AOI (10 km) with the fewest AMD positives (19–23 px),
-   so it is also the noisiest estimate. Re-run on single scenes to separate
-   a real regression from small-sample noise.
+   suspect **and has now been partly ruled out** (§3c: the two testable sites
+   disagree in direction, and Summitville is slightly worse on single scenes).
+   The remaining and more likely explanation is small-sample noise: RMP has the
+   fewest AMD positives of any site (19–23 px), so its J estimate is the least
+   stable. Increase the sample at RMP before treating the regression as real.
 4. **Add a fourth and fifth site outside Colorado** (Marysvale UT, Goldfield NV
    are already in `SITES`) to test the pamphlet's own claim that behaviour
    varies by climate.

@@ -99,7 +99,17 @@ var CLOUD_THRESHOLDS = {
 // Seasonal filtering definitions
 var SEASON_MONTHS = {
   'All Year': null,
-  'Summer (Jul-Sep)': [7, 8, 9],      // Avoid snow in mountains
+  // v3.0.0 DEFAULT. Rockwell & Gnesda (SIM 3466, p.4): "scenes acquired in
+  // late May through early July are optimal to avoid the presence of senesced
+  // cheat grass and other dry vegetation", which is spectrally similar to
+  // clay/sulfate/mica at OLI resolution and causes FALSE identifications of
+  // that group. They explicitly warn against mid-July through October -
+  // exactly what 'Summer (Jul-Sep)' selected in v2.x.
+  // Measured effect (validation/REPLICA_AUDIT_2026-07-26.md): switching to
+  // May-Jul raises IronSulfate AUC vs Rockwell at Summitville 0.678 -> 0.810
+  // and improves worst-case leave-one-site-out J 0.107 -> 0.260.
+  'Mineral Mapping (May-Jul)': [5, 6, 7],
+  'Summer (Jul-Sep)': [7, 8, 9],      // v2.x default - KNOWN to bias clay
   'Winter (Dec-Feb)': [12, 1, 2],      // Snow/ice studies
   'Spring (Mar-May)': [3, 4, 5],       // Snowmelt season
   'Fall (Sep-Nov)': [9, 10, 11],       // Post-summer, pre-snow
@@ -507,7 +517,18 @@ var settings = {
   specificEndDate: '2024-12-31',
   
   // Seasonal filtering
-  seasonFilter: 'Summer (Jul-Sep)',  // Default to summer to avoid snow
+  // v3.0.0: was 'Summer (Jul-Sep)', which SIM 3466 warns against for mineral
+  // mapping. See SEASON_MONTHS above for the measured effect of the change.
+  seasonFilter: 'Mineral Mapping (May-Jul)',
+
+  // v3.0.0 SCENE-RELATIVE THRESHOLDING.
+  // SIM 3466 ("Final Index Thresholding and Clipping") derives its cutoffs by
+  // "isolating the highest values using a common standard deviation
+  // threshold" - i.e. a PER-SCENE statistic. v2.x instead hard-coded absolute
+  // constants derived at Silverton, which is why they did not transfer
+  // (finding L1). When true, each index cutoff is taken at the percentile its
+  // absolute value occupies, computed within the current scene.
+  useSceneRelativeThresholds: true,
   
   // Iron sulfate threshold for the corrected (2/1 - 5/4) index.
   // v2.3.0 Test C RESULT (Silverton, 126 AMD / 447 clean px incl. bare-rock
@@ -561,13 +582,42 @@ var settings = {
   denseVegThreshold: 3.0,
   ndviMax: 0.25,
   
-  // NEW: Adaptive thresholding
-  useStdDevThresholds: false,
-  ironStdMult: 2.0,
-  ferric1StdMult: 1.5,
-  ferric2StdMult: 1.5,
-  ferrousStdMult: 1.5,
-  clayStdMult: 1.5,
+  // SCENE-RELATIVE (STANDARD-DEVIATION) THRESHOLDING - v3.0.0 DEFAULT ON.
+  //
+  // This is Rockwell's OWN method. SIM 3466, "Final Index Thresholding and
+  // Clipping": the final indices "were created by isolating the highest values
+  // using a common standard deviation threshold, followed by carrying out an
+  // index-specific clip". Threshold = scene mean + k * scene sigma.
+  //
+  // v2.x shipped this OFF and used absolute constants derived at Silverton
+  // instead. That was the departure from the published method, and it is why
+  // the thresholds did not transfer (finding L1): the same absolute cutoff
+  // sits at completely different points in different scenes' distributions.
+  //
+  // CALIBRATION (validation/REPLICA_AUDIT_2026-07-26.md), leave-one-site-out
+  // over Silverton + Summitville + Red Mountain Pass vs Rockwell's map:
+  //   worst-case Youden J   v2.x absolute 0.107  ->  0.405 here  (3.8x)
+  // WARNING: the old 2.0 / 1.5 multipliers below score worst-case J = 0.000 -
+  // they sit so far into the tail that almost nothing is flagged. Enabling
+  // std-dev thresholding WITHOUT recalibrating is far worse than leaving it off.
+  useStdDevThresholds: true,
+  // ironStdMult is the one value that fitted stably across all three folds.
+  ironStdMult: 0.5,
+  // clayStdMult did NOT transfer cleanly (per-fold fits -0.5, -0.5, +1.0);
+  // 0.25 is the grid optimum on worst-case J. Treat as provisional.
+  clayStdMult: 0.25,
+  // NOT empirically calibrated - only the iron and clay cutoffs drive the AMD
+  // decision, which is what the LOSO test scored. These are set to ironStdMult
+  // for consistency and remain an open item.
+  ferric1StdMult: 0.5,
+  ferric2StdMult: 0.5,
+  ferrousStdMult: 0.5,
+
+  // v3.0.0: restore the v2.x unconditional `hasIron -> class 12` fallback.
+  // Off by default because it has no counterpart in Rockwell Table 4 and
+  // collapsed the AMD decision onto the single weakest index. See the
+  // classification cascade for the full note.
+  useIronFallbackClass12: false,
   
   // NEW: Index clipping
   useIndexClipping: false,
@@ -944,9 +994,29 @@ function createBooleanClassification() {
   assignClass(hasIron.and(hasFerrous).and(hasClay).and(amdLandMask), 19);
   // Class 14: Oxidizing Sulfides - Iron + Clay ONLY (NO Fe1, NO Fe2)
   assignClass(hasIron.and(hasClay).and(hasFerric1.not()).and(hasFerric2.not()).and(amdLandMask), 14);
-  // FALLBACK Class 12: any remaining Iron even without clay. Kept LAST in priority
-  // so it no longer overwrites the specific jarosite classes above.
-  assignClass(hasIron.and(amdLandMask), 12);
+  // v3.0.0 REMOVED - the unconditional iron fallback.
+  //
+  //   assignClass(hasIron.and(amdLandMask), 12);   // <-- deleted
+  //
+  // It has no counterpart in Rockwell Table 4: EVERY one of their six iron-
+  // sulfate classes (9, 12, 14, 17, 18, 19) carries an "AND" in the clay-
+  // sulfate-mica column. A pixel with only the iron-sulfate index elevated
+  // matches no class in their scheme and is left unclassified.
+  //
+  // The consequence of having it was severe: because it caught every remaining
+  // iron pixel, our AMD decision collapsed to "hasIron alone", inheriting the
+  // behaviour of the single weakest index (Test C AUC 0.769, FAILED) and
+  // discarding the corroborating clay and ferric evidence. That is the direct
+  // mechanism behind the Silverton/Summitville inversion (finding L1).
+  //
+  // Measured: removing it lifts worst-case leave-one-site-out J from 0.403 to
+  // 0.440 and mean Cohen's kappa from 0.227 to 0.257 against Rockwell's map.
+  // Pixels formerly swept into class 12 now fall through to the STEP 2 clay
+  // and ferric classes, or to unclassified - as in the published method.
+  // Set settings.useIronFallbackClass12 = true to restore v2.x behaviour.
+  if (settings.useIronFallbackClass12) {
+    assignClass(hasIron.and(amdLandMask), 12);
+  }
 
   // STEP 2: Non-iron sulfate classes. hasIron.not() kept for explicit intent; the
   // eq(0) guard already prevents overwriting the STEP 1 iron classes.

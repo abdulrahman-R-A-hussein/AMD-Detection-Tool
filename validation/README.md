@@ -325,6 +325,52 @@ accumulates per-tile results; Silverton now reduces 983,860 px and samples
 "Collection query aborted after accumulating over 5000 elements" ceiling.
 Multi-site threshold re-derivation is therefore unblocked.
 
+### Finding L4 — the departures from SIM 3466 were the defect (2026-07-26)
+
+Full audit: [REPLICA_AUDIT_2026-07-26.md](REPLICA_AUDIT_2026-07-26.md).
+Code: `python/pool_labels.py`, `python/iron_criterion_search.py`,
+`python/paper_faithful_test.py`. Source: `paper.pdf` = the SIM 3466 pamphlet.
+
+**All six index formulas match the paper exactly** (`2/1−5/4`, `4/2`,
+`4/2×(4+6)/5`, `(3+6)/(4+5)`, `6/7−5/4`, `5/4`), as does first-match-wins
+assignment. The replica is faithful at the index level. Three departures are
+not:
+
+| # | SIM 3466 says | v2.4.0 did |
+|---|---|---|
+| D1 | thresholds from "a common **standard deviation threshold**" per scene | absolute constants from Silverton |
+| D2 | "late May through early July are **optimal**"; mid-Jul–Oct warned against (dry vegetation mimics clay-sulfate-mica) | **Jul–Sep** |
+| D3 | all six iron-sulfate classes require **clay AND** | catch-all `hasIron → 12`, no clay |
+
+D3 collapsed the AMD decision to `hasIron` alone — which is why the whole AMD
+arm inherited the behaviour of the index Test C had already failed at AUC 0.769.
+
+**Leave-one-site-out over 3 sites, worst-case Youden J vs Rockwell:**
+
+| configuration | MIN J | mean κ |
+|---|---|---|
+| as shipped (v2.4.0) | **0.107** | 0.139 |
+| + paper season | 0.260 | 0.159 |
+| + scene-relative cutoffs | 0.403 | 0.227 |
+| + clay requirement (**v3.0.0**) | **0.440** (4.1×) | 0.257 |
+
+Summitville J 0.107→0.440, κ 0.120→0.483; Silverton improves slightly;
+**Red Mountain Pass regresses** (0.642→0.452) — a real trade-off, not yet
+explained. Largest single gain anywhere: IronSulfate AUC at Summitville
+**0.678→0.810** from the season change alone.
+
+**Pooled re-derivation across 3 sites** (Test C used one): every Test C AUC
+collapses — FerricIron1 0.992→0.642, ClaySulfateMica 0.999→0.674,
+**FerrousIron 0.983→0.437 (below chance, no AMD discriminative power at any
+site)**. Every shipped constant sits *inside* its per-site optimal range, but at
+opposite ends: clay 0.021 vs Silverton optimum 0.248 (→ over-call there), iron
+0.10 vs Summitville optimum −0.045 (→ under-call there). **Opposite errors at
+opposite sites is exactly the inversion.**
+
+⚠️ Labels are Rockwell's published map, not field data. This measures replica
+fidelity, **not** accuracy. No claim that our tool beats theirs is supportable
+without fieldwork.
+
 ## Still to do
 - H2 note: the four ferric minerals are not separable at 7 bands (they identify
   as one "ferric" group); distinguishing them needs hyperspectral.
@@ -333,11 +379,25 @@ Multi-site threshold re-derivation is therefore unblocked.
   confirmed defect, finding L1.** The follow-up is now: replace or renormalise
   the iron criterion and judge candidates by *recall stability across sites*,
   not within-site AUC.
-- Re-derive thresholds on **pooled** Silverton + Summitville + Red Mountain Pass
-  polygons (`derive_thresholds.py` supports it; unblocked by L3).
-- Reconsider `NDVI < 0.25` (finding L2): Rockwell instead carries mixed
-  vegetation-plus-mineral classes. Any relaxation must be re-checked at
-  Silverton so it does not amplify the 7.11× over-call there.
+- ~~Re-derive thresholds on **pooled** sites~~ **done 2026-07-26, finding L4.**
+- Reconsider `NDVI < 0.25` (finding L2, departure D7): Rockwell instead carries
+  mixed vegetation-plus-mineral classes. Costs 42–46% of Rockwell's AMD pixels
+  before the cascade runs. Any relaxation must be re-checked at Silverton so it
+  does not amplify the 7.11× over-call there. **Highest-value open item.**
+- **Explain the Red Mountain Pass regression** (J 0.642→0.452 under v3.0.0). It
+  is the only site where the paper-faithful configuration is worse, and it sits
+  3 km from Silverton, so climate is not the explanation. Prime suspect is
+  departure D8 (multi-year median composite vs the pamphlet's single scenes).
+- **Calibrate `ferric1/2StdMult` and `ferrousStdMult`.** v3.0.0 sets them to 0.5
+  by assumption; only iron and clay were LOSO-fitted. They drive classes 1–8,
+  which nothing has validated.
+- **Re-derive `clayStdMult`** — it did not transfer (per-fold fits −0.5, −0.5,
+  +1.0) and is the weakest adopted constant.
+- Measure the remaining departures D4–D6 (class 9/17 split uses brightness where
+  Rockwell uses ferrous; water mask; atmospheric correction).
+- Add sites outside Colorado (Marysvale UT, Goldfield NV already in `SITES`) —
+  all three current sites are Colorado alpine, and the pamphlet warns behaviour
+  varies most by climate.
 - **Test D water validation: RETRACTED and being rebuilt** (see above). Work:
   (a) make the tool's water mask scene-independent so Piedmont/Atwood water is
   analysed at all; (b) re-run all three lakes on Sentinel-2 through the

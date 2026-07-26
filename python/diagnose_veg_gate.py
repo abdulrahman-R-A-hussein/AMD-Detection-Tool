@@ -65,12 +65,18 @@ AMD_CLASSES = {9, 12, 14, 17, 18, 19}
 ROCKWELL_FERRIC = {1, 2, 3, 6, 7, 8, 9, 12, 13, 17, 18}
 
 
-def composite(ee, site):
+def composite(ee, site, months=None):
+    """months: inclusive [first, last] calendar months. Defaults to the tool's
+    SUMMER=[7,8,9]. Rockwell (SIM 3466, p.4) states late May-early July is
+    optimal and warns that mid-July-October causes FALSE clay-sulfate-mica
+    detections from senesced dry vegetation, so [5,6,7] is the paper-faithful
+    setting and is testable via --months."""
+    months = months or [SUMMER[0], SUMMER[-1]]
     lon, lat, buf = SITES[site]
     region = ee.Geometry.Point([lon, lat]).buffer(buf)
     col = (ee.ImageCollection("LANDSAT/LC08/C02/T1_L2")
            .filterBounds(region).filterDate(START, END)
-           .filter(ee.Filter.calendarRange(SUMMER[0], SUMMER[-1], "month"))
+           .filter(ee.Filter.calendarRange(months[0], months[-1], "month"))
            .map(lambda i: process_landsat(ee, i))
            .map(lambda i: add_indices(ee, i)))
     return region, col, col.size().getInfo()
@@ -244,19 +250,18 @@ def mode_terms(ee, site, n_tiles):
     return total
 
 
-def mode_pixels(ee, site, n_pixels, seed, out, n_tiles=3):
+def mode_pixels(ee, site, n_pixels, seed, out, n_tiles=3, months=None):
     """Export the gate variables per pixel, for the Rockwell join."""
-    region, col, n_scenes = composite(ee, site)
+    region, col, n_scenes = composite(ee, site, months)
     comp = col.median().clip(region)
     b3, b4 = comp.select("SR_B3"), comp.select("SR_B4")
-    stack = (comp.select(["SR_B2", "SR_B3", "SR_B4", "SR_B5", "SR_B6"])
+    stack = (comp.select(["SR_B1", "SR_B2", "SR_B3", "SR_B4", "SR_B5",
+                          "SR_B6", "SR_B7"])
              .addBands(b3.divide(b4).rename("green_red"))
-             .addBands(comp.select("NDVI"))
-             .addBands(comp.select("GreenVeg"))
-             .addBands(comp.select("Brightness"))
-             .addBands(comp.select("IronSulfate"))
-             .addBands(comp.select("ClaySulfateMica"))
-             .addBands(comp.select("FerricIron1")))
+             .addBands(comp.select(["NDVI", "MNDWI", "GreenVeg", "Brightness",
+                                    "AWEINSH", "IronSulfate", "FerricIron1",
+                                    "FerricIron2", "FerrousIron",
+                                    "ClaySulfateMica"])))
     for gate in GATES:
         stack = stack.addBands(
             classify(ee, comp, veg_gate=gate).rename("cls_" + gate))
@@ -283,9 +288,10 @@ def mode_pixels(ee, site, n_pixels, seed, out, n_tiles=3):
     print("%s: %d scenes, %d sampled pixels" % (site, n_scenes, len(rows)))
     if not rows:
         return
-    cols = (["lon", "lat", "green_red", "NDVI", "GreenVeg", "Brightness",
-             "IronSulfate", "ClaySulfateMica", "FerricIron1",
-             "SR_B2", "SR_B3", "SR_B4", "SR_B5", "SR_B6"]
+    cols = (["lon", "lat", "green_red", "NDVI", "MNDWI", "GreenVeg",
+             "Brightness", "AWEINSH", "IronSulfate", "FerricIron1",
+             "FerricIron2", "FerrousIron", "ClaySulfateMica",
+             "SR_B1", "SR_B2", "SR_B3", "SR_B4", "SR_B5", "SR_B6", "SR_B7"]
             + ["cls_" + g for g in GATES] + ["land_" + g for g in GATES])
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out, "w", encoding="utf-8", newline="") as fh:
@@ -441,6 +447,7 @@ def main(argv=None):
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--csv")
     ap.add_argument("--label")
+    ap.add_argument("--months", help="inclusive month range, e.g. 5,7")
     ap.add_argument("--raster",
                     default=os.path.join(ROOT, "data", "rockwell",
                                          "L8_US_Southwest", "SouthWest",
@@ -467,7 +474,10 @@ def main(argv=None):
         out = args.csv or os.path.join(
             ROOT, "data", "imagery", "gate_%s.csv"
             % args.site.replace(", ", "_").replace(" ", "_"))
-        mode_pixels(ee, args.site, args.pixels_n, args.seed, out, args.tiles)
+        months = ([int(x) for x in args.months.split(",")]
+                  if args.months else None)
+        mode_pixels(ee, args.site, args.pixels_n, args.seed, out, args.tiles,
+                    months)
 
 
 if __name__ == "__main__":

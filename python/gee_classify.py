@@ -78,8 +78,20 @@ def add_indices(ee, img):
     return img.addBands([iron, f1, f2, fe2, clay, gv, ndvi, mndwi, bright, awei])
 
 
-def classify(ee, c, veg_gate="strict"):
+def classify(ee, c, veg_gate="strict", iron_fallback=True):
     """The v2.4.0 first-match-wins cascade, server-side.
+
+    NOTE ON VERSIONS: the defaults here reproduce **v2.4.0**, because every
+    analysis in validation/ was computed against that behaviour and must stay
+    reproducible. The shipped JS tool moved to v3.0.0 defaults (May-Jul season,
+    scene-relative thresholds, no iron fallback) - see
+    validation/REPLICA_AUDIT_2026-07-26.md. Pass iron_fallback=False and use
+    diagnose_veg_gate.py --months 5,7 to approximate the v3.0.0 configuration.
+
+    iron_fallback: v2.x assigned class 12 to ANY remaining iron pixel with no
+    clay requirement. Rockwell Table 4 has no such rule - all six of their
+    iron-sulfate classes require clay - and it collapsed the AMD decision onto
+    the single weakest index. Removed in v3.0.0.
 
     veg_gate controls the green-peak term of the land mask ONLY. "strict" is
     the shipped v2.4.0 behaviour (Green/Red <= 1.0) and is the default, so this
@@ -143,7 +155,8 @@ def classify(ee, c, veg_gate="strict"):
     assign(has_iron.And(has_f1.Not()).And(has_f2).And(has_clay).And(land), 18)
     assign(has_iron.And(has_fe2).And(has_clay).And(land), 19)
     assign(has_iron.And(has_clay).And(has_f1.Not()).And(has_f2.Not()).And(land), 14)
-    assign(has_iron.And(land), 12)
+    if iron_fallback:
+        assign(has_iron.And(land), 12)
     assign(has_clay.And(has_f1).And(has_f2).And(has_iron.Not()).And(land), 8)
     assign(has_clay.And(has_f1.Or(has_f2)).And(has_iron.Not()).And(land), 7)
     assign(has_clay.And(has_f1).And(has_f2.Not()).And(has_iron.Not()).And(land), 6)

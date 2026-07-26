@@ -130,6 +130,11 @@ NumPy port could not be used for this (see its 94.95% ceiling).
 | Silverton — **thresholds tuned here** | 0.54% | **2.07%** | we flag **3.8× more** |
 | **Summitville — never tuned** | **2.40%** | **0.30%** | Rockwell flags **8× more** |
 
+> ⚠️ **The Summitville row is superseded** (2026-07-26). Those two figures came
+> from independent histograms over mismatched footprints/denominators. The
+> paired equivalent is **2.13% vs 0.38% = 5.6×**. See
+> [GATE_DIAGNOSIS_2026-07-26.md](GATE_DIAGNOSIS_2026-07-26.md) §4.
+
 **The over-call does not generalize. It inverts.** At an independent AMD site
 we detect roughly an eighth of what the published map does.
 
@@ -138,7 +143,24 @@ most parsimonious explanation is that the Test C thresholds — ROC-derived at
 Silverton against Silverton polygons, then evaluated at Silverton — are locally
 overfitted, exactly the risk flagged in that section above. They do not transfer.
 
-### Contributing mechanism
+### Contributing mechanism — ⚠️ WRONG, corrected 2026-07-26
+
+> **The green-peak explanation below is withdrawn.** Diagnosed in
+> [GATE_DIAGNOSIS_2026-07-26.md](GATE_DIAGNOSIS_2026-07-26.md): the
+> `noGreenPeak` term is **redundant**, uniquely excluding 0 px at Summitville
+> and 6 px at Silverton, because pixels with a green peak already fail
+> `NDVI < 0.25`. Re-running with the gate relaxed or removed entirely gives
+> **identical class histograms** at both sites.
+>
+> The real cause is that all six AMD classes require `IronSulfate` to exceed an
+> absolute constant, and that index scores **AUC 0.938** against reference
+> labels at Silverton but **0.678** at Summitville, with a Youden-optimal cutoff
+> of opposite sign. See that report for the full diagnosis.
+>
+> **The 8× figure below is also wrong** — it compared two independent
+> histograms over different footprints with different denominators. Redone as a
+> paired join, the under-call is **5.6×**. Direction confirmed, magnitude
+> corrected.
 
 Our Summitville classification is **83% dense vegetation** (class 11: 230,368 of
 278,607 px) against Rockwell's 58%. That matters because the land mask requires
@@ -154,6 +176,7 @@ Two candidate causes, both testable:
    multi-year with different masking.
 2. **The vegetation gate is too aggressive** for partially-vegetated alpine
    terrain, discarding mixed pixels that carry a real mineral signal.
+   — *tested and falsified, see the box above.*
 
 ### What this changes for the thesis
 
@@ -175,16 +198,15 @@ the problem multi-site field calibration would solve.
 
 1. ~~Repeat at an independent site~~ **done — it inverted (see above).** The
    thresholds are site-specific.
-2. **Diagnose the vegetation gate.** Test `noGreenPeak` (Green/Red ≤ 1.0) on
-   Summitville pixels that Rockwell calls ferric and we call vegetation. If the
-   gate is the cause, relaxing it for partially-vegetated terrain is the fix —
-   and it must then be re-checked at Silverton so the fix does not simply
-   restore the over-call.
+2. ~~Diagnose the vegetation gate~~ **done 2026-07-26 — the gate is redundant
+   and was not the cause.** Root cause is the `IronSulfate` criterion; see
+   [GATE_DIAGNOSIS_2026-07-26.md](GATE_DIAGNOSIS_2026-07-26.md), which carries
+   the live next-steps list.
 3. **Re-derive thresholds across multiple sites, not one.** Test C used
    Silverton polygons only. Pooling labelled polygons from Silverton +
    Summitville + Red Mountain Pass would produce thresholds that at least
    attempt to generalize, and the ROC machinery in `derive_thresholds.py`
-   already supports it.
+   already supports it. — *now unblocked, see 6.*
 4. Export the Silverton disagreement pixels as a point layer for field
    targeting — the 157 "ours-only" AMD pixels remain a ready-made
    ground-truthing list, now with a sharper question attached: are they real
@@ -192,6 +214,10 @@ the problem multi-site field calibration would solve.
 5. Sentinel-2 rerun: Rockwell used Landsat 8 only. S2's red-edge bands and 10 m
    pixels are the clearest methodological advance available, and a gap this
    comparison cannot address.
-6. Silverton and Red Mountain Pass both exceeded the Earth Engine synchronous
-   memory limit at 15 km / 10 km buffers; those need `Export.table.toDrive`
-   (async) rather than `getInfo`.
+6. ~~Silverton and Red Mountain Pass exceed the EE synchronous memory limit~~
+   **solved 2026-07-26 without async exports.** `tile_geoms()` in
+   `python/diagnose_veg_gate.py` splits the AOI into an n×n grid and accumulates
+   per-tile `reduceRegion` / `sample` results, keeping each request small.
+   Silverton now reduces 983,860 px and samples 31,888 px at its full 15 km
+   buffer. Tiled sampling also avoids the separate
+   "Collection query aborted after accumulating over 5000 elements" ceiling.

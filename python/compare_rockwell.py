@@ -75,12 +75,16 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--raster", required=True, help="Rockwell .img file")
     ap.add_argument("--pixels", default=PIXELS)
+    ap.add_argument("--class-col", default="class",
+                    help="column holding OUR class; gate_*.csv uses cls_strict")
+    ap.add_argument("--label", default=None, help="site name for the header")
     args = ap.parse_args(argv)
 
     import rasterio
     from rasterio.warp import transform as warp_transform
 
     d = pd.read_csv(args.pixels)
+    print("=== %s ===" % (args.label or os.path.basename(args.pixels)))
     print("our pixels: %d from %s" % (len(d), os.path.basename(args.pixels)))
 
     with rasterio.open(args.raster) as src:
@@ -93,7 +97,7 @@ def main(argv=None):
 
     d["rockwell"] = [int(v) for v in vals]
     d["rockwell"] = d.rockwell.replace(COLLAPSE)
-    d["ours"] = d["class"].astype(int)
+    d["ours"] = d[args.class_col].astype(int)
 
     inside = d[~d.rockwell.isin([0, 15])]
     print("\n%d/%d points fall on valid Rockwell data (excl. their no-data 0/15)"

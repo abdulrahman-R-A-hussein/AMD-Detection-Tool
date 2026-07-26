@@ -78,8 +78,18 @@ def add_indices(ee, img):
     return img.addBands([iron, f1, f2, fe2, clay, gv, ndvi, mndwi, bright, awei])
 
 
-def classify(ee, c):
-    """The v2.4.0 first-match-wins cascade, server-side."""
+def classify(ee, c, veg_gate="strict"):
+    """The v2.4.0 first-match-wins cascade, server-side.
+
+    veg_gate controls the green-peak term of the land mask ONLY. "strict" is
+    the shipped v2.4.0 behaviour (Green/Red <= 1.0) and is the default, so this
+    stays a faithful replica; the other modes exist for the sensitivity study in
+    python/diagnose_veg_gate.py and must not be used to produce tool results.
+      strict  : Green/Red <= 1.0                       (v2.4.0)
+      relaxed : Green/Red <= 1.15                      (admits mildly green px)
+      off     : no green-peak term at all
+      override: strict, but a pixel carrying BOTH iron and clay bypasses it
+    """
     iron, f1 = c.select("IronSulfate"), c.select("FerricIron1")
     f2, fe2 = c.select("FerricIron2"), c.select("FerrousIron")
     clay, gv = c.select("ClaySulfateMica"), c.select("GreenVeg")
@@ -102,10 +112,24 @@ def classify(ee, c):
                   .Or(mndwi.gt(-0.10).And(mndwi.lt(0.10)))))
     not_bright = bright.lt(T["bright_max"])
     not_dark = b6.gt(T["dark"]).And(bright.gt(0.05))
-    veg_road = (b3.divide(b4).lte(1.0)).And(
+
+    green_red = b3.divide(b4)
+    if veg_gate == "strict":
+        no_green_peak = green_red.lte(1.0)
+    elif veg_gate == "relaxed":
+        no_green_peak = green_red.lte(1.15)
+    elif veg_gate == "off":
+        no_green_peak = ee.Image(1)
+    elif veg_gate == "override":
+        no_green_peak = green_red.lte(1.0).Or(has_iron.And(has_clay))
+    else:
+        raise ValueError("unknown veg_gate %r" % veg_gate)
+
+    veg_road = no_green_peak.And(
         ndvi.lt(T["ndvi_max"]).Or(has_iron.And(b6.lt(0.20)).And(gv.lt(3.5))))
     land = (water.Not().And(not_bright).And(not_dark)
             .And(built.Not()).And(veg_road))
+    classify.last_land = land.rename("land")
 
     out = ee.Image(0)
 

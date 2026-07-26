@@ -271,12 +271,73 @@ case — and matches against the real splib07 library that already contains
 Deliverable is **material identification per lake**, not concentration: no
 measured water chemistry exists for these sites beyond Ganau's single number.
 
+### Finding L1 — the land thresholds do not transfer between sites (2026-07-26)
+
+Full diagnosis: [GATE_DIAGNOSIS_2026-07-26.md](GATE_DIAGNOSIS_2026-07-26.md).
+Code: `python/diagnose_veg_gate.py`, `python/iron_index_transfer.py`.
+
+Head-to-head against Rockwell's published USGS map, paired on identical pixels
+through one code path:
+
+| | Silverton (thresholds derived here) | Summitville (never tuned) |
+|---|---|---|
+| exact class agreement | 88.1% | **64.6%** |
+| Cohen's κ | 0.552 | **0.080** |
+| Rockwell AMD / ours | 0.47% / **1.94%** | **2.13%** / 0.38% |
+| recall vs Rockwell | 0.485 | **0.106** |
+
+The direction of disagreement **reverses**: we over-call 4.1× where the
+thresholds were derived and under-call **5.6×** at an independent Superfund AMD
+site. Conditioning on our own land mask sharpens it (7.11× / 0.33×), so it is
+not a masking artifact.
+
+**Root cause.** All six AMD classes require `IronSulfate = (B2/B1) − (B5/B4)`
+to exceed an absolute 0.10. That index scores **AUC 0.938** against reference
+labels at Silverton but **0.678** at Summitville, and its Youden-optimal cutoff
+flips sign (+0.0906 → −0.0464). Scene-relative thresholding (within-scene
+z-score calibrated at Silverton) lifts Summitville recall 0.197 → 0.307, **+56%
+relative**, but cannot repair the AUC loss.
+
+This is the **same defect class as W1** — an absolute cutoff on a non-normalised
+index calibrated at a single site — now documented on the land arm too. Test C
+had already flagged IronSulfate at AUC 0.769 as "unusable as a scene-wide
+threshold"; keeping 0.10 as "provisional" is what propagated the failure.
+
+### Finding L2 — the green-peak vegetation gate is redundant (2026-07-26)
+
+`noGreenPeak` (Green/Red ≤ 1.0) uniquely excludes **0 px at Summitville and 6 px
+at Silverton** — pixels with a green peak already fail `NDVI < 0.25`. Running the
+full classification with the gate `strict` / `relaxed` / `override` / `off` gives
+**identical class histograms**. This falsifies the mechanism proposed in v2.8.0,
+which is now corrected in place in the Rockwell report.
+
+The binding term is `NDVI < 0.25`, which uniquely removes 29.3% (Silverton) and
+22.3% (Summitville) of valid pixels, and costs **42–46% of Rockwell's AMD
+pixels at both sites** before the cascade runs.
+
+### Finding L3 — the EE memory limit was a tooling problem, not a real one
+
+Silverton (15 km) and Red Mountain Pass (10 km) previously failed with
+"User memory limit exceeded" and were thought to need async
+`Export.table.toDrive`. `tile_geoms()` splits the AOI into an n×n grid and
+accumulates per-tile results; Silverton now reduces 983,860 px and samples
+31,888 px synchronously. Tiled sampling also clears the separate
+"Collection query aborted after accumulating over 5000 elements" ceiling.
+Multi-site threshold re-derivation is therefore unblocked.
+
 ## Still to do
 - H2 note: the four ferric minerals are not separable at 7 bands (they identify
   as one "ferric" group); distinguishing them needs hyperspectral.
-- ~~Threshold derivation (Test C)~~ **done 2026-07-22** (see above). Open
-  follow-up: IronSulfate failed vs bare rock — either accept ferric-led
-  detection or design a better iron-sulfate discriminator.
+- ~~Threshold derivation (Test C)~~ **done 2026-07-22** (see above).
+  ~~Open follow-up: IronSulfate failed vs bare rock~~ — **resolved as a
+  confirmed defect, finding L1.** The follow-up is now: replace or renormalise
+  the iron criterion and judge candidates by *recall stability across sites*,
+  not within-site AUC.
+- Re-derive thresholds on **pooled** Silverton + Summitville + Red Mountain Pass
+  polygons (`derive_thresholds.py` supports it; unblocked by L3).
+- Reconsider `NDVI < 0.25` (finding L2): Rockwell instead carries mixed
+  vegetation-plus-mineral classes. Any relaxation must be re-checked at
+  Silverton so it does not amplify the 7.11× over-call there.
 - **Test D water validation: RETRACTED and being rebuilt** (see above). Work:
   (a) make the tool's water mask scene-independent so Piedmont/Atwood water is
   analysed at all; (b) re-run all three lakes on Sentinel-2 through the

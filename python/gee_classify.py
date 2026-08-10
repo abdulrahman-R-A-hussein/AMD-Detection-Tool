@@ -78,7 +78,94 @@ def add_indices(ee, img):
     return img.addBands([iron, f1, f2, fe2, clay, gv, ndvi, mndwi, bright, awei])
 
 
-def classify(ee, c, veg_gate="strict", iron_fallback=True):
+# v3.0.x scene-relative multipliers (earth-engine/amd_detection_v2.4.0.js,
+# useStdDevThresholds block) - threshold = scene mean + k * scene stdDev,
+# computed over the region being classified. ironStdMult/clayStdMult were
+# LOSO-fitted (validation/REPLICA_AUDIT_2026-07-26.md); the ferric/ferrous
+# multipliers are set to match by assumption and remain uncalibrated.
+V3_STD_MULT = dict(iron=0.5, ferric1=0.5, ferric2=0.5, ferrous=0.5, clay=0.25)
+V3_NDVI_MAX = 0.35
+V3_MONTHS = [5, 6, 7]
+
+
+def tiled_mean_stddev(ee, image, bands, region, n_tiles=4, scale=30):
+    """Pooled mean/stdDev per band, computed from TILED sum/sumSq/count.
+
+    A single whole-region reduceRegion(mean.combine(stdDev)) over a large,
+    many-scene composite trips "User memory limit exceeded" even with
+    bestEffort=True and a simplified geometry - that error is about server
+    compute-graph size, not pixel count, and bestEffort only mitigates the
+    latter. Tiling the SAME reducer call the way tile_geoms/frequencyHistogram
+    already do successfully elsewhere in this project, then combining the
+    tile-level sums in Python (not in EE), sidesteps it entirely: each tile's
+    reduceRegion is small enough to evaluate, and pooling sum/sumSq/count
+    algebraically reproduces the exact whole-region mean/stdDev.
+    """
+    from diagnose_veg_gate import tile_geoms
+
+    sq = image.select(bands).pow(2).rename([b + "_sq" for b in bands])
+    stack = image.select(bands).addBands(sq)
+    sums = {b: 0.0 for b in bands}
+    sqsums = {b: 0.0 for b in bands}
+    counts = {b: 0 for b in bands}
+    for cell in tile_geoms(ee, region, n_tiles):
+        r = stack.reduceRegion(reducer=ee.Reducer.sum().combine(
+            ee.Reducer.count(), "", True), geometry=cell, scale=scale,
+            maxPixels=int(1e9), bestEffort=True).getInfo()
+        for b in bands:
+            v = r.get(b + "_sum")
+            vsq = r.get(b + "_sq_sum")
+            n = r.get(b + "_count")
+            if v is not None:
+                sums[b] += v
+            if vsq is not None:
+                sqsums[b] += vsq
+            if n:
+                counts[b] += n
+
+    out = {}
+    for b in bands:
+        n = counts[b]
+        if not n:
+            out[b + "_mean"], out[b + "_stdDev"] = 0.0, 0.0
+            continue
+        mean = sums[b] / n
+        var = max(0.0, sqsums[b] / n - mean * mean)
+        out[b + "_mean"], out[b + "_stdDev"] = mean, var ** 0.5
+    return out
+
+
+def classify_v3(ee, c, region, scale=30, iron_fallback=False, n_tiles=4):
+    """The v3.0.x cascade: scene-relative thresholds + relaxed NDVI gate + no
+    iron fallback, matching earth-engine/amd_detection_v2.4.0.js as shipped.
+
+    Unlike classify(), thresholds are computed from `region`'s own pixel
+    statistics (Rockwell's own method, SIM 3466 "common standard deviation
+    threshold"), via tiled_mean_stddev() rather than a single whole-region
+    reduceRegion - see that function's docstring for why. Stats are plain
+    Python floats by construction here, so no lazy ee.Number is ever chained
+    into the classification expression.
+    """
+    stats = tiled_mean_stddev(
+        ee, c, ["IronSulfate", "FerricIron1", "FerricIron2", "FerrousIron",
+               "ClaySulfateMica"], region, n_tiles=n_tiles, scale=scale)
+
+    def cut(band, mult):
+        return stats[band + "_mean"] + stats[band + "_stdDev"] * mult
+
+    t = dict(
+        iron=cut("IronSulfate", V3_STD_MULT["iron"]),
+        ferric1=cut("FerricIron1", V3_STD_MULT["ferric1"]),
+        ferric2=cut("FerricIron2", V3_STD_MULT["ferric2"]),
+        ferrous=cut("FerrousIron", V3_STD_MULT["ferrous"]),
+        clay=cut("ClaySulfateMica", V3_STD_MULT["clay"]),
+    )
+    return classify(ee, c, veg_gate="strict", iron_fallback=iron_fallback,
+                    ndvi_max=V3_NDVI_MAX, thresholds=t)
+
+
+def classify(ee, c, veg_gate="strict", iron_fallback=True, ndvi_max=None,
+            thresholds=None):
     """The v2.4.0 first-match-wins cascade, server-side.
 
     NOTE ON VERSIONS: the defaults here reproduce **v2.4.0**, because every
@@ -110,9 +197,10 @@ def classify(ee, c, veg_gate="strict", iron_fallback=True):
     b3, b4, b5, b6 = (c.select("SR_B3"), c.select("SR_B4"),
                       c.select("SR_B5"), c.select("SR_B6"))
 
-    has_iron, has_f1 = iron.gt(T["iron"]), f1.gt(T["ferric1"])
-    has_f2, has_fe2 = f2.gt(T["ferric2"]), fe2.gt(T["ferrous"])
-    has_clay = clay.gt(T["clay"])
+    th = thresholds or T                        # accepts ee.Number overrides
+    has_iron, has_f1 = iron.gt(th["iron"]), f1.gt(th["ferric1"])
+    has_f2, has_fe2 = f2.gt(th["ferric2"]), fe2.gt(th["ferrous"])
+    has_clay = clay.gt(th["clay"])
     sparse = gv.gt(T["green_veg"]).And(gv.lte(T["dense_veg"]))
     dense = gv.gt(T["dense_veg"])
 
@@ -138,7 +226,8 @@ def classify(ee, c, veg_gate="strict", iron_fallback=True):
         raise ValueError("unknown veg_gate %r" % veg_gate)
 
     veg_road = no_green_peak.And(
-        ndvi.lt(T["ndvi_max"]).Or(has_iron.And(b6.lt(0.20)).And(gv.lt(3.5))))
+        ndvi.lt(ndvi_max if ndvi_max is not None else T["ndvi_max"])
+        .Or(has_iron.And(b6.lt(0.20)).And(gv.lt(3.5))))
     land = (water.Not().And(not_bright).And(not_dark)
             .And(built.Not()).And(veg_road))
     classify.last_land = land.rename("land")
@@ -169,6 +258,19 @@ def classify(ee, c, veg_gate="strict", iron_fallback=True):
     assign(sparse.And(has_f1).And(has_iron.Not()).And(water.Not()), 13)
     assign(dense.And(has_iron.Not()).And(water.Not()), 11)
     return out.rename("class")
+
+
+def composite_for_region(ee, region, months=None, start=START, end=END):
+    """General-purpose composite builder over an arbitrary geometry (a
+    catchment polygon, not one of the fixed SITES). months defaults to
+    V3_MONTHS (May-Jul, the paper-faithful season, finding L4)."""
+    months = months or V3_MONTHS
+    col = (ee.ImageCollection("LANDSAT/LC08/C02/T1_L2")
+           .filterBounds(region).filterDate(start, end)
+           .filter(ee.Filter.calendarRange(months[0], months[-1], "month"))
+           .map(lambda i: process_landsat(ee, i))
+           .map(lambda i: add_indices(ee, i)))
+    return col, col.size()
 
 
 def run(ee, site, n_pixels, seed):

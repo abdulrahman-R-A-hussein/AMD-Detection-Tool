@@ -59,14 +59,62 @@ def init_ee():
     return ee
 
 
+def screen_stream_width(ee, samples, min_width_m, sensor_scale):
+    """Drop samples at STREAM stations narrower than min_width_m before any
+    scene matching is attempted (Water Phase 2, Colorado extension).
+
+    Most Animas-watershed tributaries are well under a Sentinel-2 pixel
+    (10 m) - matching them anyway wastes a GEE round-trip per date and, worse,
+    can silently return a "usable" window whose few water-flagged pixels are
+    actually shoreline/streambed contamination rather than clean water. MERIT
+    Hydro's `wth` band (modelled channel width, m) is sampled once per
+    station up front so this is a single batched query, not one per sample.
+
+    Lake/reservoir samples are never screened (wth is a river-channel metric
+    and is meaningless off the channel network).
+    """
+    stream_stations = {}
+    for s in samples:
+        if str(s.get("site_type", "")).strip().lower().startswith(
+                ("stream", "river")):
+            stream_stations[s["station_id"]] = (s["lon"], s["lat"])
+    if not stream_stations:
+        return samples, {}
+
+    img = ee.Image("MERIT/Hydro/v1_0_1").select("wth")
+    ids = list(stream_stations)
+    fc = ee.FeatureCollection([
+        ee.Feature(ee.Geometry.Point(stream_stations[sid]).buffer(45),
+                  {"station_id": sid}) for sid in ids])
+    widths_fc = img.reduceRegions(collection=fc, reducer=ee.Reducer.max(),
+                                  scale=90)
+    got = widths_fc.getInfo()["features"]
+    widths = {f["properties"]["station_id"]: f["properties"].get("max")
+             for f in got}
+
+    kept, dropped_ids = [], set()
+    for s in samples:
+        sid = s.get("station_id")
+        if sid not in stream_stations:
+            kept.append(s)
+            continue
+        w = widths.get(sid)
+        if w is not None and w >= min_width_m:
+            kept.append(s)
+        else:
+            dropped_ids.add(sid)
+    return kept, {sid: widths.get(sid) for sid in dropped_ids}
+
+
 def load_samples(path, lake_filter=None):
     """Collapse the long WQP table into one record per (station, date)."""
-    stations, samples = {}, {}
+    stations, station_type, samples = {}, {}, {}
     spath = os.path.join(os.path.dirname(path), "stations.csv")
     with open(spath, encoding="utf-8") as fh:
         for s in csv.DictReader(fh):
             try:
                 stations[s["station_id"]] = (float(s["lat"]), float(s["lon"]))
+                station_type[s["station_id"]] = s.get("site_type", "")
             except (ValueError, KeyError):
                 pass
 
@@ -88,6 +136,7 @@ def load_samples(path, lake_filter=None):
             rec = samples.setdefault((sid, date), {
                 "station_id": sid, "date": date, "lake": r.get("lake", ""),
                 "lat": stations[sid][0], "lon": stations[sid][1],
+                "site_type": station_type.get(sid, ""),
             })
             col = ("Iron_%s" % (frac or "Unspecified")) if char == "Iron" else char
             if char == "Iron" or char in CHARS:
@@ -250,6 +299,12 @@ def main(argv=None):
                     help="only match samples carrying these analytes")
     ap.add_argument("--chem", default=CHEM)
     ap.add_argument("--out", default=OUT)
+    ap.add_argument("--min-width-m", type=float, default=None,
+                    help="drop STREAM stations narrower than this (MERIT "
+                         "Hydro 'wth' band) before matching - use ~10-15 for "
+                         "Sentinel-2, ~30 for Landsat-only runs. Lake/"
+                         "reservoir stations are never screened. Recommended "
+                         "for Colorado; Ohio stations are all lakes.")
     args = ap.parse_args(argv)
 
     samples = load_samples(args.chem, args.lake)
@@ -273,6 +328,19 @@ def main(argv=None):
           % (len(samples), len(dates), dates[0], dates[-1]))
 
     ee = init_ee()
+    if args.min_width_m is not None:
+        n_before = len(samples)
+        samples, dropped = screen_stream_width(ee, samples, args.min_width_m,
+                                                20.0)
+        if dropped:
+            print("dropped %d sample(s) at %d narrow/unresolved stream "
+                  "station(s) (width < %.0f m): %s"
+                  % (n_before - len(samples), len(dropped), args.min_width_m,
+                     ", ".join("%s(%s)" % (k, "%.0fm" % v if v is not None else "?")
+                              for k, v in list(dropped.items())[:10])))
+        if not samples:
+            sys.exit("No samples left after width screening.")
+
     rows = match(ee, samples, args.days, args.radius, args.scale, args.min_water,
                  tuple(s.strip() for s in args.sensors.split(",") if s.strip()))
     if not rows:

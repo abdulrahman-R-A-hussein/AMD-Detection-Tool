@@ -336,15 +336,25 @@ def consolidate(out_dir):
 
                 if fieldnames is None:
                     fieldnames = list(r)
+                elif len(r) > len(fieldnames):
+                    # BUG FIXED 2026-08-10: capturing fieldnames from only the
+                    # FIRST row silently dropped Iron_mgL whenever that first
+                    # row wasn't an Iron characteristic (extrasaction="ignore"
+                    # discards any key not in `fieldnames` from every later
+                    # row too) - confirmed missing from Ohio's consolidated.csv
+                    # while present in Colorado's, purely because of file/row
+                    # iteration order. Track the widest row seen instead.
+                    fieldnames = list(r)
                 rows.append(r)
 
     if not rows and not sed_rows:
         return 0, 0
 
-    # sediment rows may introduce the Iron_mgL column before any water row
-    # did; make sure both tables share a superset fieldname list.
+    # Union of every key seen across BOTH tables, not just the widest single
+    # row - a key present only on some water rows (or only on sediment rows)
+    # must still make it into the shared column list for both files.
     all_fields = list(fieldnames or [])
-    for r in sed_rows:
+    for r in rows + sed_rows:
         for k in r:
             if k not in all_fields:
                 all_fields.append(k)

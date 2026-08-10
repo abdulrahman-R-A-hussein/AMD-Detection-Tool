@@ -129,7 +129,15 @@ def delineate(ee, lon, lat, radius_km=60, verbose=True):
     area_km2 = sum(float(by_id[b]["properties"]["SUB_AREA"]) for b in seen
                   if b in by_id)
     geoms = [ee.Geometry(by_id[b]["geometry"]) for b in seen if b in by_id]
-    catchment = ee.FeatureCollection([ee.Feature(g) for g in geoms]).union(1).geometry()
+    catchment_raw = ee.FeatureCollection([ee.Feature(g) for g in geoms]).union(1).geometry()
+    # HydroSHEDS basin boundaries follow real terrain and can carry thousands
+    # of vertices; every downstream intersection/clip in the classification
+    # pipeline (tile_geoms, reduceRegion) re-walks that boundary, and it was
+    # enough by itself to trip "User memory limit exceeded" even with 16
+    # tiles on a modest 237 km2 catchment. Simplify to the classification
+    # pixel scale (30 m Landsat) - shape is preserved at every scale that
+    # matters for a 30 m classifier, only sub-pixel wiggles are dropped.
+    catchment = catchment_raw.simplify(maxError=30)
 
     # Coarse warning only, see docstring: does the catchment use most of the
     # queried disc's area? If so it may be clipped by the buffer and should

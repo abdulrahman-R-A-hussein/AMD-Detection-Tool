@@ -104,9 +104,10 @@ one catchment row in Arm A (pooled chemistry), per the plan's stated risk
 ("count distinct catchments, not stations"). Upgrade path if this granularity
 turns out to matter: true DEM flow-accumulation from MERIT Hydro `dir`.
 
-## 4. Arm A - watershed NAP head-to-head [PENDING - run in progress]
+## 4. Arm A - watershed NAP head-to-head - DONE
 
-Code: `python/watershed_nap.py --region colorado`.
+Code: `python/watershed_nap.py --region colorado`. Output:
+`data/matched/watershed_nap_colorado.csv` (6 catchment rows).
 
 Two EE performance bugs found and fixed while building this (both are the
 same class of problem the plan's Phase-0 caution was meant to catch, just one
@@ -124,20 +125,87 @@ layer deeper than catchment delineation):
   Python. Verified end-to-end on the failing catchment after the fix: 130
   scenes, 334,876 classified pixels, full class histogram produced.
 
-[RESULTS TO BE FILLED IN]
+### Results (n=6 catchments, 44-130 Landsat scenes each, 45 stations by
+sample count deduped by shared basin)
 
-## 5. Arm B - direct optical detection [PENDING]
+| chemistry var | loading | n | rho | LOOCV R2 |
+|---|---|---|---|---|
+| **dissolved Fe** | **ours M1 (AMD%)** | 6 | **+0.714** | **+0.804** |
+| dissolved Fe | ours M2 (NAP-weighted) | 6 | +0.600 | +0.668 |
+| dissolved Fe | rockwell M1 | 6 | +0.257 | -1.542 |
+| dissolved Fe | rockwell M2 | 6 | +0.257 | -1.565 |
+| pH | ours M1 | 6 | -0.371 | -0.644 |
+| pH | rockwell M1 | 6 | -0.714 | -0.302 |
+| sulfate | ours M1 | 6 | +0.314 | -1.272 |
+| sulfate | rockwell M1 | 6 | +0.314 | -0.649 |
+| specific conductance | rockwell M1 | 5 | +0.600 | -1.034 |
 
-### B1 - water column
+**Headline: our v3.0.x map's upstream AMD-area fraction predicts measured
+dissolved Fe substantially better than Rockwell's published map does**, in a
+real head-to-head against independent USGS water chemistry - the one result
+in this entire project scored against ground truth neither map was fitted to.
+Rockwell's M1/M2 have negative LOOCV R² (worse than predicting the mean); ours
+is +0.80.
 
-Code: `python/match_scenes.py`, `python/detection_limit.py`.
+**This is NOT statistically significant at n=6 and must not be oversold.**
+Exact permutation p-values (720 permutations, computed directly, not a normal
+approximation): ours M1 vs dissolved Fe **p=0.136**; rockwell M1 vs dissolved
+Fe p=0.658; rockwell M1 vs pH p=0.136 (same magnitude as our headline result,
+opposite variable - Rockwell is not "zero signal everywhere"). Report this as
+**suggestive and exploratory**, not proven.
 
-Ohio matched dataset expanded from 42 rows (all 3,023 available consolidated
-rows now attempted, not the earlier subset). [RESULTS TO BE FILLED IN]
+**n=6 is a real ceiling, not an artifact of too few stations searched.**
+Re-ran with 82 stations (min_samples lowered 5->3), spanning genuinely
+different sub-watersheds (San Miguel/Telluride-area stations: Camp Bird Mine,
+Cornet Creek, Poughkeepsie Gulch) at the same 60 km search radius - EVERY one
+of the 82 collapsed into the SAME 6 catchments already found. Confirms finding
+§3's `hybas_12` granularity floor is the binding constraint here, not station
+selection. Increasing n requires either a materially larger search radius
+(pulling in genuinely separate river systems) or finer catchment delineation
+(true DEM flow-accumulation, logged as a next step in §3).
 
-Colorado matched dataset: [NOT YET RUN - stream stations need the
-`--min-width-m` MERIT Hydro screen added this session before matching, since
-most Animas tributaries are narrower than a Sentinel-2 pixel].
+**Sulfate and specific conductance show no reliable signal for either map**
+(both near the ±0.3 rho range, both maps tied on sulfate). Consistent with
+sulfate's established optical invisibility (finding W4) extending to
+watershed-scale mineral-area as a proxy too - pyrite oxidation chemistry and
+downstream transport are not simply proportional to exposed mineral area at
+Landsat resolution.
+
+## 5. Arm B - direct optical detection
+
+### B1 - water column - Ohio DONE, Colorado DONE
+
+Code: `python/match_scenes.py`, `python/detection_limit.py`. Full report:
+`validation/report_detection_limit_ohio_2026-08-10.txt`.
+
+**Ohio: expanded 42 -> 83 matched rows** (all 355 available station-dates
+attempted, not the earlier subset; 83 produced a usable scene within +/-3
+days). 49 Sentinel-2, 34 Landsat 8, median 129 water pixels/window.
+
+| variable | n | result |
+|---|---|---|
+| Iron (Total Recoverable) | 17 | **no feature's CI excludes zero - no detectable response** (0.058-6.2 mg/L range, median 0.345) |
+| Iron (Dissolved) | 4 | too few rows to test |
+| Sulfate | 23 | **no feature's CI excludes zero** (10.6-439 mg/L range) |
+| **Turbidity (confound check)** | 50 | **6 features' CI excludes zero** (green_blue rho=+0.499, f_B2 rho=-0.489, ...) |
+
+**This confirms and sharpens findings W1-W4 with nearly double the sample.**
+The water arm optically detects turbidity/sediment cleanly - multiple bands
+with confidence intervals that clearly exclude zero - but iron and sulfate
+remain undetectable at Ohio's concentrations even with the larger sample. Any
+apparent "iron signal" anywhere in this project's water-column work is a
+turbidity signal in disguise unless proven otherwise by a confound-controlled
+test, exactly as W3 already warned.
+
+**Colorado, stratified across the full concentration range**
+(0-99.7 mg/L dissolved Fe, 221 station-dates picked at even percentile
+spacing rather than by sample count, so the detection-limit curve is actually
+covered rather than clustered at whatever station happened to be sampled
+most): matched via `match_scenes.py --min-width-m 12` (new MERIT Hydro stream-
+width screen, since most Animas tributaries are sub-pixel). [RESULTS TO BE
+FILLED IN - run in progress at time of writing]
+
+### B2 - precipitate/seep [NOT BUILT THIS SESSION]
 
 ### B2 - precipitate/seep [NOT BUILT THIS SESSION]
 
@@ -165,14 +233,27 @@ Phase 3). Deferred until B1/B2 results are in.
 ## What to do next session
 
 In priority order:
-1. Finish reading Arm A's results once the run completes; write the
-   head-to-head verdict (does either map predict measured chemistry, and if
-   so does ours or Rockwell's do it better).
-2. Run Colorado B1 (water column) via `match_scenes.py --chem
-   data/chemistry/silverton_co/consolidated.csv --min-width-m 12` (or similar)
-   now that width screening exists.
-3. Build B2 (precipitate/seep extraction) - needs a defined sampling geometry
-   around known discharge points (the 62 mine-discharge/adit/spring stations
-   already identified are the natural target list).
-4. Arm C, with a permutation null from the start.
-5. Resolution-degradation curve, once B1/B2 give something to degrade.
+1. **Build B2 (precipitate/seep extraction)** - needs a defined sampling
+   geometry around known discharge points (the 62 mine-discharge/adit/spring
+   stations already identified in Colorado are the natural target list; use
+   `water_indices.py`'s `GreenNIR`/`GreenNIRNorm`, correctly scoped to
+   land-surface pixels this time).
+2. **Arm C** (vegetation NDVI stress proxy), with a permutation null from the
+   start - do not repeat finding W2.
+3. **Resolution-degradation curve**, once B1/B2 give something detectable to
+   degrade (S2 10m -> 20/30/60/100m, reproducing paper2's "3 of 6 leaks
+   resolved at 10m" finding quantitatively).
+4. **Increase Arm A's n** beyond the 6-catchment ceiling: either widen the
+   search radius to pull in genuinely separate river systems (Uncompahgre,
+   Lake Fork), or build true DEM flow-accumulation delineation
+   (`MERIT/Hydro/v1_0_1` `dir` band) for finer catchment resolution than
+   `hybas_12` provides near Silverton.
+5. Calibrate `ferric1/2StdMult`/`ferrousStdMult` in the v3.0.x classifier
+   (still uncalibrated by assumption, per REPLICA_AUDIT_2026-07-26.md) -
+   directly affects Arm A's M1/M2 loading metrics since they depend on the
+   full classification cascade, not just the iron/clay terms.
+6. Investigate whether the Cement Creek / Animas mainstem / Howardsville
+   catchment split (currently impossible at hybas_12 resolution) would
+   change the Arm A result if resolved - Cement Creek is disproportionately
+   acidic and is currently averaged in with cleaner tributaries sharing its
+   polygon, which would bias any true association toward the null.

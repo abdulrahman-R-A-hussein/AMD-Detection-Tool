@@ -1,0 +1,61 @@
+83 matched rows, 83 kept (n_water>=10, |offset|<=5d)
+sensors: {'S2': np.int64(49), 'L8': np.int64(34)}
+lakes: {'Atwood Lake At Main Swimmers Beach Oh': np.int64(26), 'Atwood Lake': np.int64(25), 'Burr Oak Reservoir': np.int64(9), 'Lake Logan (Hocking Lake)': np.int64(6), 'St. Joseph Lake': np.int64(5), 'Lake Alma': np.int64(3), 'Lake Rupert': np.int64(2), 'Leesville Lake': np.int64(2), 'Somerset Reservoir': np.int64(2), 'Lake Hope': np.int64(1), 'Piedmont Lake': np.int64(1), 'Piedmont Lake Near Piedmont Oh': np.int64(1)}
+
+==========================================================================
+IRON - Total Recoverable (ug/L)   n=17   range 58.0 - 6200.0   median 345.0
+==========================================================================
+  feature            rho       n   95% CI (bootstrap)
+  SR_B7           -0.366      17   [-0.717,  0.167]
+  SR_B6           -0.270      17   [-0.666,  0.255]
+  SR_B4           -0.243      17   [-0.662,  0.307]
+  SR_B2           -0.211      17   [-0.659,  0.352]
+  f_B5             0.197      17   [-0.365,  0.623]
+  SR_B3           -0.162      17   [-0.627,  0.407]
+  iron_idx        -0.119      17   [-0.594,  0.392]
+  blue_coastal     0.097      17   [-0.447,  0.599]
+  SR_B1           -0.096      17   [-0.561,  0.454]
+  f_B3            -0.094      17   [-0.609,  0.428]
+
+  No feature's confidence interval excludes zero: no detectable
+  response at these concentrations. This IS the result.
+
+IRON - Dissolved (ug/L): only 4 usable rows - too few to test.
+
+==========================================================================
+SULFATE (mg/L)   n=23   range 10.6 - 439.0   median 20.5
+==========================================================================
+  feature            rho       n   95% CI (bootstrap)
+  f_B5             0.367      23   [-0.100,  0.747]
+  f_B2            -0.261      23   [-0.627,  0.184]
+  red_blue         0.256      23   [-0.185,  0.610]
+  f_B3            -0.224      23   [-0.600,  0.197]
+  f_B4             0.218      23   [-0.199,  0.603]
+  SR_B7           -0.188      23   [-0.582,  0.273]
+  SR_B3           -0.169      23   [-0.530,  0.254]
+  iron_idx        -0.165      23   [-0.581,  0.294]
+  SR_B6           -0.157      23   [-0.538,  0.282]
+  blue_coastal    -0.111      23   [-0.517,  0.351]
+
+  No feature's confidence interval excludes zero: no detectable
+  response at these concentrations. This IS the result.
+
+==========================================================================
+TURBIDITY (NTU) - confound check   n=50   range 1.4 - 37.4   median 9.9
+==========================================================================
+  feature            rho       n   95% CI (bootstrap)
+  green_blue       0.499      50   [ 0.217,  0.723]  <- CI excludes 0
+  f_B2            -0.489      50   [-0.716, -0.202]  <- CI excludes 0
+  red_blue         0.466      50   [ 0.189,  0.681]  <- CI excludes 0
+  f_B4             0.427      50   [ 0.158,  0.644]  <- CI excludes 0
+  f_B1            -0.399      50   [-0.632, -0.121]  <- CI excludes 0
+  f_B3             0.388      50   [ 0.108,  0.642]  <- CI excludes 0
+  blue_coastal     0.369      50   [ 0.096,  0.601]  <- CI excludes 0
+  SR_B3            0.318      50   [ 0.009,  0.571]  <- CI excludes 0
+  iron_idx         0.309      50   [ 0.030,  0.545]  <- CI excludes 0
+  SR_B4            0.282      50   [-0.030,  0.542]
+
+--------------------------------------------------------------------------
+Read the confound checks before believing any iron result: if a band
+tracks turbidity or chlorophyll more strongly than iron, it is
+detecting sediment or algae, not acid mine drainage.

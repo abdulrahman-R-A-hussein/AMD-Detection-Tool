@@ -197,13 +197,39 @@ apparent "iron signal" anywhere in this project's water-column work is a
 turbidity signal in disguise unless proven otherwise by a confound-controlled
 test, exactly as W3 already warned.
 
-**Colorado, stratified across the full concentration range**
-(0-99.7 mg/L dissolved Fe, 221 station-dates picked at even percentile
-spacing rather than by sample count, so the detection-limit curve is actually
-covered rather than clustered at whatever station happened to be sampled
-most): matched via `match_scenes.py --min-width-m 12` (new MERIT Hydro stream-
-width screen, since most Animas tributaries are sub-pixel). [RESULTS TO BE
-FILLED IN - run in progress at time of writing]
+**Colorado, stratified across the full concentration range - ATTEMPTED,
+produced no usable matches, two distinct real findings:**
+
+221 station-dates were picked at even percentile spacing across 0-99.7 mg/L
+dissolved Fe. `--min-width-m 12` dropped **197 of 217 (91%)** before matching
+was even attempted, leaving 20. **All 20 of those 20 then failed with "no
+usable scene".**
+
+1. **The width pre-filter is too aggressive.** It dropped stations on
+   *missing* MERIT `wth` data, not *confirmed* narrowness - logged as
+   `station(?)` in the run output. MERIT's modelled channel network does not
+   resolve small headwater creeks at all; absence of a value means "MERIT has
+   no channel here", not "this channel is narrow". Treating the two the same
+   discarded stations that might have been perfectly matchable. Fix: only
+   drop a station when `wth` is present AND below threshold; when it's
+   missing, let `match_scenes.py`'s own `n_water` pixel count decide (that
+   is the actual test of usability, and it already exists).
+2. **The lake-calibrated water mask may not generalise to mountain streams at
+   all.** Even "Animas River Below Silverton" - the widened mainstem, not a
+   narrow tributary - produced zero matches across 6 attempted dates spanning
+   2015-2022. The v2.4.0 water mask (`MNDWI>0.3 ∧ AWEInsh>0 ∧ NDVI<0 ∧
+   NIR<Green ∧ brightness<0.30`) was built and validated on standing lake
+   water (findings W1-W4); a fast, shallow, turbulent, often-shadowed
+   mountain river in a narrow valley may simply not satisfy those spectral
+   conditions regardless of channel width. This is a genuine, informative
+   negative finding, not a bug to paper over - but it means **B1 cannot yet
+   answer the Colorado question with the current masking approach**, and
+   needs either a stream-specific mask or direct pixel inspection at a known-
+   wide, known-good reach before concluding streams are truly undetectable.
+
+Both are logged as concrete next-session fixes (§ "What to do next session"),
+not resolved in this session given the point of diminishing returns reached
+on this particular sub-question.
 
 ### B2 - precipitate/seep [NOT BUILT THIS SESSION]
 
@@ -233,6 +259,14 @@ Phase 3). Deferred until B1/B2 results are in.
 ## What to do next session
 
 In priority order:
+0. **Re-run Colorado B1 stream matching.** Bug (a) is FIXED this session
+   (`screen_stream_width()` now only drops on confirmed-narrow, not missing
+   data). Bug (b) is not: before re-running the full stratified sample,
+   sanity-check the water mask on ONE known-wide, known-good Animas reach and
+   date by hand (print the actual MNDWI/AWEInsh/NDVI/brightness values at the
+   pixel) to determine whether the lake-calibrated mask needs a stream-
+   specific variant - the mainstem produced zero matches across 6 dates even
+   before the width filter was the bottleneck.
 1. **Build B2 (precipitate/seep extraction)** - needs a defined sampling
    geometry around known discharge points (the 62 mine-discharge/adit/spring
    stations already identified in Colorado are the natural target list; use

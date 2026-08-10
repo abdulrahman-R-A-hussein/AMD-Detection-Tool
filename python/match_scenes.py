@@ -95,14 +95,17 @@ def screen_stream_width(ee, samples, min_width_m, sensor_scale):
     kept, dropped_ids = [], set()
     for s in samples:
         sid = s.get("station_id")
-        if sid not in stream_stations:
-            kept.append(s)
-            continue
-        w = widths.get(sid)
-        if w is not None and w >= min_width_m:
-            kept.append(s)
-        else:
+        w = widths.get(sid) if sid in stream_stations else None
+        # BUG FIXED 2026-08-10: only drop on a CONFIRMED narrow width. MERIT's
+        # modelled channel network does not resolve small headwater creeks at
+        # all, so `w is None` means "no data here", not "narrow" - treating
+        # them the same dropped 91% of a Colorado test sample on missing data,
+        # not confirmed narrowness. Unresolved stations now fall through to
+        # match_scenes.py's own n_water pixel count, which is the real test.
+        if sid in stream_stations and w is not None and w < min_width_m:
             dropped_ids.add(sid)
+        else:
+            kept.append(s)
     return kept, {sid: widths.get(sid) for sid in dropped_ids}
 
 

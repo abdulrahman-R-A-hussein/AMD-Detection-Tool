@@ -14,9 +14,28 @@ Why the fields matter (validation/WATER_VALIDATION_REPORT_2026-07-25.md):
   ResultDetectionConditionText  Non-detects carry no value; they must be kept
                             and handled explicitly, not silently dropped.
 
+v3.0.4 (Water Phase 2): added Colorado (Animas River watershed, bbox around
+Silverton). Verified 2026-08-10: 1,309 stations, 19,465 result rows, 841 dates,
+4,743 DISSOLVED iron measurements (vs Ohio's 4 total) at median ~2.3 mg/L -
+this is the water arm's first real positive control and the first place the
+dissolved/total confound (finding W4) is actually testable.
+
+Two things the Colorado pull requires that Ohio didn't:
+  - REGIONS, not just LAKES. Colorado sites are STREAMS ("ANIMAS RIVER AT
+    SILVERTON, CO"), so `_lake_of()` (station-name parsing assuming a lake
+    name) is replaced by `_site_key()`, which returns the raw station name for
+    stream sites and the parsed lake name for lake sites.
+  - UNIT normalisation. Colorado's Iron results carry FOUR unit spellings
+    (ug/L, ug/l, mg/L, and empty) plus 1,600 rows in mg/kg, which is SEDIMENT
+    not water and must never enter a water regression. `_normalize_units()`
+    converts everything to mg/L and tags sediment rows so callers can filter
+    them explicitly rather than by accident.
+
 Usage:
-    .venv/Scripts/python python/fetch_wqp.py            # all lakes
+    .venv/Scripts/python python/fetch_wqp.py                    # all lakes (Ohio)
     .venv/Scripts/python python/fetch_wqp.py --lake "Lake Hope"
+    .venv/Scripts/python python/fetch_wqp.py --region "Silverton, CO"
+    .venv/Scripts/python python/fetch_wqp.py --region "Silverton, CO" --consolidate-only
 """
 
 import argparse
@@ -44,6 +63,90 @@ LAKES = {
     "Lake Rupert":           (39.1775, -82.5203, 0.05, "Fe max 2550 ug/L; 1.3 km2"),
     "St Joseph Lake":        (39.7700, -82.2889, 0.03, "Fe max 1230 ug/L; small"),
 }
+
+# Regions pulled by BBOX rather than a named point - used for Colorado, where
+# the target is the whole Animas River watershed (streams + a few lakes), not
+# one named waterbody. (lat_lo, lon_lo, lat_hi, lon_hi, siteTypes, note)
+# WQP's siteType FILTER parameter is a small fixed domain (Stream, Lake,
+# Reservoir, Impoundment, Spring, Well, Facility, Land, Atmosphere, ...) that
+# is DIFFERENT from and narrower than the values a station's
+# MonitoringLocationTypeName can actually hold. Verified 2026-08-10: passing
+# "River/Stream", "Reservoir", "Lake", "Canal *", "Ditch", or any
+# "Mine/Mine Discharge *" / "Subsurface: Tunnel..." value as siteType causes an
+# HTTP 400 (not a silent empty result) - the filter parameter simply does not
+# accept those strings, even though real stations carry them.
+#
+# The robust fix: fetch_region() sends NO siteType filter (bbox + date +
+# characteristics only, so every type comes back), and filtering happens
+# locally against MonitoringLocationTypeName via EXCLUDE_SITE_TYPES. That
+# recovered 11,410 Iron rows (vs 3,844 under the old "Stream"-only filter),
+# including the mine-discharge/adit/spring source points that are the highest-
+# concentration, most AMD-diagnostic samples in the record.
+EXCLUDE_SITE_TYPES = {
+    "CERCLA Superfund Site",   # verified: unnamed stations, IDs like -AS-/-SE-
+                               # (air/sediment sample codes) - not water
+    "Land",                    # snow-course sites (e.g. "... SNOW SITE, CO")
+    "Atmosphere",
+    "Well", "Well: Multiple wells",
+    "Well: Test hole not completed as a well",
+    "Facility: Laboratory or sample-preparation area",
+}
+
+REGIONS = {
+    "Silverton, CO": (
+        37.70, -107.85, 37.95, -107.50, None,
+        "Animas River watershed incl. Cement Creek, Mineral Creek. Verified "
+        "2026-08-10, no server-side siteType filter (see EXCLUDE_SITE_TYPES): "
+        "11410 Iron rows, 5681 Sulfate, across 3606 stations including "
+        "62 mine-discharge/adit/tailings/spring source points.",
+    ),
+}
+
+# For downstream regression: source points (mine discharge) carry the highest
+# concentrations and are point sources; in-stream sites are diluted and
+# integrate upstream area. Arm A should NOT pool these two categories without
+# recording which is which - a station's category is a first-class covariate.
+SOURCE_POINT_TYPES = {
+    "Mine/Mine Discharge Adit (Mine Entrance)", "Mine/Mine Discharge",
+    "Mine/Mine Discharge Tailings Pile", "Mine/Mine Discharge Waste Rock Pile",
+    "Subsurface: Tunnel, shaft, or mine", "Spring",
+}
+
+
+def site_category(site_type):
+    """'source' (mine discharge/spring/adit) vs 'instream' (stream/lake/canal)."""
+    return "source" if site_type in SOURCE_POINT_TYPES else "instream"
+
+# WQP spells the same unit multiple ways; case differs by source agency.
+_UNIT_TO_MGL = {
+    "mg/l": 1.0, "mg/L": 1.0,
+    "ug/l": 0.001, "ug/L": 0.001, "µg/l": 0.001, "µg/L": 0.001,
+}
+# Units that are NOT water concentration - must be split out, never regressed
+# against water chemistry. mg/kg is sediment; the others are non-concentration.
+_NON_WATER_UNITS = {"mg/kg", "mg/kg dry", "ug/kg", "ug/g", "lb/day",
+                    "ug/m3", "mg/m3"}
+
+
+def normalize_iron_value(raw_value, raw_unit):
+    """Return (mg_per_L, is_water) for one WQP Iron result.
+
+    mg_per_L is None if the unit is unrecognised or non-numeric. is_water is
+    False for sediment/loading units (mg/kg, lb/day, ...) - these rows must be
+    routed to a separate table, never silently dropped OR silently pooled.
+    """
+    unit = (raw_unit or "").strip()
+    unit_ci = unit.lower()
+    try:
+        val = float(raw_value)
+    except (TypeError, ValueError):
+        return None, None
+    if unit_ci in _NON_WATER_UNITS or unit_ci.replace(" ", "") in _NON_WATER_UNITS:
+        return val, False
+    factor = _UNIT_TO_MGL.get(unit) or _UNIT_TO_MGL.get(unit_ci)
+    if factor is None:
+        return None, None                    # unrecognised unit - flag, don't guess
+    return val * factor, True
 
 # Iron and sulfate are the targets; the rest are the optical confounds that
 # finding W3 could not rule out, plus co-varying AMD metals.
@@ -103,6 +206,28 @@ def fetch_lake(name, lat, lon, half):
     return results, stations
 
 
+def fetch_region(name, lat_lo, lon_lo, lat_hi, lon_hi, site_types=None):
+    """Return (results_text, stations_text) for a bbox REGION (streams+lakes).
+
+    site_types is deliberately unfiltered by default (None): WQP's siteType
+    FILTER parameter uses a narrower, different vocabulary than
+    MonitoringLocationTypeName and rejects (HTTP 400) many real type strings -
+    see EXCLUDE_SITE_TYPES above. Filtering happens locally in consolidate().
+    """
+    common = {
+        "bBox": "%.4f,%.4f,%.4f,%.4f" % (lon_lo, lat_lo, lon_hi, lat_hi),
+        "mimeType": "csv",
+        "zip": "no",
+    }
+    if site_types:
+        common["siteType"] = site_types
+    results = _get("Result", dict(common,
+                                  characteristicName=CHARACTERISTICS,
+                                  startDateLo=START_DATE))
+    stations = _get("Station", common)
+    return results, stations
+
+
 def _summarise(text, lake):
     """Count rows and report the iron/sulfate spread, so a bad pull is obvious."""
     rows = list(csv.DictReader(io.StringIO(text)))
@@ -129,7 +254,7 @@ def _summarise(text, lake):
 
 
 def _lake_of(station_name):
-    """Derive the waterbody from a station name.
+    """Derive the waterbody from a LAKE station name (Ohio-style).
 
     Neighbouring lakes fall inside each other's bounding boxes (Somerset and
     St Joseph are ~1.5 km apart), so bbox membership CANNOT be used to say
@@ -142,16 +267,40 @@ def _lake_of(station_name):
     return head.strip().title() or "Unknown"
 
 
+def _site_key(station_name, site_type):
+    """Generalisation of _lake_of() for regions with STREAMS as well as lakes.
+
+    A stream station name ("ANIMAS RIVER AT SILVERTON, CO.") does not name a
+    single shared waterbody the way "SOMERSET RESERVOIR, L-1" does - the comma
+    splits off a real, meaningful qualifier (the location on the river), not a
+    station-number suffix. So streams keep their full station name as the key
+    (one key per gauge), while lakes still collapse via _lake_of() so repeat
+    stations on one lake (L-1, L-2, ...) merge as before.
+    """
+    if str(site_type).strip().lower().startswith("stream"):
+        return str(station_name).strip().title() or "Unknown"
+    return _lake_of(station_name)
+
+
 def consolidate(out_dir):
-    """Merge the per-lake pulls into one deduplicated, lake-attributed table."""
+    """Merge the per-lake/region pulls into one deduplicated, site-attributed
+    table, with Iron unit-normalised and sediment rows split out.
+
+    The "lake" column name is kept for backward compatibility with
+    match_scenes.py and everything downstream that reads it - it now holds a
+    lake name OR a stream station name, produced by _site_key(). Sediment rows
+    (mg/kg Iron) are written to a SEPARATE consolidated_sediment.csv rather
+    than dropped or mixed in, per the Colorado verification finding that 1,600
+    of Silverton's Iron rows are mg/kg.
+    """
     import glob
-    seen, rows, fieldnames = set(), [], None
+    seen, rows, sed_rows, fieldnames = set(), [], [], None
     stations = {}
     spath = os.path.join(out_dir, "stations.csv")
     if os.path.exists(spath):
         with open(spath, encoding="utf-8") as fh:
             for s in csv.DictReader(fh):
-                stations[s["station_id"]] = s["station_name"]
+                stations[s["station_id"]] = (s["station_name"], s.get("site_type", ""))
 
     for path in sorted(glob.glob(os.path.join(out_dir, "*_results.csv"))):
         with open(path, encoding="utf-8") as fh:
@@ -160,65 +309,113 @@ def consolidate(out_dir):
                        r.get("ActivityStartDate"),
                        r.get("CharacteristicName"),
                        r.get("ResultMeasureValue"),
+                       r.get("ResultMeasure/MeasureUnitCode"),
                        r.get("ResultSampleFractionText"),
                        r.get("ActivityDepthHeightMeasure/MeasureValue"))
                 if key in seen:
                     continue
                 seen.add(key)
                 sid = r.get("MonitoringLocationIdentifier", "")
-                r["lake"] = _lake_of(stations.get(sid, sid))
+                sname, stype = stations.get(sid, (sid, ""))
+                if stype in EXCLUDE_SITE_TYPES:
+                    continue                    # snow/air/sediment/well/lab - not surface water
+                r["lake"] = _site_key(sname, stype)
+                r["site_type"] = stype
+                r["site_category"] = site_category(stype)
+
+                if r.get("CharacteristicName") == "Iron":
+                    mgl, is_water = normalize_iron_value(
+                        r.get("ResultMeasureValue"),
+                        r.get("ResultMeasure/MeasureUnitCode"))
+                    r["Iron_mgL"] = "" if mgl is None else "%.6g" % mgl
+                    if is_water is False:
+                        sed_rows.append(r)
+                        continue                    # sediment - not a water row
+                    if is_water is None:
+                        r["Iron_mgL"] = ""           # unrecognised unit - flagged, not guessed
+
                 if fieldnames is None:
                     fieldnames = list(r)
                 rows.append(r)
 
-    if not rows:
-        return 0
+    if not rows and not sed_rows:
+        return 0, 0
+
+    # sediment rows may introduce the Iron_mgL column before any water row
+    # did; make sure both tables share a superset fieldname list.
+    all_fields = list(fieldnames or [])
+    for r in sed_rows:
+        for k in r:
+            if k not in all_fields:
+                all_fields.append(k)
+
     path = os.path.join(out_dir, "consolidated.csv")
     with open(path, "w", encoding="utf-8", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=fieldnames, extrasaction="ignore")
+        w = csv.DictWriter(fh, fieldnames=all_fields, extrasaction="ignore")
         w.writeheader()
         w.writerows(rows)
-    return len(rows)
+
+    if sed_rows:
+        spath2 = os.path.join(out_dir, "consolidated_sediment.csv")
+        with open(spath2, "w", encoding="utf-8", newline="") as fh:
+            w = csv.DictWriter(fh, fieldnames=all_fields, extrasaction="ignore")
+            w.writeheader()
+            w.writerows(sed_rows)
+
+    return len(rows), len(sed_rows)
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--lake", help="fetch a single lake by name")
-    ap.add_argument("--out", default=OUT_DIR, help="output directory")
+    ap.add_argument("--lake", help="fetch a single lake by name (Ohio)")
+    ap.add_argument("--region", help="fetch a named REGION by bbox (e.g. Colorado)")
+    ap.add_argument("--out", help="output directory (default: data/chemistry "
+                                  "for lakes, data/chemistry/<region-slug> for "
+                                  "regions)")
     ap.add_argument("--consolidate-only", action="store_true",
                     help="skip downloading; just rebuild consolidated.csv")
     args = ap.parse_args(argv)
 
+    if args.region and args.lake:
+        sys.exit("--region and --lake are mutually exclusive")
+
+    if args.region:
+        if args.region not in REGIONS:
+            sys.exit("Unknown region %r. Known: %s" % (args.region, ", ".join(REGIONS)))
+        out_dir = args.out or os.path.join(
+            OUT_DIR, args.region.lower().replace(", ", "_").replace(" ", "_"))
+    else:
+        out_dir = args.out or OUT_DIR
+
     if args.consolidate_only:
-        print("consolidated %d unique rows" % consolidate(args.out))
+        n_water, n_sed = consolidate(out_dir)
+        print("consolidated %d water rows, %d sediment rows" % (n_water, n_sed))
         return
 
-    if args.lake and args.lake not in LAKES:
-        sys.exit("Unknown lake %r. Known: %s" % (args.lake, ", ".join(LAKES)))
-    targets = ({args.lake: LAKES[args.lake]} if args.lake else LAKES)
-
-    os.makedirs(args.out, exist_ok=True)
+    os.makedirs(out_dir, exist_ok=True)
     station_rows, total = [], 0
 
-    for lake, (lat, lon, half, _note) in targets.items():
-        slug = lake.lower().replace(" ", "_")
+    if args.region:
+        lat_lo, lon_lo, lat_hi, lon_hi, site_types, _note = REGIONS[args.region]
+        slug = args.region.lower().replace(", ", "_").replace(" ", "_")
         try:
-            results, stations = fetch_lake(lake, lat, lon, half)
+            results, stations = fetch_region(args.region, lat_lo, lon_lo,
+                                             lat_hi, lon_hi, site_types)
         except RuntimeError as exc:
-            print("%-22s FAILED: %s" % (lake, exc))
-            continue
+            sys.exit("%s FAILED: %s" % (args.region, exc))
 
-        with open(os.path.join(args.out, "%s_results.csv" % slug), "w",
+        with open(os.path.join(out_dir, "%s_results.csv" % slug), "w",
                   encoding="utf-8", newline="") as fh:
             fh.write(results)
 
-        line, rows = _summarise(results, lake)
+        line, rows = _summarise(results, args.region)
         print(line)
         total += len(rows)
 
         for s in csv.DictReader(io.StringIO(stations)):
             station_rows.append({
-                "lake": lake,
+                "lake": _site_key(s.get("MonitoringLocationName", ""),
+                                  s.get("MonitoringLocationTypeName", "")),
                 "station_id": s.get("MonitoringLocationIdentifier", ""),
                 "station_name": s.get("MonitoringLocationName", ""),
                 "lat": s.get("LatitudeMeasure", ""),
@@ -226,16 +423,48 @@ def main(argv=None):
                 "site_type": s.get("MonitoringLocationTypeName", ""),
                 "organization": s.get("OrganizationFormalName", ""),
             })
+    else:
+        if args.lake and args.lake not in LAKES:
+            sys.exit("Unknown lake %r. Known: %s" % (args.lake, ", ".join(LAKES)))
+        targets = ({args.lake: LAKES[args.lake]} if args.lake else LAKES)
+
+        for lake, (lat, lon, half, _note) in targets.items():
+            slug = lake.lower().replace(" ", "_")
+            try:
+                results, stations = fetch_lake(lake, lat, lon, half)
+            except RuntimeError as exc:
+                print("%-22s FAILED: %s" % (lake, exc))
+                continue
+
+            with open(os.path.join(out_dir, "%s_results.csv" % slug), "w",
+                      encoding="utf-8", newline="") as fh:
+                fh.write(results)
+
+            line, rows = _summarise(results, lake)
+            print(line)
+            total += len(rows)
+
+            for s in csv.DictReader(io.StringIO(stations)):
+                station_rows.append({
+                    "lake": lake,
+                    "station_id": s.get("MonitoringLocationIdentifier", ""),
+                    "station_name": s.get("MonitoringLocationName", ""),
+                    "lat": s.get("LatitudeMeasure", ""),
+                    "lon": s.get("LongitudeMeasure", ""),
+                    "site_type": s.get("MonitoringLocationTypeName", ""),
+                    "organization": s.get("OrganizationFormalName", ""),
+                })
 
     if station_rows:
-        path = os.path.join(args.out, "stations.csv")
+        path = os.path.join(out_dir, "stations.csv")
         with open(path, "w", encoding="utf-8", newline="") as fh:
             w = csv.DictWriter(fh, fieldnames=list(station_rows[0]))
             w.writeheader()
             w.writerows(station_rows)
-        print("\n%d result rows, %d stations -> %s" % (total, len(station_rows), args.out))
-        print("consolidated %d unique rows (duplicates removed; lake assigned "
-              "by station name)" % consolidate(args.out))
+        print("\n%d result rows, %d stations -> %s" % (total, len(station_rows), out_dir))
+        n_water, n_sed = consolidate(out_dir)
+        print("consolidated %d water rows, %d sediment rows (duplicates "
+              "removed; site assigned by station name/type)" % (n_water, n_sed))
 
 
 if __name__ == "__main__":

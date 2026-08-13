@@ -1,0 +1,21 @@
+---
+name: amd-v2-vpca-validation-plan
+description: Plan/approach for AMD Detection v2.0 upgrade + VPCA spectral-library validation
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: b8bbe776-2f5c-4312-bada-a4aa5f8fd187
+  modified: 2026-07-22T20:44:50.584Z
+---
+
+v2.0 plan lives in `specs/amd-v2/plan.md` (+ `audit.md`).
+
+**STATUS (2026-07-21): Tier 1 + VALIDATION PHASE DONE, pushed** (tag v2.1.0, current file `earth-engine/amd_detection_v2.1.0.js`; v1.5.4 kept as baseline). Tier 1 fixed corrected iron index (B2/B1)-(B5/B4), first-match-wins classification, hasIron.not() on classes 2/3/4, water-score brightness guard, score scale, winter wrap. v2.0.1 (tag) added after Silverton field test: road mask OFF by default (measured jarosite SWIR1 0.35-0.43 EXCEEDS asphalt, so SWIR1>=0.20 road rule contradicted paper dark mask B6>0.2125 and blocked ALL mineral classes -> green-circle bug), strongIronThreshold 0.35->0.15, veg classes split (class13 sparse 1.5-3.0+ferric+notWater, class11 dense>3.0). Silverton re-run CONFIRMED corrected index works: scene mean -0.073, veg negative, jarosite hotspot +0.19 (~3sigma); user clicks show correct zonation (jarosite core vs Class8 ferric/clay halo).
+
+**Validation phase (v2.1.0):** built + self-test-VERIFIED `python/vpca_validation.py` (VPCA validator: embedded USGS end-members convolved to L8/S2, Kaiser retention, BRIGHTNESS-NORMALIZED contrast-direction matching by spectral angle - key fixes were needed because (a) 4 ferric minerals are NOT separable at 7 bands = finding H2 confirmed, they collapse to one 'ferric' group; (b) dark water endmember = brightness axis matched everything until L2 row-normalization added for land path, raw kept for water) and `python/derive_thresholds.py` (ROC/AUC + Youden, replaces guessed thresholds). GEE tool got exportForVPCA() + 'Export VPCA CSV' button (per-pixel SR_B1..SR_B7+class+water_class+lon/lat). Test doc = `specs/amd-v2/validation-protocol.md` (Tests A-D -> H1-H4). Venv at .venv (gitignored). **Test C DONE (2026-07-22, v2.3.0 tag, file now `amd_detection_v2.3.0.js`):** Silverton L8, 126 AMD / 447 clean px. ADOPTED Youden thresholds: FerricIron1 1.983 (AUC .992), FerricIron2 3.758 (.997), FerrousIron 0.959 (.983), ClaySulfateMica 0.021 (.999) — in settings, sliders, Reset Defaults. IronSulfate FAILED (AUC 0.769 < 0.8 vs bare rock; Youden -0.732 below scene background): kept provisional 0.10, reported as finding — ferric indices carry discrimination at Silverton. KEY PITFALL (recorded in validation/README.md): first attempt used vegetation-only clean polygons → all AUC=1.0, lon alone AUC 0.974 = spatial confounding; hard negatives (bare rock, scattered patches) are mandatory. Also: GEE Drive re-exports reuse the same filename (date-only suffix) — verify new data by row counts/cmp, a re-download can silently be the old file. Tests A/B done earlier (Silverton AUC 0.961 + Atwood clean control). NEXT: Test D water Fe³⁺ regression (Ganau 675 mg/L), Tier 2/3 upgrades, docs rewrite (METHODOLOGY.md, HOW_IT_WORKS.md), and per-site re-derivation of thresholds on desert/humid scenes (ClaySulfateMica 0.021 is site-tight). User must paste v2.3.0 into their GEE Code Editor.
+
+**VPCA validation** = the Ortiz-lab (Kent State) varimax-rotated PCA spectral-decomposition method, used here as an INDEPENDENT validator (not the detector): convolve USGS Spectral Library v7 end-members (jarosite, schwertmannite, goethite, hematite, alunite, clay, veg, water) to L8/S2 RSR → PCA+varimax on exported GEE composite → match rotated component loadings to library end-members by spectral angle → spatial overlay vs classifier output = accuracy (%, kappa). Water variant regresses Fe³⁺ component vs Ganau 675 mg/L ground truth (R², RMSE). Deliverable: `python/vpca_validation.py`.
+
+User is Abdulrahman Hussein, Kent State Earth Sciences, supervisor Dr. Joseph D. Ortiz (whose VPCA method this is). Wants results to "surprise my supervisor" — so validation rigor matters more than feature count.
+
+Upgrade tiers: T1 correctness bugs (see [[amd-v154-critical-defects]]), T2 method (enable paper's adaptive std-dev+clip thresholding already dormant in code, sensor-specific thresholds, shoreline erosion), T3 aquatic (Fe³⁺/AMWI water indices, ACOLITE/C2RCC water reflectance path, optional RF/kNN/MLP cross-check per 2024 S2+WV3 literature).

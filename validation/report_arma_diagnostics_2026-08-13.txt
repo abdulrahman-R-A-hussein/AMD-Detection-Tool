@@ -1,0 +1,108 @@
+31 catchments, 7 regions: Alma, CO, Central City, CO, Creede, CO, Lake City, CO, Leadville, CO, Ouray, CO, colorado
+
+============================================================================================
+3. DYNAMIC-RANGE SCREEN - which regions can even support a correlation?
+============================================================================================
+  region                  n     dissolved Fe range             AMD% range
+  Alma, CO                3      0.033-0.037           0.168-0.230       <- Fe barely varies; rho here is noise
+  Central City, CO        5      0.013-3.120           0.047-0.156     
+  Creede, CO              4      0.028-0.090           0.234-0.309     
+  Lake City, CO           3      0.000-0.018           0.178-0.217       <- Fe barely varies; rho here is noise
+  Leadville, CO           4      0.038-0.306           0.128-0.212     
+  Ouray, CO               6      0.000-0.083           0.058-0.178     
+  colorado                6      0.008-1.732           0.085-0.143     
+
+  2 region(s) flagged: Alma, CO, Lake City, CO
+  Their per-region rho values in the retest report should NOT be
+  read as evidence of a positive or negative relationship.
+
+============================================================================================
+1. VARIANCE DECOMPOSITION - is a pooled correlation even asking the right question?
+============================================================================================
+  chemistry var                   n   BETWEEN%    WITHIN%  regions
+  Iron_mgL_dissolved             31      46.2%      53.8%        7
+  Iron_mgL_any                   31      19.0%      81.0%        7
+  Sulfate_mgL                    31      67.5%      32.5%        7
+  pH                             31      39.6%      60.4%        7
+  SpecificConductance            26      44.3%      55.7%        7
+
+  A high BETWEEN%% means the pooled rho is mostly comparing river
+  systems to one another - geology, climate, precipitation, mining
+  history - rather than testing the loading relationship itself.
+
+============================================================================================
+2. WITHIN-REGION CORRELATION - the non-circular test (region effects removed)
+============================================================================================
+  chemistry var            loading               n regions rho_within   perm_p
+  Iron_mgL_dissolved       ours M1 (AMD%)       31       7   +0.136    0.559
+  Iron_mgL_dissolved       ours M2 (NAP-w)      31       7   +0.170    0.461
+  Iron_mgL_dissolved       rockwell M1          31       7   +0.162    0.489
+  Iron_mgL_dissolved       rockwell M2          31       7   +0.094    0.695
+
+  Iron_mgL_any             ours M1 (AMD%)       31       7   +0.119    0.625
+  Iron_mgL_any             ours M2 (NAP-w)      31       7   +0.169    0.476
+  Iron_mgL_any             rockwell M1          31       7   +0.034    0.913
+  Iron_mgL_any             rockwell M2          31       7   -0.034    0.907
+
+  Sulfate_mgL              ours M1 (AMD%)       31       7   +0.220    0.344
+  Sulfate_mgL              ours M2 (NAP-w)      31       7   +0.203    0.387
+  Sulfate_mgL              rockwell M1          31       7   +0.153    0.523
+  Sulfate_mgL              rockwell M2          31       7   +0.119    0.623
+
+  pH                       ours M1 (AMD%)       31       7   -0.237    0.311
+  pH                       ours M2 (NAP-w)      31       7   -0.271    0.242
+  pH                       rockwell M1          31       7   -0.525    0.015
+  pH                       rockwell M2          31       7   -0.458    0.039
+
+  SpecificConductance      ours M1 (AMD%)       24       6   -0.059    0.865
+  SpecificConductance      ours M2 (NAP-w)      24       6   +0.000    1.000
+  SpecificConductance      rockwell M1          24       6   +0.176    0.526
+  SpecificConductance      rockwell M2          24       6   +0.147    0.603
+
+  --- multiple-comparison correction (20 tests) ---
+    pH                       rockwell M1      rho=-0.525 p=0.015  BH_thresh=0.0025 fails BH
+    pH                       rockwell M2      rho=-0.458 p=0.039  BH_thresh=0.0050 fails BH
+    pH                       ours M2 (NAP-w)  rho=-0.271 p=0.242  BH_thresh=0.0075 fails BH
+    pH                       ours M1 (AMD%)   rho=-0.237 p=0.311  BH_thresh=0.0100 fails BH
+    Sulfate_mgL              ours M1 (AMD%)   rho=+0.220 p=0.344  BH_thresh=0.0125 fails BH
+    Bonferroni alpha = 0.0025
+    NOTHING survives correction. Any p<0.05 above is within
+    what 20 tests produce by chance and must be treated as a
+    lead to test on new data, NOT as a finding.
+============================================================================================
+4. CATCHMENT-AREA CONFOUND (pooled rank partial correlation)
+============================================================================================
+  area_km2 vs dissolved Fe : rho=+0.030 (n=31)
+  area_km2 vs ours M1      : rho=+0.367 (n=31)
+
+  chemistry var            loading                 n    rho_raw     rho|area
+  Iron_mgL_dissolved       ours M1 (AMD%)         31     +0.056       +0.048
+  Iron_mgL_dissolved       ours M2 (NAP-w)        31     +0.042       +0.033
+  Iron_mgL_dissolved       rockwell M1            31     +0.122       +0.121
+  Iron_mgL_dissolved       rockwell M2            31     +0.088       +0.085
+
+  Iron_mgL_any             ours M1 (AMD%)         31     -0.199       -0.284
+  Iron_mgL_any             ours M2 (NAP-w)        31     -0.172       -0.261
+  Iron_mgL_any             rockwell M1            31     -0.177       -0.184
+  Iron_mgL_any             rockwell M2            31     -0.248       -0.271
+
+  Sulfate_mgL              ours M1 (AMD%)         31     -0.563       -0.547
+  Sulfate_mgL              ours M2 (NAP-w)        31     -0.543       -0.526
+  Sulfate_mgL              rockwell M1            31     -0.360       -0.360
+  Sulfate_mgL              rockwell M2            31     -0.496       -0.488
+
+  pH                       ours M1 (AMD%)         31     +0.415       +0.337
+  pH                       ours M2 (NAP-w)        31     +0.364       +0.274
+  pH                       rockwell M1            31     +0.144       +0.143
+  pH                       rockwell M2            31     +0.238       +0.216
+
+  SpecificConductance      ours M1 (AMD%)         26     -0.415       -0.398
+  SpecificConductance      ours M2 (NAP-w)        26     -0.408       -0.391
+  SpecificConductance      rockwell M1            26     -0.096       -0.100
+  SpecificConductance      rockwell M2            26     -0.208       -0.204
+
+--------------------------------------------------------------------------------------------
+The geology hypothesis is NOT tested here and deliberately has no
+p-value: it was generated by looking at these same signs, so testing
+it on this data would be circular. See the module docstring for what
+would actually test it.

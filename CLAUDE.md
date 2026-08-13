@@ -48,6 +48,15 @@ only surface that survives both chat deletion and machine loss.
   measured field chemistry is ground truth. Keep those two claims separate.
 - **Always report n and the caveat** next to any rho / R² / AUC. Small-n
   results get an exact permutation p-value, not a hand-wave.
+- **Over grouped data, report the between/within variance split next to any
+  pooled correlation, and correct for multiple comparisons.** The pooled
+  sulfate result (rho = −0.563, p = 0.001) *reversed sign* to +0.220 once
+  region effects were removed — it was 67.5% between-region variance, i.e.
+  comparing river systems rather than testing the relationship. Learned
+  2026-08-13; see `validation/ARM_A_CROSS_REGION_RETEST_2026-08-13.md` Part 2.
+- **Never test a hypothesis on the data that generated it.** If a grouping or
+  cutoff was chosen by looking at the outcome, any p-value from it is
+  meaningless. Say so and state what would actually test it.
 - **A null or a collapse is a valid, publishable result** and gets reported as
   prominently as a positive would. Do not bury it.
 

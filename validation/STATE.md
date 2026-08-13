@@ -63,15 +63,24 @@ retraction is the load-bearing update this file exists to carry forward.
 
 ---
 
-## OPEN QUESTION WORTH FOLLOWING — not yet a result either way
+## OPEN QUESTIONS WORTH FOLLOWING — leads, not results
 
-**Does the Arm A relationship track geology?** Per-region rho for dissolved Fe
-vs our map's AMD-area%: Silverton **+0.714**, Ouray **+0.667** (both San Juan
-volcanic-field calderas) vs Central City **−0.700**, Creede **−0.800**,
-Leadville **−0.800** (different districts). The sign split lines up with a
-plausible geological grouping but this is an unconfirmed lead, not a tested
-hypothesis — see [`ARM_A_CROSS_REGION_RETEST_2026-08-13.md`](ARM_A_CROSS_REGION_RETEST_2026-08-13.md)
-§4 for the next step, which needs no new data fetching.
+Both from [`ARM_A_CROSS_REGION_RETEST_2026-08-13.md`](ARM_A_CROSS_REGION_RETEST_2026-08-13.md).
+
+- **Rockwell's map vs pH, within-region: rho = −0.525, p = 0.015.**
+  Mechanistically correct direction (more mapped AMD area upstream → lower
+  downstream pH), survives region-centering, and both Rockwell loading metrics
+  agree while neither of ours reaches significance. **Does NOT survive
+  multiple-comparison correction** (20 tests; BH/Bonferroni threshold 0.0025).
+  A lead to test on new data. Note it runs *opposite* to the retracted claim —
+  if it replicates it favours Rockwell's map, not ours.
+- **Does the Arm A sign-flip track geology?** Silverton +0.714 and Ouray +0.667
+  (both San Juan volcanic-field calderas) vs Central City −0.700, Creede
+  −0.800, Leadville −0.800. **Deliberately untested and given no p-value** —
+  the hypothesis was generated from these same signs, so testing it here would
+  be circular (the Test C / W1 error). Testing it needs geology labels assigned
+  to regions chosen *before* seeing their signs, or sign predicted in advance
+  for new regions.
 
 ---
 
@@ -88,6 +97,13 @@ hypothesis — see [`ARM_A_CROSS_REGION_RETEST_2026-08-13.md`](ARM_A_CROSS_REGIO
   **also failed the leave-one-region-out check** — a direct demonstration of
   why pooled significance without a held-out test is not evidence.
   → [`ARM_A_CROSS_REGION_RETEST_2026-08-13.md`](ARM_A_CROSS_REGION_RETEST_2026-08-13.md)
+- **The pooled sulfate correlation (rho = −0.563, p = 0.001).** It **reverses
+  sign to +0.220 (p = 0.344)** once between-region structure is removed.
+  Sulfate is 67.5% between-region variance, so the pooled figure was comparing
+  river systems, not testing the loading relationship — a textbook ecological
+  fallacy caught in our own data. Diagnostics also confirm the dissolved-Fe
+  null is **robust**, not a masking artifact (within-region rho +0.136,
+  p=0.559), and that catchment area is **not** a confound.
 - **The whole water contamination module (findings W1–W4, July 2026).** Indices
   ranked the *clean control* highest; the Ganau claim was circular.
   → [`WATER_VALIDATION_REPORT_2026-07-25.md`](WATER_VALIDATION_REPORT_2026-07-25.md)

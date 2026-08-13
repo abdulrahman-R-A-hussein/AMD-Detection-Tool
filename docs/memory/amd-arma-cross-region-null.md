@@ -39,6 +39,22 @@ regression result, not just a classification threshold. Any future small-n
 correlation in this project must be leave-one-group-out tested before being
 reported as a result, not just pooled-tested.
 
+**Diagnostics (same day, Part 2 of the report) added three things:**
+1. The dissolved-Fe null is ROBUST - within-region rho +0.136 (p=0.559) after
+   removing all between-region structure. Not a masking artifact.
+2. The pooled sulfate result (rho=-0.563, p=0.001) **REVERSES SIGN** to +0.220
+   (p=0.344) within regions. Sulfate is 67.5% between-region variance - the
+   pooled figure was comparing river systems, not testing the relationship.
+   Textbook ecological fallacy, caught in our own data.
+3. One lead, favouring ROCKWELL not us: their map vs pH within-region
+   rho=-0.525 p=0.015, mechanistically correct direction. Fails BH/Bonferroni
+   (20 tests, threshold 0.0025). Lead, not finding.
+Catchment area ruled out as a confound (area vs Fe rho=+0.030).
+
+**New standing rule from this**: over grouped data, always report the
+between/within variance split alongside a pooled correlation, and correct for
+multiple comparisons. Added to the repo CLAUDE.md science rules.
+
 The `hybas_12` catchment-resolution dilution problem (documented 2026-08-10 —
 Cement Creek gets averaged with cleaner tributaries sharing its polygon) biases
 every number here toward the null and is the leading candidate explanation if

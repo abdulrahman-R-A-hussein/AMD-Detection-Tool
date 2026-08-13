@@ -157,6 +157,141 @@ it caught it **before** the finding went into a grant narrative. Finding an
 n=6 false positive collapse at n=31, in-house, with the mechanism understood,
 is a far better outcome than a reviewer or a field season finding it later.
 
+---
+
+# PART 2 — Diagnostics: why it nulled, and what the pooled p-values were really measuring
+
+**Added same day.** Code: `python/arma_diagnostics.py` · Raw output:
+[`report_arma_diagnostics_2026-08-13.txt`](report_arma_diagnostics_2026-08-13.txt).
+
+Part 1 established the null. This asks whether between-region variation was
+*masking* a real within-system relationship, and what the apparently-significant
+pooled sulfate/pH/conductance results actually were.
+
+## First: the geology hypothesis is NOT tested here, on purpose
+
+The "San Juan calderas behave differently" idea in Part 1 §4 was generated *by
+looking at these signs*. Testing it on the same 31 catchments would fit the
+grouping to the outcome — the identical error behind Test C's within-site
+thresholds and finding W1's tuned-until-Ganau-scored-severe water indices.
+`arma_diagnostics.py` therefore reports **no p-value** for it. What would
+actually test it: assign geology labels from a published source for regions
+chosen *before* seeing their signs, or predict the sign of new regions in
+advance. Logged as such; not attempted.
+
+## D1 — The dissolved-Fe null is robust, not a masking artifact
+
+Removing every between-region difference by construction (rank within each
+region, mean-centre, pool) leaves the relationship still absent:
+
+| loading | within-region rho | perm p |
+|---|---|---|
+| ours M1 (AMD-area%) | +0.136 | 0.559 |
+| ours M2 (NAP-weighted) | +0.170 | 0.461 |
+| rockwell M1 | +0.162 | 0.489 |
+
+Permutation shuffles chemistry *within* region only, preserving region
+structure under the null. So the Part 1 null is not an artifact of pooling
+dissimilar river systems — there is no detectable within-system relationship
+between upstream AMD area and downstream dissolved Fe either.
+
+## D2 — The "significant" pooled sulfate result REVERSES SIGN within regions
+
+This is the most important result in Part 2, and it is methodological.
+
+| | pooled | within-region |
+|---|---|---|
+| **Sulfate vs ours M1** | **−0.563 (p=0.001)** | **+0.220 (p=0.344)** |
+| Sulfate vs ours M2 | −0.543 (p=0.002) | +0.203 (p=0.387) |
+| Sulfate vs rockwell M2 | −0.496 (p=0.005) | +0.119 (p=0.623) |
+
+Sulfate also has by far the highest between-region variance share (**67.5%**
+between vs 32.5% within — variance decomposition on ranks).
+
+Read together: the pooled sulfate correlation, which at p=0.001 would have
+read as one of the strongest results this project has ever produced, was
+**almost entirely a comparison between river systems, not a test of the
+loading relationship** — and it points the *opposite* direction once that
+between-system structure is removed. This is a textbook ecological fallacy
+(Simpson's paradox), caught in our own data with the mechanism identified.
+
+Variance decomposition for all variables:
+
+| chemistry var | between-region | within-region |
+|---|---|---|
+| Sulfate | **67.5%** | 32.5% |
+| dissolved Fe | 46.2% | 53.8% |
+| specific conductance | 44.3% | 55.7% |
+| pH | 39.6% | 60.4% |
+| Fe (any fraction) | 19.0% | 81.0% |
+
+## D3 — One lead, it favours ROCKWELL, and it does not survive correction
+
+The only within-region relationships reaching uncorrected p<0.05:
+
+| | within-region rho | perm p |
+|---|---|---|
+| pH vs **rockwell** M1 | **−0.525** | **0.015** |
+| pH vs **rockwell** M2 | −0.458 | 0.039 |
+| pH vs ours M1 | −0.237 | 0.311 |
+| pH vs ours M2 | −0.271 | 0.242 |
+
+The direction is mechanistically correct — more mapped AMD area upstream,
+lower downstream pH — and it is the variable most directly tied to acid
+production. Both of Rockwell's loading metrics agree; neither of ours reaches
+significance.
+
+**It does not survive multiple-comparison correction.** 20 within-region tests
+were run; Benjamini-Hochberg threshold for the smallest p is 0.0025 and
+Bonferroni α is 0.0025, against an observed p of 0.015. At uncorrected α=0.05,
+20 tests produce ~1 false positive by chance, which is approximately what was
+seen. **Treat as a lead to test on new data, not a finding.**
+
+Worth stating plainly: this lead runs *opposite* to the retracted claim. If it
+does replicate, it would support Rockwell's map predicting pH better than
+ours — not the reverse.
+
+## D4 — Catchment area is not the confound
+
+| | rho |
+|---|---|
+| area vs dissolved Fe | +0.030 |
+| area vs ours M1 | +0.367 |
+
+Area correlates moderately with AMD-area fraction but essentially not at all
+with dissolved Fe, and every rank partial correlation controlling for area is
+within ~0.09 of its raw value (dissolved Fe/ours M1: +0.056 → +0.048). Area is
+ruled out as an explanation for both the null and the sulfate reversal.
+
+Dimensionally this is the expected result: outlet concentration ≈ load /
+discharge, load scales with absolute AMD area and discharge with catchment
+area, so AMD *fraction* (M1) is already the area-normalised quantity.
+
+## D5 — Two regions contribute 6 catchments with no usable chemistry variation
+
+| region | n | dissolved Fe range |
+|---|---|---|
+| Alma | 3 | 0.033 – 0.037 mg/L |
+| Lake City | 3 | 0.000 – 0.018 mg/L |
+
+Neither spans enough Fe to support a correlation; they were correctly below
+the n≥4 cutoff for a per-region rho in Part 1 §2, so no reported per-region
+number is affected — but they do contribute 6 of the 31 catchments to every
+pooled figure, adding noise. Any future pooled estimate should screen on
+outcome dynamic range, not just catchment count.
+
+## What Part 2 changes
+
+- The Part 1 retraction **stands and is strengthened**: the dissolved-Fe null
+  survives removal of all between-region structure.
+- The pooled sulfate/pH/conductance results flagged in Part 1 as "failed
+  leave-one-region-out" now have a **named mechanism**: they were
+  between-region comparisons, and sulfate's actively reverses sign.
+- A concrete methodological rule for this project, beyond "use LORO": **report
+  the between/within variance split alongside any pooled correlation over
+  grouped data.** A pooled rho over 67%-between-variance data is not measuring
+  what it appears to measure.
+
 ## Next steps
 
 1. **Test the geological-cluster hypothesis directly.** Silverton and Ouray

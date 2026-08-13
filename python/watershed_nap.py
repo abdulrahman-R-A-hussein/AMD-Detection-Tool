@@ -292,7 +292,8 @@ def loocv_r2(x, y):
 
 # ---------------------------------------------------------------- pipeline
 
-def run(region_key, chem_dir, min_samples, max_stations, out_csv, radius_km=60):
+def run(region_key, chem_dir, min_samples, max_stations, out_csv, radius_km=60,
+       rockwell_available=True):
     from catchment_delineation import delineate, merit_upstream_area_km2
 
     ee = init_ee()
@@ -345,7 +346,7 @@ def run(region_key, chem_dir, min_samples, max_stations, out_csv, radius_km=60):
                  m_ours["m2_nap_weighted"]))
 
         m_rw = None
-        if region_key == "colorado":
+        if rockwell_available:
             try:
                 geojson = c["geom"].getInfo()
                 hist_rw = classify_catchment_rockwell(geojson)
@@ -364,9 +365,9 @@ def run(region_key, chem_dir, min_samples, max_stations, out_csv, radius_km=60):
             pooled_chem[var] = statistics.median(vals) if vals else None
 
         rows_out.append(dict(
-            basin_id=bid, area_km2=c["area_km2"], n_basins=c["n_basins"],
-            n_stations=len(c["station_ids"]), n_scenes=n_scenes,
-            edge_touched=c["edge_touched"],
+            region=region_key, basin_id=bid, area_km2=c["area_km2"],
+            n_basins=c["n_basins"], n_stations=len(c["station_ids"]),
+            n_scenes=n_scenes, edge_touched=c["edge_touched"],
             ours_m1=m_ours["m1_amd_frac"], ours_m2=m_ours["m2_nap_weighted"],
             rockwell_m1=m_rw["m1_amd_frac"] if m_rw else None,
             rockwell_m2=m_rw["m2_nap_weighted"] if m_rw else None,
@@ -422,24 +423,54 @@ def run(region_key, chem_dir, min_samples, max_stations, out_csv, radius_km=60):
           "mean, which is common and informative with this few catchments.")
 
 
+# Every fetch_wqp.py REGIONS key that has been fetched, mapped to its
+# data/chemistry/<slug>/ dir (slug = fetch_wqp.py's own convention:
+# lower(), ", "->"_", " "->"_" - kept in sync manually since the two modules
+# don't share that helper). "colorado" is kept as a backward-compatible alias
+# for "Silverton, CO" so existing commands/CSVs from before 2026-08-13 still
+# work. rockwell=True for every Colorado region (all within Rockwell's
+# published SouthWest raster footprint); Ohio has no Rockwell coverage.
+KNOWN_REGIONS = {
+    "colorado":        ("silverton_co",     True),   # alias, see above
+    "Silverton, CO":   ("silverton_co",     True),
+    "Ouray, CO":       ("ouray_co",         True),
+    "Alma, CO":        ("alma_co",          True),
+    "Leadville, CO":   ("leadville_co",     True),
+    "Creede, CO":      ("creede_co",        True),
+    "Central City, CO": ("central_city_co", True),
+    "Lake City, CO":   ("lake_city_co",     True),
+    "ohio":            (None,               False),  # chem_dir handled specially below
+}
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--region", choices=["colorado", "ohio"], required=True)
+    ap.add_argument("--region", required=True,
+                    help="one of: " + ", ".join(sorted(KNOWN_REGIONS)))
     ap.add_argument("--min-samples", type=int, default=5)
     ap.add_argument("--max-stations", type=int, default=25)
     ap.add_argument("--radius-km", type=float, default=60)
     ap.add_argument("--out")
     args = ap.parse_args(argv)
 
-    if args.region == "colorado":
-        chem_dir = os.path.join(ROOT, "data", "chemistry", "silverton_co")
-    else:
+    if args.region not in KNOWN_REGIONS:
+        ap.error("unknown --region %r. Known: %s"
+                 % (args.region, ", ".join(sorted(KNOWN_REGIONS))))
+    slug, rockwell_available = KNOWN_REGIONS[args.region]
+    if args.region == "ohio":
         chem_dir = os.path.join(ROOT, "data", "chemistry")
+    else:
+        chem_dir = os.path.join(ROOT, "data", "chemistry", slug)
+    if not os.path.isdir(chem_dir):
+        ap.error("no chemistry pulled yet for %r - run fetch_wqp.py --region "
+                 "first (expected %s)" % (args.region, chem_dir))
 
+    region_key = "Silverton, CO" if args.region == "colorado" else args.region
+    out_slug = slug or "ohio"
     out = args.out or os.path.join(ROOT, "data", "matched",
-                                   "watershed_nap_%s.csv" % args.region)
-    run(args.region, chem_dir, args.min_samples, args.max_stations, out,
-        args.radius_km)
+                                   "watershed_nap_%s.csv" % out_slug)
+    run(region_key, chem_dir, args.min_samples, args.max_stations, out,
+        args.radius_km, rockwell_available)
 
 
 if __name__ == "__main__":

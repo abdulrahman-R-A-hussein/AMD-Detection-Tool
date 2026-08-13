@@ -1,6 +1,6 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-08-10 · **Current tag:** `v3.0.7`
+**Last updated:** 2026-08-13 · **Current tag:** `v3.0.10`
 
 This file is the canonical "where are we right now". It is maintained under
 the logging rule in [`../CLAUDE.md`](../CLAUDE.md). It should be sufficient to
@@ -15,11 +15,14 @@ The **land arm** is a verified-faithful reimplementation of USGS SIM 3466: all
 six index formulas match the paper exactly. Three departures this project had
 introduced as "improvements" turned out to be regressions; fixing them improved
 worst-case cross-site agreement 4.1×. The **water arm** was retracted in July
-2026 and is being rebuilt as Phase 2 along three arms. The single most
-promising result in the whole project is **Arm A** (watershed mineral loading
-predicting measured stream chemistry), where our map outperformed Rockwell's
-published map against real USGS chemistry — but at n=6 and p=0.136, so it is
-suggestive, not proven. Raising that n is the current priority.
+2026 and is being rebuilt as Phase 2 along three arms. **Arm A's n=6 headline
+(our map predicting dissolved Fe better than Rockwell's) did NOT survive being
+raised to n=31 across 7 independent river systems — it is RETRACTED as of
+2026-08-13.** Leave-one-region-out R² is negative for every map, every
+loading model, on dissolved Fe. This is reported as prominently as the
+original finding was, per this project's own rule that a collapse is as
+valuable as a confirmation. See "RETRACTED" below before "OPEN" — the
+retraction is the load-bearing update this file exists to carry forward.
 
 ---
 
@@ -60,31 +63,31 @@ suggestive, not proven. Raising that n is the current priority.
 
 ---
 
-## SUGGESTIVE, NOT PROVEN — the current headline
+## OPEN QUESTION WORTH FOLLOWING — not yet a result either way
 
-**Arm A: our map predicts real dissolved Fe better than Rockwell's does.**
-
-| | rho (ours, M1 AMD-area%) | rho (Rockwell M1) |
-|---|---|---|
-| dissolved Fe | **+0.714** | +0.257 |
-| LOOCV R² | **+0.804** | −1.542 (worse than the mean) |
-
-Scored against measured USGS chemistry — the only outcome variable in this
-project that **neither map was fitted to**.
-
-**Why it is not yet a result:** n = 6 catchments; exact permutation
-p = **0.136** (computed over all 720 permutations, not approximated). Rockwell
-shows a same-magnitude correlation with pH (rho = −0.714), so this is not
-"their map has no signal". Sulfate and conductance show nothing for either map.
-
-**n=6 is a real ceiling, not laziness:** 82 stations spanning genuinely
-different sub-watersheds all collapsed into the same 6 `hybas_12` polygons.
-Raising n requires **different river systems**.
+**Does the Arm A relationship track geology?** Per-region rho for dissolved Fe
+vs our map's AMD-area%: Silverton **+0.714**, Ouray **+0.667** (both San Juan
+volcanic-field calderas) vs Central City **−0.700**, Creede **−0.800**,
+Leadville **−0.800** (different districts). The sign split lines up with a
+plausible geological grouping but this is an unconfirmed lead, not a tested
+hypothesis — see [`ARM_A_CROSS_REGION_RETEST_2026-08-13.md`](ARM_A_CROSS_REGION_RETEST_2026-08-13.md)
+§4 for the next step, which needs no new data fetching.
 
 ---
 
 ## RETRACTED / DISPROVEN — do not cite these
 
+- **Arm A: "our map predicts dissolved Fe better than Rockwell's" (2026-08-10,
+  retracted 2026-08-13).** At n=6 (Silverton only): rho=+0.714 vs Rockwell's
+  +0.257, LOOCV R²=+0.804 vs −1.542, p=0.136 (suggestive). Raised to **n=31
+  across 7 independent river systems**: pooled rho collapses to **+0.056**
+  (p=0.760), **every leave-one-region-out R² for dissolved Fe is negative**
+  for both maps. Per-region signs are not even consistent (Silverton/Ouray
+  positive, Central City/Creede/Leadville negative). Several *other* pooled
+  relationships (sulfate, pH, conductance) looked significant at p<0.05 and
+  **also failed the leave-one-region-out check** — a direct demonstration of
+  why pooled significance without a held-out test is not evidence.
+  → [`ARM_A_CROSS_REGION_RETEST_2026-08-13.md`](ARM_A_CROSS_REGION_RETEST_2026-08-13.md)
 - **The whole water contamination module (findings W1–W4, July 2026).** Indices
   ranked the *clean control* highest; the Ganau claim was circular.
   → [`WATER_VALIDATION_REPORT_2026-07-25.md`](WATER_VALIDATION_REPORT_2026-07-25.md)
@@ -107,33 +110,40 @@ Raising n requires **different river systems**.
 
 Ordered by value.
 
-1. **Raise Arm A's n from 6 toward 15–25** — the active task. Requires new
-   river systems, not more Silverton stations. Verified available:
-   Uncompahgre/Ouray (101 stations with ≥3 Fe samples), Alma/Fairplay (27).
-   Unprobed: Lake City, Creede, Leadville, Clear Creek.
-   **Must report pooled + per-region + leave-one-REGION-out.**
-2. **Arm B2 — precipitate/seep detection.** Not built. `water_indices.py` has
+1. **Test whether Arm A's sign-flip tracks geology** (see "OPEN QUESTION"
+   above). Silverton+Ouray (San Juan calderas) vs Central
+   City+Creede+Leadville — no new fetching needed, the 31-catchment dataset
+   already exists at `data/matched/watershed_nap_*.csv`.
+2. **Fix the `hybas_12` dilution problem** before running Arm A further —
+   affects every region, not just Silverton, and biases every number toward
+   the null. True DEM flow-accumulation (`MERIT/Hydro/v1_0_1` `dir` band)
+   would let disproportionately acidic tributaries (Cement Creek) be scored
+   separately from the cleaner water they currently get averaged into.
+   **Do not add more regions/catchments to chase significance before this is
+   addressed** — 31 catchments across 7 systems is already a reasonably
+   powered null with the current method.
+3. **Arm B2 — precipitate/seep detection.** Not built. `water_indices.py` has
    the paper2 indices correctly scoped; the extraction geometry around the 62
    identified mine-discharge/adit/spring stations is what's missing. This is
    where finding W4 predicts a positive result actually lives.
-3. **Colorado B1 stream matching.** Zero matches so far. One bug fixed (width
+4. **Colorado B1 stream matching.** Zero matches so far. One bug fixed (width
    screen dropped on *missing* MERIT data, not confirmed narrowness); one open
    — the lake-calibrated water mask returns nothing even on the wide Animas
    mainstem across 6 dates. Needs a hand check of actual pixel values before
    concluding streams are undetectable.
-4. **Arm C — vegetation NDVI stress proxy.** Not built. Needs a permutation
+5. **Arm C — vegetation NDVI stress proxy.** Not built. Needs a permutation
    null from the start or it will repeat finding W2.
-5. **Resolution-degradation curve.** Blocked on B1/B2 finding something
+6. **Resolution-degradation curve.** Blocked on B1/B2 finding something
    detectable to degrade. Would quantitatively reproduce paper2's "Sentinel-2
    resolved 3 of 6 leaks" — the published justification for a 7 cm drone.
-6. **Uncalibrated classifier constants.** `ferric1StdMult`, `ferric2StdMult`,
+7. **Uncalibrated classifier constants.** `ferric1StdMult`, `ferric2StdMult`,
    `ferrousStdMult` are all set to 0.5 *by assumption*; only iron and clay were
    LOSO-fitted. They drive classes 1–8, which nothing has validated.
    `clayStdMult` did not transfer cleanly (per-fold fits −0.5, −0.5, +1.0).
-7. **Red Mountain Pass regression** under v3.0.x (J 0.642→0.452) — rests on
+8. **Red Mountain Pass regression** under v3.0.x (J 0.642→0.452) — rests on
    19–23 positive pixels. Compositing (D8) was the prime suspect and is largely
    ruled out; small-sample noise is now the leading explanation.
-8. **Departures D4, D5, D6** (class 9/17 split uses brightness where Rockwell
+9. **Departures D4, D5, D6** (class 9/17 split uses brightness where Rockwell
    uses ferrous; water mask; atmospheric correction) remain unmeasured.
 
 ---

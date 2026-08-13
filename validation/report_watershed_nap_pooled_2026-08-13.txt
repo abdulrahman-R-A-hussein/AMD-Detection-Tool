@@ -1,0 +1,190 @@
+Loading catchment files:
+  watershed_nap_alma_co.csv                    3 catchments  region(s): Alma, CO
+  watershed_nap_central_city_co.csv            5 catchments  region(s): Central City, CO
+  watershed_nap_colorado.csv                   6 catchments  region(s): colorado
+  watershed_nap_creede_co.csv                  4 catchments  region(s): Creede, CO
+  watershed_nap_lake_city_co.csv               3 catchments  region(s): Lake City, CO
+  watershed_nap_leadville_co.csv               4 catchments  region(s): Leadville, CO
+  watershed_nap_ouray_co.csv                   6 catchments  region(s): Ouray, CO
+
+31 catchments total across 7 region(s): Alma, CO, Central City, CO, Creede, CO, Lake City, CO, Leadville, CO, Ouray, CO, colorado
+catchments per region: {'Alma, CO': np.int64(3), 'Central City, CO': np.int64(5), 'Creede, CO': np.int64(4), 'Lake City, CO': np.int64(3), 'Leadville, CO': np.int64(4), 'Ouray, CO': np.int64(6), 'colorado': np.int64(6)}
+
+====================================================================================================
+1. POOLED (n=31 catchments) - primary headline number, but see 2 and 3 before believing it
+====================================================================================================
+  chemistry var            loading               n       rho         p p-method                    
+  Iron_mgL_dissolved       ours M1 (AMD%)       31    +0.056     0.760 random (100000 perms, seed=0)
+  Iron_mgL_dissolved       ours M2 (NAP-w)      31    +0.042     0.820 random (100000 perms, seed=0)
+  Iron_mgL_dissolved       rockwell M1          31    +0.122     0.507 random (100000 perms, seed=0)
+  Iron_mgL_dissolved       rockwell M2          31    +0.088     0.633 random (100000 perms, seed=0)
+
+  Iron_mgL_any             ours M1 (AMD%)       31    -0.199     0.282 random (100000 perms, seed=0)
+  Iron_mgL_any             ours M2 (NAP-w)      31    -0.172     0.353 random (100000 perms, seed=0)
+  Iron_mgL_any             rockwell M1          31    -0.177     0.340 random (100000 perms, seed=0)
+  Iron_mgL_any             rockwell M2          31    -0.248     0.179 random (100000 perms, seed=0)
+
+  Sulfate_mgL              ours M1 (AMD%)       31    -0.563     0.001 random (100000 perms, seed=0)
+  Sulfate_mgL              ours M2 (NAP-w)      31    -0.543     0.002 random (100000 perms, seed=0)
+  Sulfate_mgL              rockwell M1          31    -0.360     0.047 random (100000 perms, seed=0)
+  Sulfate_mgL              rockwell M2          31    -0.496     0.005 random (100000 perms, seed=0)
+
+  pH                       ours M1 (AMD%)       31    +0.415     0.021 random (100000 perms, seed=0)
+  pH                       ours M2 (NAP-w)      31    +0.364     0.044 random (100000 perms, seed=0)
+  pH                       rockwell M1          31    +0.144     0.441 random (100000 perms, seed=0)
+  pH                       rockwell M2          31    +0.238     0.197 random (100000 perms, seed=0)
+
+  SpecificConductance      ours M1 (AMD%)       26    -0.415     0.036 random (100000 perms, seed=0)
+  SpecificConductance      ours M2 (NAP-w)      26    -0.408     0.039 random (100000 perms, seed=0)
+  SpecificConductance      rockwell M1          26    -0.096     0.641 random (100000 perms, seed=0)
+  SpecificConductance      rockwell M2          26    -0.208     0.306 random (100000 perms, seed=0)
+
+====================================================================================================
+2. PER-REGION (n>=4 catchments only) - is one region driving the pooled result?
+====================================================================================================
+  Iron_mgL_dissolved      
+    Central City, CO     ours M1 (AMD%)   n=5    rho=-0.700
+    Central City, CO     ours M2 (NAP-w)  n=5    rho=-0.700
+    Central City, CO     rockwell M1      n=5    rho=+0.300
+    Central City, CO     rockwell M2      n=5    rho=-0.100
+    Creede, CO           ours M1 (AMD%)   n=4    rho=-0.800
+    Creede, CO           ours M2 (NAP-w)  n=4    rho=-0.800
+    Creede, CO           rockwell M1      n=4    rho=-0.800
+    Creede, CO           rockwell M2      n=4    rho=-0.800
+    Leadville, CO        ours M1 (AMD%)   n=4    rho=-0.800
+    Leadville, CO        ours M2 (NAP-w)  n=4    rho=-0.400
+    Leadville, CO        rockwell M1      n=4    rho=-0.200
+    Leadville, CO        rockwell M2      n=4    rho=-0.200
+    Ouray, CO            ours M1 (AMD%)   n=6    rho=+0.667
+    Ouray, CO            ours M2 (NAP-w)  n=6    rho=+0.783
+    Ouray, CO            rockwell M1      n=6    rho=+0.522
+    Ouray, CO            rockwell M2      n=6    rho=+0.522
+    colorado             ours M1 (AMD%)   n=6    rho=+0.714
+    colorado             ours M2 (NAP-w)  n=6    rho=+0.600
+    colorado             rockwell M1      n=6    rho=+0.257
+    colorado             rockwell M2      n=6    rho=+0.257
+
+  Iron_mgL_any            
+    Central City, CO     ours M1 (AMD%)   n=5    rho=-0.700
+    Central City, CO     ours M2 (NAP-w)  n=5    rho=-0.700
+    Central City, CO     rockwell M1      n=5    rho=+0.300
+    Central City, CO     rockwell M2      n=5    rho=-0.100
+    Creede, CO           ours M1 (AMD%)   n=4    rho=-0.800
+    Creede, CO           ours M2 (NAP-w)  n=4    rho=-0.800
+    Creede, CO           rockwell M1      n=4    rho=-0.800
+    Creede, CO           rockwell M2      n=4    rho=-0.800
+    Leadville, CO        ours M1 (AMD%)   n=4    rho=-0.400
+    Leadville, CO        ours M2 (NAP-w)  n=4    rho=-0.200
+    Leadville, CO        rockwell M1      n=4    rho=-0.400
+    Leadville, CO        rockwell M2      n=4    rho=-0.400
+    Ouray, CO            ours M1 (AMD%)   n=6    rho=+0.371
+    Ouray, CO            ours M2 (NAP-w)  n=6    rho=+0.600
+    Ouray, CO            rockwell M1      n=6    rho=+0.257
+    Ouray, CO            rockwell M2      n=6    rho=+0.257
+    colorado             ours M1 (AMD%)   n=6    rho=+0.714
+    colorado             ours M2 (NAP-w)  n=6    rho=+0.600
+    colorado             rockwell M1      n=6    rho=+0.257
+    colorado             rockwell M2      n=6    rho=+0.257
+
+  Sulfate_mgL             
+    Central City, CO     ours M1 (AMD%)   n=5    rho=-0.300
+    Central City, CO     ours M2 (NAP-w)  n=5    rho=-0.300
+    Central City, CO     rockwell M1      n=5    rho=+0.300
+    Central City, CO     rockwell M2      n=5    rho=+0.100
+    Creede, CO           ours M1 (AMD%)   n=4    rho=+0.800
+    Creede, CO           ours M2 (NAP-w)  n=4    rho=+0.800
+    Creede, CO           rockwell M1      n=4    rho=+0.800
+    Creede, CO           rockwell M2      n=4    rho=+0.800
+    Leadville, CO        ours M1 (AMD%)   n=4    rho=-0.200
+    Leadville, CO        ours M2 (NAP-w)  n=4    rho=-0.400
+    Leadville, CO        rockwell M1      n=4    rho=-0.800
+    Leadville, CO        rockwell M2      n=4    rho=-0.800
+    Ouray, CO            ours M1 (AMD%)   n=6    rho=+0.371
+    Ouray, CO            ours M2 (NAP-w)  n=6    rho=+0.600
+    Ouray, CO            rockwell M1      n=6    rho=+0.257
+    Ouray, CO            rockwell M2      n=6    rho=+0.257
+    colorado             ours M1 (AMD%)   n=6    rho=+0.314
+    colorado             ours M2 (NAP-w)  n=6    rho=+0.086
+    colorado             rockwell M1      n=6    rho=+0.314
+    colorado             rockwell M2      n=6    rho=+0.314
+
+  pH                      
+    Central City, CO     ours M1 (AMD%)   n=5    rho=+0.700
+    Central City, CO     ours M2 (NAP-w)  n=5    rho=+0.700
+    Central City, CO     rockwell M1      n=5    rho=-0.300
+    Central City, CO     rockwell M2      n=5    rho=+0.100
+    Creede, CO           ours M1 (AMD%)   n=4    rho=-0.800
+    Creede, CO           ours M2 (NAP-w)  n=4    rho=-0.800
+    Creede, CO           rockwell M1      n=4    rho=-0.800
+    Creede, CO           rockwell M2      n=4    rho=-0.800
+    Leadville, CO        ours M1 (AMD%)   n=4    rho=+0.400
+    Leadville, CO        ours M2 (NAP-w)  n=4    rho=+0.800
+    Leadville, CO        rockwell M1      n=4    rho=+1.000
+    Leadville, CO        rockwell M2      n=4    rho=+1.000
+    Ouray, CO            ours M1 (AMD%)   n=6    rho=-0.771
+    Ouray, CO            ours M2 (NAP-w)  n=6    rho=-0.829
+    Ouray, CO            rockwell M1      n=6    rho=-0.886
+    Ouray, CO            rockwell M2      n=6    rho=-0.886
+    colorado             ours M1 (AMD%)   n=6    rho=-0.371
+    colorado             ours M2 (NAP-w)  n=6    rho=-0.543
+    colorado             rockwell M1      n=6    rho=-0.714
+    colorado             rockwell M2      n=6    rho=-0.714
+
+  SpecificConductance     
+    Central City, CO     ours M1 (AMD%)   n=5    rho=-0.300
+    Central City, CO     ours M2 (NAP-w)  n=5    rho=-0.300
+    Central City, CO     rockwell M1      n=5    rho=+0.000
+    Central City, CO     rockwell M2      n=5    rho=-0.100
+    Creede, CO           ours M1 (AMD%)   n=4    rho=+0.800
+    Creede, CO           ours M2 (NAP-w)  n=4    rho=+0.800
+    Creede, CO           rockwell M1      n=4    rho=+0.800
+    Creede, CO           rockwell M2      n=4    rho=+0.800
+    Ouray, CO            ours M1 (AMD%)   n=4    rho=-0.800
+    Ouray, CO            ours M2 (NAP-w)  n=4    rho=-0.400
+    Ouray, CO            rockwell M1      n=4    rho=-0.800
+    Ouray, CO            rockwell M2      n=4    rho=-0.800
+    colorado             ours M1 (AMD%)   n=5    rho=+0.300
+    colorado             ours M2 (NAP-w)  n=5    rho=+0.300
+    colorado             rockwell M1      n=5    rho=+0.600
+    colorado             rockwell M2      n=5    rho=+0.600
+
+  (regions with <4 catchments contribute to the pooled figure above
+  but are too small to show a per-region rho on their own)
+
+====================================================================================================
+3. LEAVE-ONE-REGION-OUT R^2 - fit on 5 systems, predict the 6th. The real test.
+====================================================================================================
+  chemistry var            loading                 n    LORO_R2   regions_used
+  Iron_mgL_dissolved       ours M1 (AMD%)         31     -0.168              7
+  Iron_mgL_dissolved       ours M2 (NAP-w)        31     -0.170              7
+  Iron_mgL_dissolved       rockwell M1            31     -0.093              7
+  Iron_mgL_dissolved       rockwell M2            31     -0.100              7
+
+  Iron_mgL_any             ours M1 (AMD%)         31     -0.003              7
+  Iron_mgL_any             ours M2 (NAP-w)        31     -0.005              7
+  Iron_mgL_any             rockwell M1            31     -0.066              7
+  Iron_mgL_any             rockwell M2            31     -0.074              7
+
+  Sulfate_mgL              ours M1 (AMD%)         31     +0.081              7
+  Sulfate_mgL              ours M2 (NAP-w)        31     +0.053              7
+  Sulfate_mgL              rockwell M1            31     -0.258              7
+  Sulfate_mgL              rockwell M2            31     -0.273              7
+
+  pH                       ours M1 (AMD%)         31     -0.141              7
+  pH                       ours M2 (NAP-w)        31     -0.162              7
+  pH                       rockwell M1            31     -0.232              7
+  pH                       rockwell M2            31     -0.229              7
+
+  SpecificConductance      ours M1 (AMD%)         26     -0.109              7
+  SpecificConductance      ours M2 (NAP-w)        26     -0.122              7
+  SpecificConductance      rockwell M1            26     -0.225              7
+  SpecificConductance      rockwell M2            26     -0.255              7
+
+----------------------------------------------------------------------------------------------------
+Read section 3 as the real generalisation test. A positive LORO R2
+means loading measured in OTHER river systems predicts chemistry in
+one it has never seen - that is what 'our map beats Rockwell's' would
+actually have to mean to support a grant claim. Section 1's pooled rho
+alone is NOT sufficient evidence by itself; a result that only shows
+up in section 1 and collapses in sections 2-3 is a pooling artefact,
+not a finding, and must be reported as such.

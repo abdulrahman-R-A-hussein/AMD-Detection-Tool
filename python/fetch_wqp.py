@@ -100,6 +100,57 @@ REGIONS = {
         "11410 Iron rows, 5681 Sulfate, across 3606 stations including "
         "62 mine-discharge/adit/tailings/spring source points.",
     ),
+    # Added 2026-08-13 (Water Phase 2 Part B) specifically to raise Arm A's n
+    # beyond its verified 6-catchment ceiling at Silverton: hybas_12 has a
+    # granularity floor there, and 82 stations spanning that whole search area
+    # all collapsed into the same 6 polygons. Raising n needs DIFFERENT river
+    # systems, not more Silverton stations - each region below drains to a
+    # different major system, verified independent by river network, not just
+    # by distance:
+    #   Animas (Silverton, above)         -> San Juan -> Colorado River
+    #   Uncompahgre (Ouray)                -> Gunnison -> Colorado River
+    #   Alma/Fairplay, Leadville           -> Arkansas River (two districts)
+    #   Creede                             -> Rio Grande
+    #   Clear Creek/Central City           -> South Platte River
+    #   Lake City/Lake Fork                -> Gunnison (Lake Fork tributary)
+    # Counts are Iron-characteristic probe results (WQP, 2026-08-10/13),
+    # >=3-sample station counts are what actually matters for a chemistry
+    # median; verify per-region distinct-catchment count once delineated,
+    # same as Silverton was - do not assume more stations means more n.
+    "Ouray, CO": (
+        37.95, -107.90, 38.20, -107.55, None,
+        "Uncompahgre River watershed (Gunnison system). Probed 2026-08-10: "
+        "2935 Iron rows, 134 stations, 101 with >=3 samples.",
+    ),
+    "Alma, CO": (
+        39.20, -106.20, 39.45, -105.95, None,
+        "Arkansas River headwaters, Alma/Fairplay mining district. Probed "
+        "2026-08-10: 472 Iron rows, 31 stations, 27 with >=3 samples.",
+    ),
+    "Leadville, CO": (
+        39.15, -106.45, 39.35, -106.15, None,
+        "Arkansas River headwaters, California Gulch Superfund site "
+        "(different district from Alma, same river system). Probed "
+        "2026-08-13: 1685 Iron rows, 83 stations, 72 with >=3 samples.",
+    ),
+    "Creede, CO": (
+        37.75, -107.00, 37.95, -106.75, None,
+        "Rio Grande headwaters, Creede mining district (Bulldog Mountain/"
+        "Nelson Tunnel). Probed 2026-08-13: 438 Iron rows, 34 stations, "
+        "21 with >=3 samples.",
+    ),
+    "Central City, CO": (
+        39.65, -105.75, 39.85, -105.40, None,
+        "South Platte River system, Clear Creek/Central City Superfund site. "
+        "Probed 2026-08-13: 2317 Iron rows, 161 stations, 105 with >=3 "
+        "samples - richest of the new regions.",
+    ),
+    "Lake City, CO": (
+        37.90, -107.45, 38.15, -107.15, None,
+        "Lake Fork of the Gunnison, Lake City mining district. Probed "
+        "2026-08-13: 202 Iron rows, 13 stations, 11 with >=3 samples - "
+        "thinnest of the new regions, may collapse to very few catchments.",
+    ),
 }
 
 # For downstream regression: source points (mine discharge) carry the highest

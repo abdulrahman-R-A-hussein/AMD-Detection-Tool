@@ -130,14 +130,20 @@ Ordered by value.
    above). Silverton+Ouray (San Juan calderas) vs Central
    City+Creede+Leadville — no new fetching needed, the 31-catchment dataset
    already exists at `data/matched/watershed_nap_*.csv`.
-2. **Fix the `hybas_12` dilution problem** before running Arm A further —
-   affects every region, not just Silverton, and biases every number toward
-   the null. True DEM flow-accumulation (`MERIT/Hydro/v1_0_1` `dir` band)
-   would let disproportionately acidic tributaries (Cement Creek) be scored
-   separately from the cleaner water they currently get averaged into.
-   **Do not add more regions/catchments to chase significance before this is
-   addressed** — 31 catchments across 7 systems is already a reasonably
-   powered null with the current method.
+2. ~~Fix the `hybas_12` dilution problem~~ **TOOL BUILT AND VALIDATED
+   2026-08-13** (`python/catchment_dem.py`), **not yet wired into Arm A.**
+   True MERIT D8 delineation scores **6/6 within ±33%** of published USGS
+   drainage areas vs `hybas_12`'s 2/6, and resolves Cement Creek to 13.3 sq mi
+   (0.99×) where `hybas_12` gave it the same 91.7 sq mi polygon as the Animas
+   mainstem. Tracing independently verified against MERIT's own `upa` band
+   (ratio 1.00 at all 6 gauges).
+   **Remaining work:** wire it into `watershed_nap.py` and re-run Arm A.
+   **Temper expectations on n:** catchments on one river are deeply nested
+   (5 Animas gauges → only **3** independent catchments after
+   `select_non_nested()`), so DEM delineation will NOT multiply n the way it
+   first appeared. Report non-nested n, never station count. Still worth
+   running: the question is whether removing Cement-Creek-style dilution
+   reveals a relationship `hybas_12` was masking.
 3. **Arm B2 — precipitate/seep detection.** Not built. `water_indices.py` has
    the paper2 indices correctly scoped; the extraction geometry around the 62
    identified mine-discharge/adit/spring stations is what's missing. This is

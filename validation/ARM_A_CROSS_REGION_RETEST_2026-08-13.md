@@ -326,3 +326,78 @@ D:/dev/VPCA+STEPWISE-REGRESSION/.venv/Scripts/python.exe python/watershed_nap.py
 ```
 
 `REGIONS` bboxes for the six new districts are in `python/fetch_wqp.py`.
+
+---
+
+# PART 3 — DEM catchment delineation built and validated (the dilution fix)
+
+**Added 2026-08-13.** Code: `python/catchment_dem.py` (`--self-test`).
+Addresses OPEN item 2: the `hybas_12` granularity floor that averages
+chemically distinct tributaries together and biases every Arm A number toward
+the null.
+
+## Validation against official USGS drainage areas
+
+True D8 upstream tracing on MERIT Hydro (92.77 m), pour points snapped to the
+modelled channel, validated on the same 6 Animas gauges used for `hybas_12`:
+
+| gauge | NWIS sq mi | hybas_12 | **DEM** |
+|---|---|---|---|
+| Animas at Howardsville | 55.9 | 91.7 (1.64×) | **57.1 (1.02×)** |
+| Animas at Silverton | 70.6 | 91.7 (1.30×) | 90.2 (1.28×) |
+| **Cement Ck nr Silverton** | 13.5 | **91.7 (6.79×)** | **13.3 (0.99×)** |
+| Mineral Ck abv Silverton | 11.0 | 51.9 (4.72×) | **11.0 (1.00×)** |
+| Mineral Ck nr Silverton | 44.3 | 51.9 (1.17×) | 49.7 (1.12×) |
+| Animas blw Silverton | 146.0 | 204.9 (1.40×) | **146.7 (1.00×)** |
+| **within ±33%** | | **2/6** | **6/6** |
+
+**The dilution problem is fixed.** `hybas_12` gave Howardsville, Silverton and
+Cement Creek the *identical* 91.7 sq mi polygon; the DEM separates them into
+57.1 / 90.2 / 13.3. Cement Creek — the acidic tributary whose signal was being
+averaged away — is now resolved to within 1% of its published area.
+
+**The tracing algorithm is independently verified.** MERIT's own `upa` band is
+a precomputed upstream drainage area; our trace reproduces it at **ratio 1.00
+for all 6 gauges**. That cleanly separates two error sources: tracing is
+correct, so any residual disagreement with NWIS is about *where the pour point
+sits*, not about the algorithm.
+
+**The one imperfect gauge is diagnosed, not hand-waved.** Animas at Silverton
+(1.28×) snapped *below* the Cement Creek confluence, absorbing Cement Creek's
+area — confirmed independently by the nesting analysis below, which finds
+Cement Creek fully contained in "Silverton". 70.6 + 13.3 ≈ 84, against a traced
+90.2. Snap window was tested at 2 and 3 cells; it made no difference here
+(the confluence is further than 3 cells), so the smaller window (2, ~185 m) was
+adopted as it was never worse and fixed Mineral Ck abv (1.10× → 1.00×).
+
+## The catch: nesting caps how much n can actually grow
+
+With true delineation every station gets its own catchment, and stations on one
+river are **deeply nested**. Measured on 5 Animas gauges:
+
+```
+Howardsville  ⊂ Silverton ⊂ Animas blw      (mainstem, overlap 1.00)
+Cement Ck     ⊂ Silverton, Animas blw       (overlap 1.00)
+Mineral nr    ⊂ Animas blw                  (overlap 1.00)
+non-nested subset retained: 3 of 5
+```
+
+Their loading and their chemistry are largely *the same water*. Treating nested
+catchments as independent observations would inflate n and manufacture
+significance — the single biggest statistical hazard in moving from `hybas_12`
+(whose coarse polygons accidentally prevented this) to DEM delineation.
+
+`select_non_nested()` greedily retains the smallest/headwater catchments first,
+since those carry the most independent information. **Consequence: DEM
+delineation will NOT multiply n as hoped.** 5 stations → 3 independent
+catchments here. The realistic gain over the current 31 is modest, and any
+future Arm A run must report the non-nested n, not the station count.
+
+## Status and what remains
+
+The tool is built, validated 6/6 against published areas, internally
+cross-checked against MERIT `upa`, and carries an explicit nesting guard. It is
+**not yet wired into `watershed_nap.py`** — that integration, and the re-run of
+Arm A on DEM catchments, is the next step. The scientific question it answers
+is unchanged: does removing the Cement-Creek-style dilution reveal a
+relationship that `hybas_12` was masking?

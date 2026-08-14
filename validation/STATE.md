@@ -1,6 +1,6 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-08-13 · **Current tag:** `v3.0.10`
+**Last updated:** 2026-08-13 · **Current tag:** `v3.0.12`
 
 This file is the canonical "where are we right now". It is maintained under
 the logging rule in [`../CLAUDE.md`](../CLAUDE.md). It should be sufficient to

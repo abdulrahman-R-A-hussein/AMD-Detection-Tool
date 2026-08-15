@@ -64,6 +64,13 @@ SLOPE_TOL_DEG = 5.0
 NDVI_BARE_PCTL = 25              # C3 draws below this percentile
 MIN_SCENES = 3
 S2_MAX_CLOUD = 20        # percent; see s2_composite() for why this matters
+# Hard cap on scenes entering the S2 median. The cloud filter alone was still
+# not enough for Silverton (278 scenes after filtering, still over the limit),
+# and "tighten the threshold until it fits" would make the composite depend on
+# a region's weather. Taking the N LEAST-CLOUDY scenes is deterministic, gives
+# every region the same compositing depth, and caps graph size directly - the
+# actual constraint. 120 x 5-day revisit over May-Jul still spans many years.
+S2_MAX_SCENES = 120
 N_PERM = 10000                   # primary family
 N_PERM_SENS = 2000               # sensitivity radii / statistics
 J_THRESHOLD = 0.25               # decision rule, with BH p < 0.05
@@ -205,6 +212,7 @@ def s2_composite(ee, region):
            .filterBounds(region).filterDate(START, END)
            .filter(ee.Filter.calendarRange(V3_MONTHS[0], V3_MONTHS[-1], "month"))
            .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", S2_MAX_CLOUD))
+           .sort("CLOUDY_PIXEL_PERCENTAGE").limit(S2_MAX_SCENES)
            .map(prep))
     return col.median().clip(region), int(col.size().getInfo())
 
@@ -915,11 +923,104 @@ def run_dose_loro(paths, radius=PRIMARY_RADIUS, stat=PRIMARY_STAT, out_txt=None)
         print("\n-> %s" % out_txt)
 
 
+DEGRADE_SCALES = [10, 20, 30, 60, 100]
+# Only indices whose Sentinel-2 bands are natively 10 m can honestly be tested
+# at 10 m. FerricIron1 = red/blue, both 10 m - and it is also the index that
+# carried the only surviving positive result, so the ladder lands exactly where
+# it matters. The SWIR- and coastal-band indices are excluded rather than
+# resampled up and reported as if they were 10 m.
+DEGRADE_INDICES = ["FerricIron1", "GreenNIR", "GreenNIRNorm", "NDVI_stress"]
+
+
+def run_degrade(slugs, out_txt=None, radius=PRIMARY_RADIUS):
+    """Resolution-degradation ladder on the DOSE-RESPONSE, Sentinel-2.
+
+    Applied to the dose-response rather than to detection because detection is
+    already a null at both 30 m (Landsat) and 20 m (S2) - degrading a null
+    yields a flat line of nulls and answers nothing. The dose-response is the
+    result that survived, so the question worth asking is whether finer pixels
+    strengthen it. That is precisely the drone-justification question, and it
+    reproduces paper2's resolution argument on a quantity that actually exists
+    here rather than on their leak-count.
+
+    Targets only (86 points), so this is cheap: one reduceRegions per region
+    per scale.
+    """
+    from gee_classify import init_ee
+    ee = init_ee()
+    lines = []
+
+    def say(s=""):
+        print(s)
+        lines.append(s)
+
+    say("=" * 88)
+    say("ARM B2 RESOLUTION LADDER - Sentinel-2, dose-response vs pixel size")
+    say("buffer=%dm, targets only, indices natively 10m on S2" % radius)
+    say("=" * 88)
+
+    per_scale = {}
+    for slug in slugs:
+        region = region_geometry(ee, REGIONS[slug])
+        targets, _ = load_region_points(slug)
+        comp, n_scenes = s2_composite(ee, region)
+        if n_scenes < MIN_SCENES:
+            continue
+        img = index_image(ee, comp)
+        proj = img.select("FerricIron1").projection()
+        for sc in DEGRADE_SCALES:
+            if sc <= 10:
+                deg = img
+            else:
+                deg = (img.select(DEGRADE_INDICES)
+                       .reduceResolution(ee.Reducer.mean(), maxPixels=1024)
+                       .reproject(crs=proj.crs(), scale=sc))
+            vals = extract_buffers(ee, deg, targets, radius, sc,
+                                   DEGRADE_INDICES, batch=15)
+            for t in targets:
+                v = vals.get(t["pid"], {})
+                for idx in DEGRADE_INDICES:
+                    per_scale.setdefault((sc, idx), []).append(
+                        (v.get(idx + "_p90"), t.get("Iron_mgL_dissolved"),
+                         t.get("pH"), slug))
+            print("  %s scale=%3dm done" % (slug, sc))
+
+    say("  %-14s %5s %8s %5s %8s %5s  %s"
+        % ("index", "GSD", "rho_Fe", "n", "rho_pH", "n", "per-region sign (Fe)"))
+    for idx in DEGRADE_INDICES:
+        for sc in DEGRADE_SCALES:
+            rows = per_scale.get((sc, idx), [])
+            fe = [(a, b, r) for a, b, _, r in rows if a is not None and b is not None]
+            ph = [(a, c) for a, _, c, _ in rows if a is not None and c is not None]
+            if len(fe) < 10:
+                continue
+            rho_fe, n_fe = spearman([f[0] for f in fe], [f[1] for f in fe])
+            rho_ph, n_ph = (spearman([p[0] for p in ph], [p[1] for p in ph])
+                            if len(ph) >= 10 else (float("nan"), 0))
+            signs = {}
+            for g in sorted({f[2] for f in fe}):
+                sub = [f for f in fe if f[2] == g]
+                if len(sub) >= 5:
+                    signs[g] = spearman([s[0] for s in sub], [s[1] for s in sub])[0]
+            say("  %-14s %4dm %8.3f %5d %8.3f %5d  %s"
+                % (idx, sc, rho_fe, n_fe, rho_ph, n_ph,
+                   " ".join("%s%+.2f" % (g[:4], v) for g, v in signs.items())))
+        say()
+    say("Read DOWN each index: if |rho| rises as GSD falls, finer pixels help")
+    say("and the drone case is quantitative. If flat, resolution is not the")
+    say("limiting factor and the ceiling is spectral, not spatial.")
+    if out_txt:
+        with open(out_txt, "w", encoding="utf-8") as fh:
+            fh.write("\n".join(lines) + "\n")
+        print("\n-> %s" % out_txt)
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--extract", action="store_true")
     ap.add_argument("--analyse", action="store_true")
     ap.add_argument("--dose-loro", action="store_true")
+    ap.add_argument("--degrade", action="store_true")
     ap.add_argument("--sensor", default="L8", choices=["L8", "S2"])
     ap.add_argument("--regions", default="")
     ap.add_argument("--inputs", default="",
@@ -933,6 +1034,8 @@ if __name__ == "__main__":
     if a.extract:
         out = a.out or os.path.join(OUTDIR, "seep_%s.csv" % a.sensor.lower())
         run_extract(a.sensor, slugs, out)
+    elif a.degrade:
+        run_degrade(slugs, a.out)
     elif a.dose_loro:
         paths = [p for p in a.inputs.split(",") if p]
         run_dose_loro(paths, a.radius, a.stat, a.out)

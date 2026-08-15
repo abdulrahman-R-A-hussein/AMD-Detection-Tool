@@ -235,6 +235,46 @@ def index_image(ee, comp):
     return img.updateMask(water_term(ee, comp).Not())
 
 
+NLCD_BARREN = 31          # NLCD "Barren Land (Rock/Sand/Clay)"
+
+
+def sample_c3b(ee, region, targets, rng, n_candidates=3000):
+    """C3b - bare ground defined by NLCD, INDEPENDENT of our imagery.
+
+    AMENDMENT to the pre-registration, added 2026-08-15 and labelled as one.
+    The registered C3 tier drew bare ground as "land pixels below the region's
+    25th-percentile NDVI", which makes any NDVI-based index separate targets
+    from C3 by construction - the W1 circularity, rebuilt by accident. NDVI_stress
+    duly scored AUC 0.898 against it, which measures the control definition,
+    not the imagery.
+
+    NLCD class 31 owes nothing to the Landsat/Sentinel composite being tested,
+    so it breaks the circularity. C3 is kept and reported alongside rather than
+    replaced, so the defect stays visible in the record.
+    """
+    nlcd = (ee.ImageCollection("USGS/NLCD_RELEASES/2019_REL/NLCD")
+            .filter(ee.Filter.eq("system:index", "2019")).first()
+            .select("landcover"))
+    pts = ee.FeatureCollection.randomPoints(region, n_candidates, SEED + 1)
+    got = _retry_mem(
+        lambda: nlcd.reduceRegions(collection=pts, reducer=ee.Reducer.first(),
+                                   scale=30).getInfo()["features"],
+        lambda: None)
+    out = []
+    for f in got:
+        p, g = f["properties"], f["geometry"]["coordinates"]
+        if p.get("first") != NLCD_BARREN:
+            continue
+        lon, lat = float(g[0]), float(g[1])
+        if not far_from_sources(lat, lon, targets):
+            continue
+        out.append(dict(pid="C3b_%d" % len(out), lat=lat, lon=lon,
+                        region=targets[0]["region"]))
+        if len(out) >= CONTROLS_PER_TARGET * len(targets):
+            break
+    return out
+
+
 def _retry_mem(fn, shrink, tries=4):
     """Run fn(), and on an EE memory error call shrink() and try again.
 
@@ -398,7 +438,7 @@ def sample_controls(ee, region, comp, targets, rng, n_candidates=1500):
 
 # ------------------------------------------------------------------ extract
 
-def run_extract(sensor, slugs, out_csv):
+def run_extract(sensor, slugs, out_csv, tiers=None):
     from gee_classify import init_ee
     ee = init_ee()
     rng = random.Random(SEED)
@@ -433,6 +473,12 @@ def run_extract(sensor, slugs, out_csv):
         amd = amd_binary(ee, comp, region, scale, n_tiles=n_tiles)
 
         groups = [("target", targets), ("C1", instream), ("C2", c2), ("C3", c3)]
+        if tiers is None or "C3b" in tiers:
+            c3b = sample_c3b(ee, region, targets, rng)
+            print("  C3b (NLCD barren, amendment): %d pts" % len(c3b))
+            groups.append(("C3b", c3b))
+        if tiers is not None:
+            groups = [(t, p) for t, p in groups if t in tiers]
         for radius in RADII:
             for tier, pts in groups:
                 if not pts:
@@ -720,6 +766,9 @@ def run_analyse(paths, radius=PRIMARY_RADIUS, stat=PRIMARY_STAT,
            len({r["pid"] for r in sel if r["tier"] == "C1"}),
            len({r["pid"] for r in sel if r["tier"] == "C2"}),
            len({r["pid"] for r in sel if r["tier"] == "C3"})))
+    n_c3b = len({r["pid"] for r in sel if r["tier"] == "C3b"})
+    if n_c3b:
+        say("C3b (NLCD barren, AMENDMENT - fixes C3's NDVI circularity): %d" % n_c3b)
 
     drops = [r for r in sel if r["tier"] == "target"
              and (r.get("n_px") != r.get("n_px") or (r.get("n_px") or 0) < 1)]
@@ -733,7 +782,7 @@ def run_analyse(paths, radius=PRIMARY_RADIUS, stat=PRIMARY_STAT,
     for sensor in sensors:
         for index in ALL_INDICES:
             key = _score_key(index, stat)
-            for tier in ("C1", "C2", "C3"):
+            for tier in ("C1", "C2", "C3", "C3b"):
                 pos, neg, sc, lb, rg = [], [], [], [], []
                 for r in sel:
                     if r["sensor"] != sensor:
@@ -783,7 +832,9 @@ def run_analyse(paths, radius=PRIMARY_RADIUS, stat=PRIMARY_STAT,
         for index in ALL_INDICES:
             got = {r["tier"]: r for r in results
                    if r["sensor"] == sensor and r["index"] == index}
-            if len(got) < 3:
+            # Decision rule stays on the three PRE-REGISTERED tiers. C3b is an
+            # amendment and is reported, never used to change a pass/fail.
+            if not all(t in got for t in ("C1", "C2", "C3")):
                 continue
             ok = all(got[t]["worst_j"] >= J_THRESHOLD and got[t]["q"] < 0.05
                      for t in ("C1", "C2", "C3"))
@@ -1021,6 +1072,7 @@ if __name__ == "__main__":
     ap.add_argument("--analyse", action="store_true")
     ap.add_argument("--dose-loro", action="store_true")
     ap.add_argument("--degrade", action="store_true")
+    ap.add_argument("--tiers", default="", help="limit extraction to these tiers")
     ap.add_argument("--sensor", default="L8", choices=["L8", "S2"])
     ap.add_argument("--regions", default="")
     ap.add_argument("--inputs", default="",
@@ -1033,7 +1085,8 @@ if __name__ == "__main__":
     slugs = ([s for s in a.regions.split(",") if s] or list(REGIONS))
     if a.extract:
         out = a.out or os.path.join(OUTDIR, "seep_%s.csv" % a.sensor.lower())
-        run_extract(a.sensor, slugs, out)
+        run_extract(a.sensor, slugs, out,
+                    [t for t in a.tiers.split(",") if t] or None)
     elif a.degrade:
         run_degrade(slugs, a.out)
     elif a.dose_loro:

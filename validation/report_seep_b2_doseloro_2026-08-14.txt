@@ -1,0 +1,36 @@
+============================================================================================
+ARM B2 DOSE-RESPONSE - LEAVE-ONE-REGION-OUT (the Arm A knife)
+radius=60m statistic=p90
+============================================================================================
+  index           analyte               pooled  LORO_R2 per-region rho
+  IronSulfate     Iron_mgL_dissolved    -0.057   -0.676  cent=+0.47 lead=+0.14 oura=-0.07 silv=-0.33  [*** SIGNS DISAGREE ***]
+  IronSulfate     Iron_mgL_any          -0.087   -0.694  cent=+0.47 lead=+0.05 oura=-0.03 silv=-0.40  [*** SIGNS DISAGREE ***]
+  IronSulfate     pH                    +0.144   -1.659  cent=+0.23 lead=-0.44 oura=-0.65 silv=-0.36  [*** SIGNS DISAGREE ***]
+  FerricIron1     Iron_mgL_dissolved    +0.568   -0.538  cent=+0.64 lead=+0.00 oura=+0.68 silv=+0.64  [ALL +]
+  FerricIron1     Iron_mgL_any          +0.558   -0.530  cent=+0.62 lead=+0.07 oura=+0.34 silv=+0.62  [ALL +]
+  FerricIron1     pH                    -0.554   -0.882  cent=-0.30 lead=-0.40 oura=-0.24 silv=-0.27  [ALL -]
+  FerricIron2     Iron_mgL_dissolved    +0.427   -0.624  cent=+0.74 lead=+0.05 oura=+0.48 silv=+0.36  [ALL +]
+  FerricIron2     Iron_mgL_any          +0.339   -0.616  cent=+0.72 lead=-0.03 oura=+0.30 silv=+0.32  [*** SIGNS DISAGREE ***]
+  FerricIron2     pH                    -0.488   -1.142  cent=-0.25 lead=-0.30 oura=-0.41 silv=-0.36  [ALL -]
+  FerrousIron     Iron_mgL_dissolved    +0.271   -0.749  cent=+0.51 lead=-0.04 oura=+0.46 silv=+0.07  [*** SIGNS DISAGREE ***]
+  FerrousIron     Iron_mgL_any          +0.164   -0.720  cent=+0.50 lead=-0.14 oura=+0.23 silv=-0.04  [*** SIGNS DISAGREE ***]
+  FerrousIron     pH                    -0.445   -1.386  cent=-0.21 lead=-0.02 oura=-0.17 silv=-0.22  [ALL -]
+  ClaySulfateMica Iron_mgL_dissolved    -0.069   -0.670  cent=+0.58 lead=+0.14 oura=-0.05 silv=+0.04  [*** SIGNS DISAGREE ***]
+  ClaySulfateMica Iron_mgL_any          -0.065   -0.686  cent=+0.59 lead=+0.06 oura=+0.03 silv=+0.09  [ALL +]
+  ClaySulfateMica pH                    +0.160   -1.681  cent=+0.11 lead=-0.31 oura=-0.57 silv=-0.52  [*** SIGNS DISAGREE ***]
+  GreenNIR        Iron_mgL_dissolved    -0.113   -0.719  cent=+0.51 lead=+0.16 oura=-0.25 silv=-0.35  [*** SIGNS DISAGREE ***]
+  GreenNIR        Iron_mgL_any          -0.136   -0.724  cent=+0.51 lead=+0.07 oura=-0.10 silv=-0.47  [*** SIGNS DISAGREE ***]
+  GreenNIR        pH                    +0.242   -1.548  cent=+0.21 lead=-0.31 oura=-0.50 silv=-0.31  [*** SIGNS DISAGREE ***]
+  GreenNIRNorm    Iron_mgL_dissolved    -0.113   -0.725  cent=+0.51 lead=+0.16 oura=-0.25 silv=-0.35  [*** SIGNS DISAGREE ***]
+  GreenNIRNorm    Iron_mgL_any          -0.136   -0.730  cent=+0.51 lead=+0.07 oura=-0.10 silv=-0.47  [*** SIGNS DISAGREE ***]
+  GreenNIRNorm    pH                    +0.242   -1.554  cent=+0.21 lead=-0.31 oura=-0.50 silv=-0.31  [*** SIGNS DISAGREE ***]
+  NDVI_stress     Iron_mgL_dissolved    -0.081   -0.667  cent=-0.43 lead=-0.04 oura=+0.22 silv=-0.04  [*** SIGNS DISAGREE ***]
+  NDVI_stress     Iron_mgL_any          -0.030   -0.673  cent=-0.46 lead=-0.02 oura=+0.35 silv=+0.06  [*** SIGNS DISAGREE ***]
+  NDVI_stress     pH                    +0.232   -1.564  cent=-0.26 lead=+0.38 oura=+0.36 silv=+0.17  [*** SIGNS DISAGREE ***]
+  AMDclassFrac    Iron_mgL_dissolved    +0.266   -0.614  cent=+0.58 lead=+0.18 oura=+0.31 silv=+0.34  [ALL +]
+  AMDclassFrac    Iron_mgL_any          +0.204   -0.608  cent=+0.58 lead=+0.14 oura=+0.01 silv=+0.28  [ALL +]
+  AMDclassFrac    pH                    -0.224   -1.434  cent=-0.07 lead=-0.19 oura=-0.64 silv=-0.10  [ALL -]
+
+Sign consistency across all four districts is the headline check:
+Arm A failed exactly here (Silverton +0.71, Ouray +0.67, but Creede
+-0.80, Leadville -0.80), which is why it was retracted.

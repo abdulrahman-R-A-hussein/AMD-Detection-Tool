@@ -1,6 +1,6 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-08-14 · **Current tag:** `v3.1.0`
+**Last updated:** 2026-08-14 · **Current tag:** `v3.1.1`
 
 This file is the canonical "where are we right now". It is maintained under
 the logging rule in [`../CLAUDE.md`](../CLAUDE.md). It should be sufficient to
@@ -64,7 +64,17 @@ retraction is the load-bearing update this file exists to carry forward.
   36 tests), and pH at −0.554. Only **24% between-region variance**, and the
   p-value comes from permuting labels *within* region — i.e. it passes the exact
   test that destroyed the pooled sulfate claim. Pre-registered as H2 before
-  extraction. → [`ARM_B2_SEEP_DETECTION_2026-08-14.md`](ARM_B2_SEEP_DETECTION_2026-08-14.md)
+  extraction. **Leave-one-region-out, applied the same day, tempers it and the
+  tempered version is the one to cite:** the sign holds in **all four**
+  districts (Arm A's signs were incoherent — this is the check Arm A failed),
+  but it is **heterogeneous** (Leadville rho ≈ 0.00 vs +0.62/+0.64/+0.68) and
+  **LORO R² is negative for every pair**. → **`FerricIron1` RANKS severity
+  within a district; it does NOT predict concentration across districts.**
+  The most robust single relationship is `FerricIron1` vs **pH**: all four
+  districts negative and tight in magnitude (−0.24 to −0.40).
+  paper2's `GreenNIR`/`GreenNIRNorm` **fail** sign consistency (+0.51, +0.16,
+  −0.25, −0.35) — their pooled value is not a relationship.
+  → [`ARM_B2_SEEP_DETECTION_2026-08-14.md`](ARM_B2_SEEP_DETECTION_2026-08-14.md)
 - **Arm B2 detection is a NULL, at n=86.** All 9 indices fail the pre-registered
   criterion (worst-case LORO Youden J >= 0.25 vs all 3 control tiers, BH
   p < 0.05, 10k permutations). Apparent separation exists only against

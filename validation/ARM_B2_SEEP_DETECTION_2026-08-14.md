@@ -17,6 +17,13 @@ committed `4bb3b63` **before any imagery was extracted** (auditable in `git log`
 
 Both halves are reported with equal prominence, per project rule.
 
+> **TEMPERED same day by the leave-one-region-out test (Part 3).** The
+> direction replicates in **all four** districts — no sign flips, which is
+> exactly where Arm A died — but it is **not uniform** (Leadville rho ≈ 0.00
+> while the other three are +0.62 to +0.68), and **LORO R² is negative for
+> every pair**. Read the claim as: *ranks severity within a district; does not
+> predict concentration across districts.* The pooled +0.568 overstates it.
+
 ## Sample
 
 n = **86** source points (mine discharge / adit / tailings / waste rock /
@@ -86,6 +93,48 @@ Signs are mechanistically correct in both directions: more ferric iron staining
 
 `FerricIron1` = SR_B4/SR_B2 (red/blue), the simplest index in the panel and the
 only SIM 3466 index computable at genuine 10 m on Sentinel-2.
+
+## Part 3 — Leave-one-region-out: the Arm A knife, applied
+
+Raw output: [`report_seep_b2_doseloro_2026-08-14.txt`](report_seep_b2_doseloro_2026-08-14.txt)
+
+| index | analyte | pooled | LORO R² | per-region rho | signs |
+|---|---|---|---|---|---|
+| `FerricIron1` | dissolved Fe | +0.568 | −0.538 | cent +0.64 · lead **+0.00** · oura +0.68 · silv +0.64 | **all +** |
+| `FerricIron1` | total Fe | +0.558 | −0.530 | +0.62 · **+0.07** · +0.34 · +0.62 | **all +** |
+| **`FerricIron1`** | **pH** | **−0.554** | −0.882 | **−0.30 · −0.40 · −0.24 · −0.27** | **all −** |
+| `FerricIron2` | pH | −0.488 | −1.142 | −0.25 · −0.30 · −0.41 · −0.36 | all − |
+| `AMDclassFrac` | dissolved Fe | +0.266 | −0.614 | +0.58 · +0.18 · +0.31 · +0.34 | all + |
+| `GreenNIR` | dissolved Fe | −0.113 | −0.719 | +0.51 · +0.16 · −0.25 · −0.35 | **disagree** |
+
+**Two things this establishes, and one it takes away.**
+
+1. **It is not Arm A.** Arm A's per-region signs were +0.71, +0.67, −0.70,
+   −0.80, −0.80 — incoherent. Here the sign holds in **all four** districts for
+   every `FerricIron1` pair. Sign consistency across four independent mining
+   districts is the check Arm A failed, and this passes it.
+2. **`FerricIron1` vs pH is the most robust relationship in the study** —
+   sign-consistent *and* tight in magnitude (−0.24 to −0.40 across all four),
+   where the Fe relationship is sign-consistent but heterogeneous.
+3. **Absolute calibration does not transfer. LORO R² is negative for every
+   index × analyte pair tested**, including the sign-consistent ones. A linear
+   model fitted on three districts predicts the fourth worse than that
+   district's own mean. Regions carry their own offsets — different geology,
+   baseline Fe, illumination.
+
+**Leadville is the weak district** (rho +0.00 for dissolved Fe, +0.07 total),
+so the pooled +0.568 is carried by the other three. Stated rather than averaged
+away.
+
+**Therefore the defensible claim is a ranking claim, not a prediction claim:**
+within a district, `FerricIron1` orders source points by severity; it cannot be
+handed a number and asked for mg/L in a district it has not seen. That is still
+useful — ranking is what site-prioritisation and drone-target selection need —
+but it is a materially weaker claim than the pooled rho suggests, and the
+weaker one is the correct one.
+
+Note the paper2 indices (`GreenNIR`/`GreenNIRNorm`) **fail sign consistency**
+here (+0.51, +0.16, −0.25, −0.35). Their pooled −0.113 is not a relationship.
 
 ## What this means
 

@@ -789,10 +789,98 @@ def run_analyse(paths, radius=PRIMARY_RADIUS, stat=PRIMARY_STAT,
         print("\n-> %s" % out_txt)
 
 
+def run_dose_loro(paths, radius=PRIMARY_RADIUS, stat=PRIMARY_STAT, out_txt=None):
+    """Leave-one-REGION-out test of the dose-response relationship.
+
+    The pooled rho (+0.568 for FerricIron1 vs dissolved Fe) already survives
+    within-region permutation, which is far stronger than the retracted sulfate
+    result ever was. But this project's own standard is a HELD-OUT test:
+    Arm A's n=6 headline also looked significant pooled and died leave-one-
+    region-out. So the same knife is applied here.
+
+    Two things are reported per pair:
+      - per-region rho, i.e. does the sign even replicate in each district;
+      - LORO R2: fit y~x on three regions, predict the fourth, pooled against
+        the held-out region's own mean. Negative means worse than predicting
+        the mean - the standard that killed Arm A.
+    """
+    rows = load_extracted(paths)
+    sel = [r for r in rows if r["radius"] == radius and r["tier"] == "target"
+           and r["region"] in REGIONS]
+    lines = []
+
+    def say(s=""):
+        print(s)
+        lines.append(s)
+
+    say("=" * 92)
+    say("ARM B2 DOSE-RESPONSE - LEAVE-ONE-REGION-OUT (the Arm A knife)")
+    say("radius=%dm statistic=%s" % (radius, stat))
+    say("=" * 92)
+    say("  %-15s %-20s %7s %8s %s" % ("index", "analyte", "pooled", "LORO_R2",
+                                      "per-region rho"))
+
+    for index in ALL_INDICES:
+        key = _score_key(index, stat)
+        for cv in ("Iron_mgL_dissolved", "Iron_mgL_any", "pH"):
+            pts = [(r[key], r[cv], r["region"]) for r in sel
+                   if r.get(key, float("nan")) == r.get(key, float("nan"))
+                   and r.get(cv, float("nan")) == r.get(cv, float("nan"))]
+            if len(pts) < 20:
+                continue
+            regs = sorted({p[2] for p in pts})
+            if len(regs) < 3:
+                continue
+            pooled, _ = spearman([p[0] for p in pts], [p[1] for p in pts])
+            if pooled != pooled:
+                continue
+
+            per = {}
+            for g in regs:
+                sub = [p for p in pts if p[2] == g]
+                if len(sub) >= 5:
+                    per[g] = spearman([s[0] for s in sub], [s[1] for s in sub])[0]
+
+            ss_res = ss_tot = 0.0
+            for held in regs:
+                tr = [p for p in pts if p[2] != held]
+                te = [p for p in pts if p[2] == held]
+                if len(tr) < 10 or len(te) < 3:
+                    continue
+                mx = statistics.mean(p[0] for p in tr)
+                my = statistics.mean(p[1] for p in tr)
+                den = sum((p[0] - mx) ** 2 for p in tr)
+                if den <= 0:
+                    continue
+                b = sum((p[0] - mx) * (p[1] - my) for p in tr) / den
+                a = my - b * mx
+                mte = statistics.mean(p[1] for p in te)
+                ss_res += sum((p[1] - (a + b * p[0])) ** 2 for p in te)
+                ss_tot += sum((p[1] - mte) ** 2 for p in te)
+            r2 = 1 - ss_res / ss_tot if ss_tot else float("nan")
+
+            sgn = ("ALL +" if all(v > 0 for v in per.values())
+                   else "ALL -" if all(v < 0 for v in per.values())
+                   else "*** SIGNS DISAGREE ***")
+            say("  %-15s %-20s %+7.3f %8.3f  %s  [%s]"
+                % (index, cv, pooled, r2,
+                   " ".join("%s=%+.2f" % (g[:4], v) for g, v in sorted(per.items())),
+                   sgn))
+    say()
+    say("Sign consistency across all four districts is the headline check:")
+    say("Arm A failed exactly here (Silverton +0.71, Ouray +0.67, but Creede")
+    say("-0.80, Leadville -0.80), which is why it was retracted.")
+    if out_txt:
+        with open(out_txt, "w", encoding="utf-8") as fh:
+            fh.write("\n".join(lines) + "\n")
+        print("\n-> %s" % out_txt)
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--extract", action="store_true")
     ap.add_argument("--analyse", action="store_true")
+    ap.add_argument("--dose-loro", action="store_true")
     ap.add_argument("--sensor", default="L8", choices=["L8", "S2"])
     ap.add_argument("--regions", default="")
     ap.add_argument("--inputs", default="",
@@ -806,6 +894,9 @@ if __name__ == "__main__":
     if a.extract:
         out = a.out or os.path.join(OUTDIR, "seep_%s.csv" % a.sensor.lower())
         run_extract(a.sensor, slugs, out)
+    elif a.dose_loro:
+        paths = [p for p in a.inputs.split(",") if p]
+        run_dose_loro(paths, a.radius, a.stat, a.out)
     elif a.analyse:
         paths = ([p for p in a.inputs.split(",") if p]
                  or [os.path.join(OUTDIR, "seep_l8.csv"),

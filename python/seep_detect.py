@@ -63,6 +63,7 @@ ELEV_TOL_M = 100.0
 SLOPE_TOL_DEG = 5.0
 NDVI_BARE_PCTL = 25              # C3 draws below this percentile
 MIN_SCENES = 3
+S2_MAX_CLOUD = 20        # percent; see s2_composite() for why this matters
 N_PERM = 10000                   # primary family
 N_PERM_SENS = 2000               # sensitivity radii / statistics
 J_THRESHOLD = 0.25               # decision rule, with BH p < 0.05
@@ -193,9 +194,17 @@ def s2_composite(ee, region):
         nir10 = b.select("B8").divide(10000).clamp(0.0, 1.0).rename("SR_B8_10")
         return add_indices(ee, scaled.addBands(nir10))
 
+    # CLOUD FILTER IS LOAD-BEARING, not cosmetic. Silverton returns 554 S2
+    # scenes in the May-Jul window (Ouray 276) against Landsat's handful, and a
+    # median over 554 images with add_indices mapped onto each exceeds the EE
+    # memory limit before any tiling or batching downstream can help - retries
+    # cannot fix a graph that is too large to build. Capping cloud cover cuts
+    # the collection several-fold AND improves the composite, since >60% cloudy
+    # scenes contribute almost nothing after SCL masking anyway.
     col = (ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
            .filterBounds(region).filterDate(START, END)
            .filter(ee.Filter.calendarRange(V3_MONTHS[0], V3_MONTHS[-1], "month"))
+           .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", S2_MAX_CLOUD))
            .map(prep))
     return col.median().clip(region), int(col.size().getInfo())
 

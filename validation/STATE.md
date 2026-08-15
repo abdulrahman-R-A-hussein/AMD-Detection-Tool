@@ -1,6 +1,6 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-08-13 · **Current tag:** `v3.0.12`
+**Last updated:** 2026-08-14 · **Current tag:** `v3.1.0`
 
 This file is the canonical "where are we right now". It is maintained under
 the logging rule in [`../CLAUDE.md`](../CLAUDE.md). It should be sufficient to
@@ -57,6 +57,26 @@ retraction is the load-bearing update this file exists to carry forward.
   `NEXT_DOWN` reverse traversal, cross-checked against official USGS NWIS
   `drain_area_va`. Station 09359020 correctly aggregates its two upstream
   neighbours (204.9 sq mi, 1.40× NWIS / 1.39× MERIT).
+- **Arm B2 dose-response: the first ground-truth-validated POSITIVE in the
+  water arm (2026-08-14).** At 86 chemically-confirmed AMD source points across
+  4 regions, `FerricIron1` (red/blue) tracks measured **dissolved Fe at
+  rho = +0.568** (n=75, within-region permutation p = 0.0004, BH q = 0.0072 over
+  36 tests), and pH at −0.554. Only **24% between-region variance**, and the
+  p-value comes from permuting labels *within* region — i.e. it passes the exact
+  test that destroyed the pooled sulfate claim. Pre-registered as H2 before
+  extraction. → [`ARM_B2_SEEP_DETECTION_2026-08-14.md`](ARM_B2_SEEP_DETECTION_2026-08-14.md)
+- **Arm B2 detection is a NULL, at n=86.** All 9 indices fail the pre-registered
+  criterion (worst-case LORO Youden J >= 0.25 vs all 3 control tiers, BH
+  p < 0.05, 10k permutations). Apparent separation exists only against
+  terrain-matched land (C2) and collapses to ~0 against in-stream stations in
+  the same region (C1). **Imagery ranks severity at known sites; it does not
+  find sites.**
+- **The shipped v3.0.x classifier is substantially a BARE-GROUND detector.**
+  `AMDclassFrac` vs bare ground: AUC 0.456, worst-case LORO J **−0.304** — it
+  scores bare ground *higher* than confirmed mine discharge (Leadville medians
+  0.376 vs 0.049, 7.7x). Structural, not a bug: the NDVI gate requires a pixel
+  to be unvegetated before it can receive any AMD class. State this whenever
+  the classifier is used.
 - **Colorado chemistry is rich.** 17,062 water rows; **1,770 dissolved Fe**
   measurements (vs Ohio's 4), median 0.45 mg/L; mine-discharge source points
   median 6.2 mg/L, max 120 mg/L.
@@ -144,10 +164,23 @@ Ordered by value.
    first appeared. Report non-nested n, never station count. Still worth
    running: the question is whether removing Cement-Creek-style dilution
    reveals a relationship `hybas_12` was masking.
-3. **Arm B2 — precipitate/seep detection.** Not built. `water_indices.py` has
-   the paper2 indices correctly scoped; the extraction geometry around the 62
-   identified mine-discharge/adit/spring stations is what's missing. This is
-   where finding W4 predicts a positive result actually lives.
+3. ~~Arm B2 — precipitate/seep detection~~ **RUN 2026-08-14 on Landsat 8**
+   (`python/seep_detect.py`). Detection null, dose-response positive — see
+   PROVEN above. **Remaining B2 work, in value order:**
+   a. **C3b amendment (required).** The pre-registered C3 bare-ground tier is
+      circular for vegetation-sensitive indices — it was defined by NDVI, so
+      `NDVI_stress` separates from it by construction. Re-run with NLCD
+      `USGS/NLCD_RELEASES/2019_REL/NLCD` class 31 (Barren Land), independent of
+      our imagery, as a **labelled amendment**. Does not change the null.
+   b. **Hold out a region on the dose-response.** rho=+0.568 is pooled-with-
+      within-region-permutation, which is much stronger than the retracted
+      sulfate result but is still not a held-out test. Leave-one-region-out is
+      the obvious next check and this project's own standard.
+   c. **Sentinel-2 + the resolution ladder** (was OPEN #6). NOTE: S2 is NOT
+      10 m for most of the panel — SWIR is 20 m and the coastal band 60 m;
+      only `FerricIron1` and the green:NIR pair are true 10 m
+      (`seep_detect.S2_NATIVE_M`). Report effective GSD per index, not the
+      nominal collection resolution.
 4. **Colorado B1 stream matching.** Zero matches so far. One bug fixed (width
    screen dropped on *missing* MERIT data, not confirmed narrowness); one open
    — the lake-calibrated water mask returns nothing even on the wide Animas

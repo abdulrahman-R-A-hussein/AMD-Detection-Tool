@@ -164,6 +164,23 @@ def classify_v3(ee, c, region, scale=30, iron_fallback=False, n_tiles=4):
                     ndvi_max=V3_NDVI_MAX, thresholds=t)
 
 
+def water_term(ee, c):
+    """The classifier's own water test, factored out unchanged.
+
+    Extracted 2026-08-14 for Arm B2, which must exclude water pixels WITHOUT
+    applying the rest of the land gate: paper2's Green:NIR is degenerate on
+    open water (every water pixel absorbs NIR and scores high), but the full
+    `land` mask also drops bright/dark/built/vegetated pixels, which would
+    remove legitimate precipitate targets. Factored rather than copied so the
+    two definitions cannot drift apart - classify() calls this.
+    """
+    ndvi, mndwi = c.select("NDVI"), c.select("MNDWI")
+    bright, awei = c.select("Brightness"), c.select("AWEINSH")
+    b3, b5 = c.select("SR_B3"), c.select("SR_B5")
+    return (mndwi.gt(T["water"]).And(awei.gt(0.0)).And(ndvi.lt(0.0))
+            .And(b5.lt(b3)).And(bright.lt(0.30)))
+
+
 def classify(ee, c, veg_gate="strict", iron_fallback=True, ndvi_max=None,
             thresholds=None):
     """The v2.4.0 first-match-wins cascade, server-side.
@@ -204,8 +221,7 @@ def classify(ee, c, veg_gate="strict", iron_fallback=True, ndvi_max=None,
     sparse = gv.gt(T["green_veg"]).And(gv.lte(T["dense_veg"]))
     dense = gv.gt(T["dense_veg"])
 
-    water = (mndwi.gt(T["water"]).And(awei.gt(0.0)).And(ndvi.lt(0.0))
-             .And(b5.lt(b3)).And(bright.lt(0.30)))
+    water = water_term(ee, c)
     built = (bright.gt(T["bu_bright"]).And(ndvi.lt(T["bu_ndvi_hi"]))
              .And(ndvi.gt(T["bu_ndvi_lo"]))
              .And(mndwi.lt(T["bu_mndwi"])

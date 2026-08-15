@@ -218,7 +218,27 @@ def index_image(ee, comp):
     return img.updateMask(water_term(ee, comp).Not())
 
 
-def amd_binary(ee, comp, region, scale):
+def _retry_mem(fn, shrink, tries=4):
+    """Run fn(), and on an EE memory error call shrink() and try again.
+
+    Added 2026-08-15: the batch-shrinking inside extract_buffers covered only
+    the buffer reductions, but Sentinel-2 (finer scale, more scenes, so a much
+    larger compute graph) also blew the limit in sample_controls' random-point
+    reduction and in classify_v3's tiled stats, which had no guard. That killed
+    the Silverton and Ouray S2 runs outright while Leadville and Central City
+    survived - the same job succeeding or failing on region size alone.
+    """
+    for i in range(tries):
+        try:
+            return fn()
+        except Exception as exc:                            # noqa: BLE001
+            if "memory" not in str(exc).lower() or i == tries - 1:
+                raise
+            shrink()
+            print("      memory limit - shrinking and retrying")
+
+
+def amd_binary(ee, comp, region, scale, n_tiles=4):
     """1 where the SHIPPED v3.0.x classifier calls the pixel an AMD class.
 
     This is the highest-value single index in the panel: it scores the actual
@@ -226,7 +246,7 @@ def amd_binary(ee, comp, region, scale):
     chemically-confirmed AMD point sources.
     """
     from gee_classify import classify_v3
-    cls = classify_v3(ee, comp, region, scale=scale)
+    cls = classify_v3(ee, comp, region, scale=scale, n_tiles=n_tiles)
     amd = cls.remap(list(AMD_CLASSES), [1] * len(AMD_CLASSES), 0)
     return amd.updateMask(comp.select("SR_B4").mask()).rename("AMDclassFrac")
 
@@ -298,9 +318,14 @@ def sample_controls(ee, region, comp, targets, rng, n_candidates=1500):
         ee.Terrain.slope(srtm).rename("slope")).addBands(
         comp.select("NDVI"))
 
-    pts = ee.FeatureCollection.randomPoints(region, n_candidates, SEED)
-    got = terrain.reduceRegions(
-        collection=pts, reducer=ee.Reducer.first(), scale=90).getInfo()["features"]
+    state = {"n": n_candidates}
+
+    def _cand():
+        pts = ee.FeatureCollection.randomPoints(region, state["n"], SEED)
+        return terrain.reduceRegions(collection=pts, reducer=ee.Reducer.first(),
+                                     scale=90).getInfo()["features"]
+
+    got = _retry_mem(_cand, lambda: state.__setitem__("n", max(200, state["n"] // 2)))
 
     cand = []
     for f in got:
@@ -318,8 +343,10 @@ def sample_controls(ee, region, comp, targets, rng, n_candidates=1500):
     tfc = ee.FeatureCollection([
         ee.Feature(ee.Geometry.Point([t["lon"], t["lat"]]), {"pid": t["pid"]})
         for t in targets])
-    tgot = terrain.reduceRegions(collection=tfc, reducer=ee.Reducer.first(),
-                                 scale=90).getInfo()["features"]
+    tgot = _retry_mem(
+        lambda: terrain.reduceRegions(collection=tfc, reducer=ee.Reducer.first(),
+                                      scale=90).getInfo()["features"],
+        lambda: None)
     tterr = {f["properties"]["pid"]: f["properties"] for f in tgot}
 
     ndvis = sorted(c["ndvi"] for c in cand if c["ndvi"] is not None)
@@ -377,13 +404,16 @@ def run_extract(sensor, slugs, out_csv):
             print("  SKIP - fewer than %d scenes" % MIN_SCENES)
             continue
 
-        c2, c3, ndvi_cut = sample_controls(ee, region, comp, targets, rng)
+        n_tiles = 4 if sensor == "L8" else 8
+        c2, c3, ndvi_cut = sample_controls(
+            ee, region, comp, targets, rng,
+            n_candidates=1500 if sensor == "L8" else 600)
         print("  controls: C1=%d  C2=%d  C3=%d  (C3 NDVI cut %.3f)"
               % (len(instream), len(c2), len(c3),
                  ndvi_cut if ndvi_cut is not None else float("nan")))
 
         img = index_image(ee, comp)
-        amd = amd_binary(ee, comp, region, scale)
+        amd = amd_binary(ee, comp, region, scale, n_tiles=n_tiles)
 
         groups = [("target", targets), ("C1", instream), ("C2", c2), ("C3", c3)]
         for radius in RADII:

@@ -1,0 +1,45 @@
+======================================================================================
+B2c CONTINUOUS DETECTOR - PRE-REGISTERED (6af0b5b, before any fitting)
+sensor=L8  radius=60m  stat=p90  features=8  perms=10000
+Rule: J>=0.25 vs C1+C2+C3b, BH p<0.05, AND beat FerricIron1 alone.
+======================================================================================
+n targets=86  tiers present: C1=446, C2=429, C3=430
+
+--- REPRODUCTION CHECK (must match prior runs before judging models) ---
+  FerricIron1 alone vs C1   worst-case LORO J = -0.019   cent=+0.03 lead=+0.17 oura=-0.02 silv=+0.22
+  FerricIron1 alone vs C2   worst-case LORO J = -0.010   cent=+0.48 lead=+0.17 oura=-0.01 silv=+0.07
+  FerricIron1 alone vs C3   worst-case LORO J = -0.045   cent=+0.26 lead=+0.23 oura=-0.05 silv=+0.19
+
+--- MODEL vs BASELINE, leave-one-region-out ---
+  tier   model_J   base_J    perm_p      BH_q  per-region model J
+  C1       0.228   -0.019    0.2098         -  cent=+0.30 lead=+0.23 oura=+0.27 silv=+0.35
+  C2       0.330   -0.010    0.1273         -  cent=+0.73 lead=+0.33 oura=+0.80 silv=+0.68
+  C3       0.120   -0.045    0.2558         -  cent=+0.12 lead=+0.82 oura=+0.58 silv=+0.62
+
+  BH_q C1    = 0.2558
+  BH_q C2    = 0.2558
+  BH_q C3    = 0.2558
+
+--- WHAT THE MODEL LEARNED (per-fold coefficients, standardised) ---
+  feature          central_ leadvill ouray_co silverto
+  IronSulfate        -0.876   -0.799   -1.507   -1.663
+  FerricIron1        -0.297   -0.313   -0.325   -0.099
+  FerricIron2        +1.053   +1.316   +1.483   +1.199
+  FerrousIron        -0.088   -0.488   -0.363   +0.022  <-- SIGN FLIPS
+  ClaySulfateMica    +0.370   +1.018   +0.745   +0.693
+  GreenNIR           +0.156   +0.047   +0.058   +0.193
+  GreenNIRNorm       +0.641   +0.064   +0.150   +0.461
+  NDVI_stress        +0.870   +0.616   +0.337   +0.639
+
+  SIGN INSTABILITY in 1/8 features: FerrousIron
+  Reported, not smoothed - this is the diagnostic that exposed Arm A.
+
+--- LEAKAGE POSITIVE CONTROL (a deliberate leak MUST inflate J) ---
+  C1    clean J=+0.228   leaked J=+0.188   *** NO INFLATION - guard suspect ***
+  C2    clean J=+0.330   leaked J=+0.374   as expected
+  C3    clean J=+0.120   leaked J=+0.460   as expected
+
+--- VERDICT (pre-registered vocabulary) ---
+  tiers absent for this sensor: C3b
+  PARTIAL
+  model beats FerricIron1 alone on: C1, C2

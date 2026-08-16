@@ -1,0 +1,48 @@
+======================================================================================
+B2c CONTINUOUS DETECTOR - PRE-REGISTERED (6af0b5b, before any fitting)
+sensor=S2  radius=60m  stat=p90  features=8  perms=10000
+Rule: J>=0.25 vs C1+C2+C3b, BH p<0.05, AND beat FerricIron1 alone.
+======================================================================================
+n targets=86  tiers present: C1=446, C2=378, C3=430, C3b=350
+
+--- REPRODUCTION CHECK (must match prior runs before judging models) ---
+  FerricIron1 alone vs C1   worst-case LORO J = +0.234   cent=+0.42 lead=+0.35 oura=+0.26 silv=+0.23
+  FerricIron1 alone vs C2   worst-case LORO J = +0.291   cent=+0.66 lead=+0.35 oura=+0.29 silv=+0.34
+  FerricIron1 alone vs C3   worst-case LORO J = +0.318   cent=+0.44 lead=+0.58 oura=+0.32 silv=+0.54
+  FerricIron1 alone vs C3b  worst-case LORO J = +0.318   cent=+0.50 lead=+0.36 oura=+0.32 silv=+0.56
+
+--- MODEL vs BASELINE, leave-one-region-out ---
+  tier   model_J   base_J    perm_p      BH_q  per-region model J
+  C1       0.178    0.234    0.0001         -  cent=+0.35 lead=+0.18 oura=+0.42 silv=+0.25
+  C2       0.319    0.291    0.0001         -  cent=+0.64 lead=+0.32 oura=+0.59 silv=+0.63
+  C3       0.420    0.318    0.0001         -  cent=+0.42 lead=+0.70 oura=+0.68 silv=+0.85
+  C3b      0.617    0.318    0.0001         -  cent=+0.65 lead=+0.62 oura=+0.75 silv=+0.88
+
+  BH_q C1    = 0.0001
+  BH_q C2    = 0.0001
+  BH_q C3    = 0.0001
+  BH_q C3b   = 0.0001
+
+--- WHAT THE MODEL LEARNED (per-fold coefficients, standardised) ---
+  feature          central_ leadvill ouray_co silverto
+  IronSulfate        +0.650   +0.086   +0.343   +0.501
+  FerricIron1        +0.507   +0.167   +0.850   +0.646
+  FerricIron2        +0.772   +1.492   +0.507   +1.135
+  FerrousIron        -0.464   -1.091   -0.286   -0.570
+  ClaySulfateMica    -1.040   +0.174   -0.838   -1.077  <-- SIGN FLIPS
+  GreenNIR           +0.057   -0.324   -0.166   +0.115  <-- SIGN FLIPS
+  GreenNIRNorm       +0.555   +0.231   +0.528   +0.081
+  NDVI_stress        +0.221   +0.183   +0.071   -0.172  <-- SIGN FLIPS
+
+  SIGN INSTABILITY in 3/8 features: ClaySulfateMica, GreenNIR, NDVI_stress
+  Reported, not smoothed - this is the diagnostic that exposed Arm A.
+
+--- LEAKAGE POSITIVE CONTROL (a deliberate leak MUST inflate J) ---
+  C1    clean J=+0.178   leaked J=+0.214   as expected
+  C2    clean J=+0.319   leaked J=+0.360   as expected
+  C3    clean J=+0.420   leaked J=+0.410   *** NO INFLATION - guard suspect ***
+  C3b   clean J=+0.617   leaked J=+0.700   as expected
+
+--- VERDICT (pre-registered vocabulary) ---
+  PARTIAL
+  model beats FerricIron1 alone on: C2, C3b

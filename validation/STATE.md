@@ -1,6 +1,6 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-08-14 · **Current tag:** `v3.1.1`
+**Last updated:** 2026-08-15 · **Current tag:** `v3.2.0`
 
 This file is the canonical "where are we right now". It is maintained under
 the logging rule in [`../CLAUDE.md`](../CLAUDE.md). It should be sufficient to
@@ -75,6 +75,21 @@ retraction is the load-bearing update this file exists to carry forward.
   paper2's `GreenNIR`/`GreenNIRNorm` **fail** sign consistency (+0.51, +0.16,
   −0.25, −0.35) — their pooled value is not a relationship.
   → [`ARM_B2_SEEP_DETECTION_2026-08-14.md`](ARM_B2_SEEP_DETECTION_2026-08-14.md)
+- **RESOLUTION IS THE BINDING CONSTRAINT — shown with numbers (2026-08-15).**
+  Same 86 points, same controls, same pre-registered test; only pixel size
+  changes. `FerricIron1` worst-case LORO Youden J, **Landsat 30 m → Sentinel-2
+  20 m**: vs C1 in-stream **−0.018 → +0.234**, vs C2 **−0.101 → +0.291**, vs C3
+  **−0.045 → +0.318** (all BH q = 0.0003). Every tier flips from below zero to
+  strongly positive. At 20 m it misses the pre-registered bar **only on C1 and
+  only by 0.016** — still a null by the registered rule, but a qualitatively
+  different one from Landsat's all-negative failure. **`AMDclassFrac` does NOT
+  improve with resolution** (≈0.000 vs C1/C2 at both), consistent with its AMD
+  calls being driven by the bare-ground gate rather than by iron.
+  Independent convergence with paper2's "S2 resolved 3 of 6 leaks" conclusion,
+  at n=86 vs their n=6, with a pre-registered criterion instead of a visual
+  count — and reached *despite* their green:NIR indices performing poorly here.
+  **Extrapolation to 7 cm is extrapolation, not measurement.**
+  → [`ARM_B2_SENTINEL2_RESOLUTION_2026-08-15.md`](ARM_B2_SENTINEL2_RESOLUTION_2026-08-15.md)
 - **Arm B2 detection is a NULL, at n=86.** All 9 indices fail the pre-registered
   criterion (worst-case LORO Youden J >= 0.25 vs all 3 control tiers, BH
   p < 0.05, 10k permutations). Apparent separation exists only against

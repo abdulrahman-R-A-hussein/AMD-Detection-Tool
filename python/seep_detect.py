@@ -438,7 +438,7 @@ def sample_controls(ee, region, comp, targets, rng, n_candidates=1500):
 
 # ------------------------------------------------------------------ extract
 
-def run_extract(sensor, slugs, out_csv, tiers=None):
+def run_extract(sensor, slugs, out_csv, tiers=None, radii=None):
     from gee_classify import init_ee
     ee = init_ee()
     rng = random.Random(SEED)
@@ -479,7 +479,7 @@ def run_extract(sensor, slugs, out_csv, tiers=None):
             groups.append(("C3b", c3b))
         if tiers is not None:
             groups = [(t, p) for t, p in groups if t in tiers]
-        for radius in RADII:
+        for radius in (radii or RADII):
             for tier, pts in groups:
                 if not pts:
                     continue
@@ -1073,6 +1073,7 @@ if __name__ == "__main__":
     ap.add_argument("--dose-loro", action="store_true")
     ap.add_argument("--degrade", action="store_true")
     ap.add_argument("--tiers", default="", help="limit extraction to these tiers")
+    ap.add_argument("--radii", default="", help="limit extraction to these radii (m)")
     ap.add_argument("--sensor", default="L8", choices=["L8", "S2"])
     ap.add_argument("--regions", default="")
     ap.add_argument("--inputs", default="",
@@ -1086,7 +1087,8 @@ if __name__ == "__main__":
     if a.extract:
         out = a.out or os.path.join(OUTDIR, "seep_%s.csv" % a.sensor.lower())
         run_extract(a.sensor, slugs, out,
-                    [t for t in a.tiers.split(",") if t] or None)
+                    [t for t in a.tiers.split(",") if t] or None,
+                    [int(x) for x in a.radii.split(",") if x] or None)
     elif a.degrade:
         run_degrade(slugs, a.out)
     elif a.dose_loro:

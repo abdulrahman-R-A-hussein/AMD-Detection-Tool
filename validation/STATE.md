@@ -1,6 +1,6 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-08-15 · **Current tag:** `v3.2.0`
+**Last updated:** 2026-08-16 · **Current tag:** `v3.3.0`
 
 This file is the canonical "where are we right now". It is maintained under
 the logging rule in [`../CLAUDE.md`](../CLAUDE.md). It should be sufficient to
@@ -75,6 +75,21 @@ retraction is the load-bearing update this file exists to carry forward.
   paper2's `GreenNIR`/`GreenNIRNorm` **fail** sign consistency (+0.51, +0.16,
   −0.25, −0.35) — their pooled value is not a relationship.
   → [`ARM_B2_SEEP_DETECTION_2026-08-14.md`](ARM_B2_SEEP_DETECTION_2026-08-14.md)
+- **⛔ RESOLUTION IS *NOT* THE BINDING CONSTRAINT — REFUTED 2026-08-16.**
+  The within-Sentinel-2 detection ladder (only pixel size varies, one sensor)
+  gives `FerricIron1` mean AUC **0.732 / 0.724 / 0.740 at 10 / 20 / 40 m** —
+  flat, 3 of 4 regions (Silverton died on GEE memory). With the dose-response
+  ladder also flat over 10–100 m, **neither detection nor severity improves with
+  finer pixels anywhere in 10–100 m.**
+  **So the Landsat→Sentinel-2 jump (J −0.018 → +0.234) was a SENSOR effect —
+  bands, SNR, atmospheric correction, deeper scene stacks — not resolution.**
+  **Instrumentation consequence, against our own earlier framing:** these data
+  point at the **spectral/radiometric** axis (multi-band, spectrometer), **not**
+  at spatial resolution. Do not justify a 7 cm platform from this evidence;
+  a 10-band sensor and ASD spectrometer sit on the axis actually implicated.
+  **Bound:** tested range is 10–100 m, which does span the mixed→pure pixel
+  transition for a 5–20 m fan. Sub-metre is untested; a 7 cm claim is
+  extrapolation *against a flat trend*.
 - **SEVERITY RANKING DOES NOT NEED FINE RESOLUTION (2026-08-15).** The
   resolution ladder — which varies **only** pixel size inside one sensor — shows
   the dose-response is **FLAT from 10 m to 100 m**: `FerricIron1` vs dissolved

@@ -4,6 +4,42 @@
 **Landsat companion:** [`ARM_B2_SEEP_DETECTION_2026-08-14.md`](ARM_B2_SEEP_DETECTION_2026-08-14.md)
 **Raw output:** [`report_seep_b2_s2_2026-08-15.txt`](report_seep_b2_s2_2026-08-15.txt)
 
+> ## ⛔ FINAL VERDICT (2026-08-16): THE RESOLUTION CLAIM IS REFUTED
+>
+> The within-Sentinel-2 detection ladder has now run — varying **only** pixel
+> size, one sensor, everything else held fixed. Detection AUC for
+> `FerricIron1`, 3 of 4 regions (Silverton failed on GEE memory):
+>
+> | GSD | mean AUC | per-region |
+> |---|---|---|
+> | 10 m | 0.732 | 0.767, 0.657, 0.773 |
+> | 20 m | 0.724 | 0.713, 0.644, 0.814 |
+> | 40 m | 0.740 | 0.745, 0.755, 0.721 |
+>
+> **Flat.** Combined with the dose-response ladder (also flat, 10–100 m), the
+> conclusion is that **resolution is NOT the binding constraint anywhere in
+> 10–100 m**, for either detection or severity.
+>
+> **Therefore the Landsat 30 m → Sentinel-2 20 m improvement (J −0.018 → +0.234)
+> was a SENSOR effect, not a pixel-size effect** — band centres, radiometry,
+> signal-to-noise, atmospheric correction, and far deeper scene stacks for
+> compositing. Everything below that attributes it to resolution is withdrawn.
+>
+> **What this means for instrumentation, stated against our own earlier
+> framing:** these data do **not** support justifying finer *spatial* resolution
+> for AMD work in this range. They point instead at the **spectral and
+> radiometric** axis — which is an argument for multi-band and
+> spectrometer-grade measurement, not for pixel size per se. A 10-band drone
+> sensor and an ASD field spectrometer sit on the axis the evidence actually
+> implicates; 7 cm pixels do not.
+>
+> **Honest bound on this claim:** the tested range is 10–100 m. A 5–20 m
+> precipitate fan crosses the mixed-pixel/pure-pixel transition *inside* that
+> range (≈4 pixels at 10 m, sub-pixel at 40 m) and no effect appears, which is
+> meaningful. But sub-metre imaging is 100×+ finer than anything tested here;
+> these data neither support nor refute a benefit there. Any 7 cm claim remains
+> **extrapolation, and now extrapolation against a flat trend.**
+>
 > ## ⚠ CORRECTION, same day — read this before the headline below
 >
 > **The headline as originally written overstated what the data show, and is

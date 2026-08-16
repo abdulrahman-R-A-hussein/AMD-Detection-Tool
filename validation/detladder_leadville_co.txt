@@ -1,0 +1,27 @@
+========================================================================================
+ARM B2 RESOLUTION LADDER - Sentinel-2, dose-response vs pixel size
+buffer=60m, targets only, indices natively 10m on S2
+========================================================================================
+  index            GSD   rho_Fe     n   rho_pH     n  per-region sign (Fe)
+  FerricIron1      10m    0.031    23   -0.022    20  lead+0.03
+  FerricIron1      20m    0.188    23    0.007    20  lead+0.19
+  FerricIron1      40m    0.105    23    0.099    20  lead+0.11
+
+
+
+
+
+DETECTION vs GSD - within ONE sensor, so resolution is the ONLY
+variable. This is the test the L8-vs-S2 comparison could not make,
+because that one confounds sensor with pixel size.
+  index            GSD      AUC   worstJ  n+/n-
+  FerricIron1      10m    0.767      nan  23/40
+  FerricIron1      20m    0.713      nan  23/40
+  FerricIron1      40m    0.745      nan  23/40
+
+
+
+
+Read DOWN each index: if |rho| rises as GSD falls, finer pixels help
+and the drone case is quantitative. If flat, resolution is not the
+limiting factor and the ceiling is spectral, not spatial.

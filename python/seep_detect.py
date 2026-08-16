@@ -997,7 +997,8 @@ DEGRADE_INDICES = ["FerricIron1", "GreenNIR", "GreenNIRNorm", "NDVI_stress"]
 
 
 def run_degrade(slugs, out_txt=None, radius=PRIMARY_RADIUS,
-                with_controls=False):
+                with_controls=False, scales=None, indices=None,
+                max_controls=40):
     """Resolution-degradation ladder on the DOSE-RESPONSE, Sentinel-2.
 
     Applied to the dose-response rather than to detection because detection is
@@ -1013,6 +1014,7 @@ def run_degrade(slugs, out_txt=None, radius=PRIMARY_RADIUS,
     """
     from gee_classify import init_ee
     ee = init_ee()
+    rng = random.Random(SEED)
     lines = []
 
     def say(s=""):
@@ -1037,9 +1039,10 @@ def run_degrade(slugs, out_txt=None, radius=PRIMARY_RADIUS,
         # metric and true-scale here. EPSG:3857 would be wrong: at latitude 38
         # its metres are inflated ~1.27x, so a nominal "10 m" would really be
         # ~7.9 m on the ground and every rung of the ladder would be mislabelled.
-        base = img.select(DEGRADE_INDICES).setDefaultProjection(
+        idxs = indices or DEGRADE_INDICES
+        base = img.select(idxs).setDefaultProjection(
             crs="EPSG:32613", scale=10)
-        for sc in DEGRADE_SCALES:
+        for sc in (scales or DEGRADE_SCALES):
             if sc <= 10:
                 deg = base
             else:
@@ -1047,24 +1050,31 @@ def run_degrade(slugs, out_txt=None, radius=PRIMARY_RADIUS,
                        .reproject(crs="EPSG:32613", scale=sc))
             if with_controls:
                 _, instream = load_region_points(slug)
+                # Subsample controls. The full ladder (5 scales x 4 regions x
+                # ~570 buffers, each behind a reduceResolution) hit GEE's
+                # per-computation TIME limit, not the memory limit - a
+                # different failure that retrying cannot fix. 40 controls per
+                # region still gives ~160 vs 86 targets, ample for an AUC.
+                rng.shuffle(instream)
+                instream = instream[:max_controls]
                 cvals = extract_buffers(ee, deg, instream, radius, sc,
-                                        DEGRADE_INDICES, batch=15)
+                                        idxs, batch=15)
                 for c in instream:
                     v = cvals.get(c["pid"], {})
-                    for idx in DEGRADE_INDICES:
+                    for idx in idxs:
                         det.setdefault((sc, idx), []).append(
                             (v.get(idx + "_p90"), 0, slug))
             vals = extract_buffers(ee, deg, targets, radius, sc,
-                                   DEGRADE_INDICES, batch=15)
+                                   idxs, batch=15)
             if with_controls:
                 for t in targets:
                     v = vals.get(t["pid"], {})
-                    for idx in DEGRADE_INDICES:
+                    for idx in idxs:
                         det.setdefault((sc, idx), []).append(
                             (v.get(idx + "_p90"), 1, slug))
             for t in targets:
                 v = vals.get(t["pid"], {})
-                for idx in DEGRADE_INDICES:
+                for idx in idxs:
                     per_scale.setdefault((sc, idx), []).append(
                         (v.get(idx + "_p90"), t.get("Iron_mgL_dissolved"),
                          t.get("pH"), slug))
@@ -1073,7 +1083,7 @@ def run_degrade(slugs, out_txt=None, radius=PRIMARY_RADIUS,
     say("  %-14s %5s %8s %5s %8s %5s  %s"
         % ("index", "GSD", "rho_Fe", "n", "rho_pH", "n", "per-region sign (Fe)"))
     for idx in DEGRADE_INDICES:
-        for sc in DEGRADE_SCALES:
+        for sc in (scales or DEGRADE_SCALES):
             rows = per_scale.get((sc, idx), [])
             fe = [(a, b, r) for a, b, _, r in rows if a is not None and b is not None]
             ph = [(a, c) for a, _, c, _ in rows if a is not None and c is not None]
@@ -1098,7 +1108,7 @@ def run_degrade(slugs, out_txt=None, radius=PRIMARY_RADIUS,
         say("because that one confounds sensor with pixel size.")
         say("  %-14s %5s %8s %8s  %s" % ("index", "GSD", "AUC", "worstJ", "n+/n-"))
         for idx in DEGRADE_INDICES:
-            for sc in DEGRADE_SCALES:
+            for sc in (scales or DEGRADE_SCALES):
                 rows = [r for r in det.get((sc, idx), []) if r[0] is not None]
                 if len(rows) < 40:
                     continue
@@ -1127,6 +1137,8 @@ if __name__ == "__main__":
     ap.add_argument("--dose-loro", action="store_true")
     ap.add_argument("--degrade", action="store_true")
     ap.add_argument("--detection-ladder", action="store_true")
+    ap.add_argument("--scales", default="")
+    ap.add_argument("--dindices", default="")
     ap.add_argument("--tiers", default="", help="limit extraction to these tiers")
     ap.add_argument("--radii", default="", help="limit extraction to these radii (m)")
     ap.add_argument("--sensor", default="L8", choices=["L8", "S2"])
@@ -1145,7 +1157,9 @@ if __name__ == "__main__":
                     [t for t in a.tiers.split(",") if t] or None,
                     [int(x) for x in a.radii.split(",") if x] or None)
     elif a.degrade:
-        run_degrade(slugs, a.out, with_controls=a.detection_ladder)
+        run_degrade(slugs, a.out, with_controls=a.detection_ladder,
+                    scales=[int(x) for x in a.scales.split(",") if x] or None,
+                    indices=[i for i in a.dindices.split(",") if i] or None)
     elif a.dose_loro:
         paths = [p for p in a.inputs.split(",") if p]
         run_dose_loro(paths, a.radius, a.stat, a.out)

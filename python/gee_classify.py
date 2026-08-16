@@ -135,6 +135,55 @@ def tiled_mean_stddev(ee, image, bands, region, n_tiles=4, scale=30):
     return out
 
 
+def bare_land_mask(ee, c, ndvi_max=V3_NDVI_MAX):
+    """Threshold-INDEPENDENT bare/land mask, for computing threshold statistics.
+
+    Deliberately NOT the classifier's full `land` term. That one contains an
+    escape clause - `.Or(has_iron.And(b6.lt(0.20)).And(gv.lt(3.5)))` - which
+    depends on the iron threshold itself. Using it to compute the iron
+    threshold would be circular: the mask would define the statistic that
+    defines the mask. This variant keeps every threshold-free term (water,
+    brightness, darkness, built-up, green-peak, NDVI) and drops only the
+    iron-dependent escape, so it can be computed before any threshold exists.
+    """
+    ndvi, mndwi = c.select("NDVI"), c.select("MNDWI")
+    bright = c.select("Brightness")
+    b3, b4, b6 = c.select("SR_B3"), c.select("SR_B4"), c.select("SR_B6")
+
+    water = water_term(ee, c)
+    built = (bright.gt(T["bu_bright"]).And(ndvi.lt(T["bu_ndvi_hi"]))
+             .And(ndvi.gt(T["bu_ndvi_lo"]))
+             .And(mndwi.lt(T["bu_mndwi"])
+                  .Or(mndwi.gt(-0.10).And(mndwi.lt(0.10)))))
+    not_bright = bright.lt(T["bright_max"])
+    not_dark = b6.gt(T["dark"]).And(bright.gt(0.05))
+    no_green_peak = b3.divide(b4).lte(1.0)
+    return (water.Not().And(not_bright).And(not_dark).And(built.Not())
+            .And(no_green_peak).And(ndvi.lt(ndvi_max)))
+
+
+def bare_subset_stats(ee, c, region, bands, n_tiles=4, scale=30,
+                      ndvi_max=V3_NDVI_MAX):
+    """Scene statistics over the BARE/LAND subset instead of the whole region.
+
+    THE POINT (Phase B2b, validation/B2B_PREREGISTRATION_2026-08-16.md):
+    whole-region statistics include vegetation and water, whose iron-index
+    values are low. They drag the scene mean down, so `mean + 0.5*sd` admits a
+    large share of ORDINARY BARE GROUND. Since the classifier's NDVI gate
+    already requires a pixel to be unvegetated before any AMD class is
+    assigned, the effective question becomes "bare, and iron-rich compared with
+    grass and water" - which most bare pixels pass. Measured consequence:
+    AMDclassFrac scores worst-case LORO J = 0.000 against NLCD bare ground
+    while FerricIron1 alone scores +0.318.
+
+    Restricting the statistics to bare land makes the threshold ask the
+    question that actually discriminates: iron-rich compared with OTHER BARE
+    GROUND in the same scene.
+    """
+    return tiled_mean_stddev(ee, c.updateMask(bare_land_mask(ee, c, ndvi_max)),
+                             bands, region, n_tiles=n_tiles, scale=scale)
+
+
 def classify_v3(ee, c, region, scale=30, iron_fallback=False, n_tiles=4):
     """The v3.0.x cascade: scene-relative thresholds + relaxed NDVI gate + no
     iron fallback, matching earth-engine/amd_detection_v2.4.0.js as shipped.
@@ -179,6 +228,59 @@ def water_term(ee, c):
     b3, b5 = c.select("SR_B3"), c.select("SR_B5")
     return (mndwi.gt(T["water"]).And(awei.gt(0.0)).And(ndvi.lt(0.0))
             .And(b5.lt(b3)).And(bright.lt(0.30)))
+
+
+STAT_BANDS = ["IronSulfate", "FerricIron1", "FerricIron2", "FerrousIron",
+              "ClaySulfateMica"]
+
+
+def classify_v4_from_stats(ee, c, stats, k_bare=0.5, clay_bare=0.25,
+                           iron_fallback=False):
+    """v4 cascade from PRE-COMPUTED statistics.
+
+    Split out so a parameter sweep computes the (expensive, tiled) scene
+    statistics ONCE per region and reuses them across every grid point - the
+    multipliers only rescale an already-known mean and sd, so recomputing them
+    per grid point would be 8x the Earth Engine cost for identical numbers.
+    """
+    def cut(band, mult):
+        return stats[band + "_mean"] + stats[band + "_stdDev"] * mult
+
+    t = dict(iron=cut("IronSulfate", k_bare),
+             ferric1=cut("FerricIron1", k_bare),
+             ferric2=cut("FerricIron2", k_bare),
+             ferrous=cut("FerrousIron", k_bare),
+             clay=cut("ClaySulfateMica", clay_bare))
+    return classify(ee, c, veg_gate="strict", iron_fallback=iron_fallback,
+                    ndvi_max=V3_NDVI_MAX, thresholds=t)
+
+
+def classify_v4(ee, c, region, scale=30, iron_fallback=False, n_tiles=4,
+                k_bare=0.5, clay_bare=0.25, whole_region=False):
+    """v4: identical cascade to v3, thresholds relative to BARE GROUND.
+
+    The ONLY difference from classify_v3() is where the mean/sd come from.
+    Cascade order, class codes, first-match-wins and NAP ranks are untouched,
+    so any change in output is attributable to the statistics and nothing else.
+
+    `whole_region=True` reproduces v3's statistics exactly, which is the
+    equivalence test required by the plan: with it set, v4 must equal v3.
+    """
+    stats = (tiled_mean_stddev(ee, c, STAT_BANDS, region, n_tiles=n_tiles,
+                               scale=scale) if whole_region else
+             bare_subset_stats(ee, c, region, STAT_BANDS, n_tiles=n_tiles,
+                               scale=scale))
+
+    def cut(band, mult):
+        return stats[band + "_mean"] + stats[band + "_stdDev"] * mult
+
+    t = dict(iron=cut("IronSulfate", k_bare),
+             ferric1=cut("FerricIron1", k_bare),
+             ferric2=cut("FerricIron2", k_bare),
+             ferrous=cut("FerrousIron", k_bare),
+             clay=cut("ClaySulfateMica", clay_bare))
+    return classify(ee, c, veg_gate="strict", iron_fallback=iron_fallback,
+                    ndvi_max=V3_NDVI_MAX, thresholds=t)
 
 
 def classify(ee, c, veg_gate="strict", iron_fallback=True, ndvi_max=None,

@@ -987,6 +987,135 @@ def run_dose_loro(paths, radius=PRIMARY_RADIUS, stat=PRIMARY_STAT, out_txt=None)
         print("\n-> %s" % out_txt)
 
 
+V4_GRID = [(k, c) for k in (0.5, 1.0, 1.5, 2.0) for c in (0.25, 0.5)]
+
+
+def run_v4_sweep(slugs, out_csv):
+    """Phase B2b sweep: AMDclassFrac_v4 over the pre-registered 8-point grid.
+
+    Extracts ONLY targets and C3b, because C3b is the pre-registered PRIMARY
+    outcome (bare ground is the confound under repair). Selection happens on
+    that tier alone; the winning parameter set is then re-extracted against all
+    four tiers for reporting. Sweeping every tier would multiply cost by four
+    for numbers that cannot influence the selection.
+    """
+    from gee_classify import (init_ee, STAT_BANDS, bare_subset_stats,
+                              classify_v4_from_stats)
+    ee = init_ee()
+    rng = random.Random(SEED)
+    rows = []
+
+    for slug in slugs:
+        region = region_geometry(ee, REGIONS[slug])
+        targets, _ = load_region_points(slug)
+        comp, n_scenes = l8_composite(ee, region)
+        if n_scenes < MIN_SCENES:
+            continue
+        c3b = sample_c3b(ee, region, targets, rng)
+        # Computed once per region and reused across all 8 grid points.
+        stats = bare_subset_stats(ee, comp, region, STAT_BANDS, n_tiles=4)
+        print("\n%s: %d scenes, %d targets, %d C3b"
+              % (slug, n_scenes, len(targets), len(c3b)))
+
+        for k_bare, clay_bare in V4_GRID:
+            cls = classify_v4_from_stats(ee, comp, stats, k_bare, clay_bare)
+            amd = (cls.remap(list(AMD_CLASSES), [1] * len(AMD_CLASSES), 0)
+                   .updateMask(comp.select("SR_B4").mask())
+                   .rename("AMDclassFrac_v4"))
+            for tier, pts in (("target", targets), ("C3b", c3b)):
+                got = extract_buffers(ee, amd, pts, PRIMARY_RADIUS, 30,
+                                      ["AMDclassFrac_v4"])
+                for p in pts:
+                    v = got.get(p["pid"], {})
+                    rows.append(dict(
+                        region=slug, sensor="L8", radius=PRIMARY_RADIUS,
+                        tier=tier, pid=p["pid"], k_bare=k_bare,
+                        clay_bare=clay_bare,
+                        AMDclassFrac_v4_p90=v.get("AMDclassFrac_v4_mean"),
+                        AMDclassFrac_v4_mean=v.get("AMDclassFrac_v4_mean")))
+            print("    k=%.1f clay=%.2f done" % (k_bare, clay_bare))
+
+    os.makedirs(OUTDIR, exist_ok=True)
+    keys = sorted({k for r in rows for k in r})
+    with open(out_csv, "w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=keys)
+        w.writeheader()
+        w.writerows(rows)
+    print("\n-> %s (%d rows)" % (out_csv, len(rows)))
+
+
+def analyse_v4_sweep(paths, n_perm=N_PERM, out_txt=None):
+    """Score every grid point by worst-case LORO J vs C3b, BH-corrected.
+
+    Reports the FULL grid, not the winner alone, so the selection is visible
+    and a lucky cell cannot be presented as if it were the only thing tried.
+    """
+    rows = load_extracted(paths)
+    rng = random.Random(SEED)
+    lines = []
+
+    def say(s=""):
+        print(s)
+        lines.append(s)
+
+    say("=" * 84)
+    say("B2b SWEEP - AMDclassFrac_v4 vs C3b (NLCD barren), PRE-REGISTERED")
+    say("Baseline: shipped v3 classifier scores worst-case LORO J = 0.000")
+    say("Rule: >=0.25 SUCCESS | 0.15-0.25 PARTIAL | <0.15 FAILURE")
+    say("=" * 84)
+    say("  %6s %6s %8s %8s %9s %9s" % ("k_bare", "clay", "AUC", "worstJ",
+                                       "perm_p", "BH_q"))
+
+    res = []
+    for k_bare, clay_bare in V4_GRID:
+        sc, lb, rg = [], [], []
+        for r in rows:
+            if (r.get("k_bare") != k_bare or r.get("clay_bare") != clay_bare
+                    or r["region"] not in REGIONS):
+                continue
+            v = r.get("AMDclassFrac_v4_p90", float("nan"))
+            if v != v:
+                continue
+            sc.append(v)
+            lb.append(1 if r["tier"] == "target" else 0)
+            rg.append(r["region"])
+        if sum(lb) < 10 or len(lb) - sum(lb) < 10:
+            continue
+        pos = [v for v, l in zip(sc, lb) if l]
+        neg = [v for v, l in zip(sc, lb) if not l]
+        wj, per = loro_worst_j(sc, lb, rg)
+        p = perm_p_within_region(sc, lb, rg, wj, n_perm, rng)
+        res.append(dict(k=k_bare, clay=clay_bare, auc=auc(pos, neg),
+                        wj=wj, p=p, per=per))
+
+    if not res:
+        say("no usable grid points")
+        return
+    for r, q in zip(res, benjamini_hochberg([r["p"] for r in res])):
+        r["q"] = q
+    for r in res:
+        say("  %6.1f %6.2f %8.3f %8.3f %9.4f %9.4f"
+            % (r["k"], r["clay"], r["auc"], r["wj"], r["p"], r["q"]))
+
+    best = max(res, key=lambda r: r["wj"])
+    say()
+    say("BEST by worst-case LORO J (the pre-registered criterion):")
+    say("  k_bare=%.1f clay_bare=%.2f  J=%.3f  AUC=%.3f  BH_q=%.4f"
+        % (best["k"], best["clay"], best["wj"], best["auc"], best["q"]))
+    say("  per-region J: %s"
+        % " ".join("%s=%+.2f" % (g[:4], v) for g, v in sorted(best["per"].items())))
+    verdict = ("SUCCESS" if best["wj"] >= 0.25 and best["q"] < 0.05
+               else "PARTIAL" if best["wj"] >= 0.15 else "FAILURE")
+    say()
+    say("VERDICT (pre-registered): %s   [v3 baseline was 0.000]" % verdict)
+    if verdict == "FAILURE":
+        say("Reported as a null, as prominently as a success would be.")
+    if out_txt:
+        with open(out_txt, "w", encoding="utf-8") as fh:
+            fh.write("\n".join(lines) + "\n")
+        print("\n-> %s" % out_txt)
+
+
 DEGRADE_SCALES = [10, 20, 30, 60, 100]
 # Only indices whose Sentinel-2 bands are natively 10 m can honestly be tested
 # at 10 m. FerricIron1 = red/blue, both 10 m - and it is also the index that
@@ -1136,6 +1265,8 @@ if __name__ == "__main__":
     ap.add_argument("--analyse", action="store_true")
     ap.add_argument("--dose-loro", action="store_true")
     ap.add_argument("--degrade", action="store_true")
+    ap.add_argument("--v4-sweep", action="store_true")
+    ap.add_argument("--v4-analyse", action="store_true")
     ap.add_argument("--detection-ladder", action="store_true")
     ap.add_argument("--scales", default="")
     ap.add_argument("--dindices", default="")
@@ -1156,6 +1287,10 @@ if __name__ == "__main__":
         run_extract(a.sensor, slugs, out,
                     [t for t in a.tiers.split(",") if t] or None,
                     [int(x) for x in a.radii.split(",") if x] or None)
+    elif a.v4_sweep:
+        run_v4_sweep(slugs, a.out or os.path.join(OUTDIR, "seep_v4_sweep.csv"))
+    elif a.v4_analyse:
+        analyse_v4_sweep([p for p in a.inputs.split(",") if p], a.perms, a.out)
     elif a.degrade:
         run_degrade(slugs, a.out, with_controls=a.detection_ladder,
                     scales=[int(x) for x in a.scales.split(",") if x] or None,

@@ -1,0 +1,21 @@
+====================================================================================
+B2b SWEEP - AMDclassFrac_v4 vs C3b (NLCD barren), PRE-REGISTERED
+Baseline: shipped v3 classifier scores worst-case LORO J = 0.000
+Rule: >=0.25 SUCCESS | 0.15-0.25 PARTIAL | <0.15 FAILURE
+====================================================================================
+  k_bare   clay      AUC   worstJ    perm_p      BH_q
+     0.5   0.25    0.372    0.000    0.7065    0.9928
+     0.5   0.50    0.381    0.000    0.7096    0.9928
+     1.0   0.25    0.340    0.000    0.7934    0.9928
+     1.0   0.50    0.343    0.000    0.7951    0.9928
+     1.5   0.25    0.355    0.000    0.8636    0.9928
+     1.5   0.50    0.355    0.000    0.8683    0.9928
+     2.0   0.25    0.496    0.000    0.9928    0.9928
+     2.0   0.50    0.496    0.000    0.9926    0.9928
+
+BEST by worst-case LORO J (the pre-registered criterion):
+  k_bare=0.5 clay_bare=0.25  J=0.000  AUC=0.372  BH_q=0.9928
+  per-region J: cent=+0.00 lead=+0.00 oura=+0.00 silv=+0.00
+
+VERDICT (pre-registered): FAILURE   [v3 baseline was 0.000]
+Reported as a null, as prominently as a success would be.

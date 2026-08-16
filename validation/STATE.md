@@ -1,6 +1,6 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-08-16 · **Current tag:** `v3.3.0`
+**Last updated:** 2026-08-16 · **Current tag:** `v3.3.1`
 
 This file is the canonical "where are we right now". It is maintained under
 the logging rule in [`../CLAUDE.md`](../CLAUDE.md). It should be sufficient to
@@ -131,6 +131,24 @@ retraction is the load-bearing update this file exists to carry forward.
   terrain-matched land (C2) and collapses to ~0 against in-stream stations in
   the same region (C1). **Imagery ranks severity at known sites; it does not
   find sites.**
+- **The bare-ground fix FAILED, and the failure is informative (2026-08-16).**
+  Pre-registered (`df6a6ae`) before any run. The mechanism check passed
+  **16/16** — v3's thresholds really were mis-referenced (whole-region
+  `mean+0.5σ` sat far below typical bare ground; `IronSulfate` at Ouray −2.334
+  vs −0.399). **But correcting it changed nothing:** all 8 grid points give
+  worst-case LORO J = **0.000** vs NLCD bare ground, AUC **0.34–0.50**,
+  identical to v3. **H-mech supported, H-fix refuted** — a confirmed mechanism
+  is not a sufficient cause. **v4 was NOT shipped**, per the pre-registered
+  gate. → [`ARM_B2B_CLASSIFIER_FIX_2026-08-16.md`](ARM_B2B_CLASSIFIER_FIX_2026-08-16.md)
+- **⭐ THE SHARPEST OPEN LEAD: continuous beats binarised.** Same 86 points,
+  same control: `FerricIron1` **continuous** (p90) = **J +0.318**;
+  `AMDclassFrac` **binarised** = 0.000, at two different threshold references.
+  The information is in the imagery; thresholding discards it. Two post-hoc
+  explanations, both UNTESTED and neither citable as a finding: (a)
+  binarisation destroys the magnitude carrying the signal; (b) in a mineralised
+  belt, iron-bearing bare ground is not diagnostic of AMD, so a "bare + iron"
+  classifier describes regional geology. Tests for each are written in the
+  report.
 - **The shipped v3.0.x classifier is substantially a BARE-GROUND detector.**
   `AMDclassFrac` vs bare ground: AUC 0.456, worst-case LORO J **−0.304** — it
   scores bare ground *higher* than confirmed mine discharge (Leadville medians

@@ -1,6 +1,6 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-08-16 · **Current tag:** `v3.3.1`
+**Last updated:** 2026-08-16 · **Current tag:** `v3.4.0`
 
 This file is the canonical "where are we right now". It is maintained under
 the logging rule in [`../CLAUDE.md`](../CLAUDE.md). It should be sufficient to
@@ -131,6 +131,26 @@ retraction is the load-bearing update this file exists to carry forward.
   terrain-matched land (C2) and collapses to ~0 against in-stream stations in
   the same region (C1). **Imagery ranks severity at known sites; it does not
   find sites.**
+- **⭐ GOING CONTINUOUS SOLVES THE BARE-GROUND PROBLEM (2026-08-16, B2c).**
+  Pre-registered `6af0b5b` before any fitting. Against NLCD bare ground, an
+  8-index continuous model scores worst-case LORO **J = +0.617** (all folds
+  +0.62 to +0.88) where the **binarised** classifier scored **0.000** under two
+  different threshold references, and the single index +0.318. **Binarisation
+  was destroying the signal.** Baseline reproduction check passed exactly, and
+  the model null (refit per draw) gives p = 0.0020 at every tier — the floor
+  for 500 permutations.
+  **BUT the verdict is PARTIAL, not success:** against in-stream controls (the
+  pre-registered PRIMARY tier) the model scores **0.178** — under the 0.25 bar
+  **and worse than `FerricIron1` alone (0.234)**. Not shipped.
+  **Capability is now bounded on both sides:** separates mine discharge from
+  *land* reliably and out-of-region; does **not** separate it from *other
+  monitored water features* in the same district.
+  **On Landsat the combination does real work** (C1 0.228 vs single index
+  −0.019) — the multi-index model substitutes for sensor quality rather than
+  adding to it. **3 of 8 coefficients flip sign across folds**
+  (`ClaySulfateMica`, `GreenNIR`, `NDVI_stress`); the ferric/iron indices are
+  stable, paper2's vegetation indices are not.
+  → [`ARM_B2C_CONTINUOUS_2026-08-16.md`](ARM_B2C_CONTINUOUS_2026-08-16.md)
 - **The bare-ground fix FAILED, and the failure is informative (2026-08-16).**
   Pre-registered (`df6a6ae`) before any run. The mechanism check passed
   **16/16** — v3's thresholds really were mis-referenced (whole-region

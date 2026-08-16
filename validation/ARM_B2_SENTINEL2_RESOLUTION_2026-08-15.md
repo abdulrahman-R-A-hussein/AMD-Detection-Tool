@@ -4,7 +4,37 @@
 **Landsat companion:** [`ARM_B2_SEEP_DETECTION_2026-08-14.md`](ARM_B2_SEEP_DETECTION_2026-08-14.md)
 **Raw output:** [`report_seep_b2_s2_2026-08-15.txt`](report_seep_b2_s2_2026-08-15.txt)
 
-## Headline
+> ## ⚠ CORRECTION, same day — read this before the headline below
+>
+> **The headline as originally written overstated what the data show, and is
+> corrected here rather than edited away.**
+>
+> The 30 m → 20 m comparison below is **Landsat vs Sentinel-2**, which differ in
+> *sensor* as well as pixel size — band centres, radiometry, atmospheric
+> correction, scene count and compositing all change together. Attributing the
+> whole improvement to resolution is not justified from that comparison.
+>
+> The **resolution ladder** ([`report_seep_b2_ladder_2026-08-15.txt`](report_seep_b2_ladder_2026-08-15.txt)),
+> which varies **only** pixel size inside a single sensor, shows the
+> **dose-response is FLAT from 10 m to 100 m**: `FerricIron1` vs dissolved Fe
+> = +0.494, +0.526, +0.493, +0.523, +0.517 at 10/20/30/60/100 m, and vs pH
+> −0.575 → −0.658, i.e. marginally *stronger* at coarser pixels.
+>
+> **What this means, and it splits the two claims apart:**
+> - **Severity ranking does NOT need fine resolution.** The signal lives at
+>   scales ≥ 100 m; free 30 m Landsat is sufficient for it. This *weakens* the
+>   equipment case for that specific use.
+> - **Detection may still be resolution-limited** — the mechanism differs
+>   (discriminating a small feature from its surroundings, not measuring
+>   magnitude at a known point). But that must be shown *within one sensor*
+>   before it can be claimed. A within-Sentinel-2 detection ladder is running;
+>   until it reports, **the resolution claim for detection is UNPROVEN**, not
+>   proven.
+>
+> The numbers in the table below are correct as measured. Their *interpretation*
+> as a resolution effect is what is withdrawn pending the within-sensor test.
+
+## Headline (as originally written — see correction above)
 
 > **Resolution is the binding constraint, and we can now show it with numbers.**
 >

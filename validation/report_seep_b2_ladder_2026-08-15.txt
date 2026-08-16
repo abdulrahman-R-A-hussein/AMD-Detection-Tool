@@ -1,0 +1,32 @@
+========================================================================================
+ARM B2 RESOLUTION LADDER - Sentinel-2, dose-response vs pixel size
+buffer=60m, targets only, indices natively 10m on S2
+========================================================================================
+  index            GSD   rho_Fe     n   rho_pH     n  per-region sign (Fe)
+  FerricIron1      10m    0.494    75   -0.575    77  cent+0.58 lead+0.03 oura+0.32 silv+0.60
+  FerricIron1      20m    0.526    75   -0.582    77  cent+0.55 lead+0.19 oura+0.37 silv+0.68
+  FerricIron1      30m    0.493    75   -0.558    77  cent+0.44 lead+0.20 oura+0.64 silv+0.60
+  FerricIron1      60m    0.523    75   -0.613    77  cent+0.46 lead+0.18 oura+0.74 silv+0.71
+  FerricIron1     100m    0.517    75   -0.658    77  cent+0.46 lead+0.15 oura+0.70 silv+0.45
+
+  GreenNIR         10m   -0.099    75    0.237    77  cent+0.57 lead+0.16 oura-0.27 silv-0.60
+  GreenNIR         20m   -0.104    75    0.277    77  cent+0.56 lead+0.19 oura-0.29 silv-0.51
+  GreenNIR         30m   -0.094    75    0.262    77  cent+0.55 lead+0.20 oura-0.37 silv-0.54
+  GreenNIR         60m   -0.101    75    0.113    77  cent+0.48 lead+0.05 oura-0.09 silv-0.49
+  GreenNIR        100m    0.133    75   -0.224    77  cent+0.46 lead+0.22 oura-0.32 silv-0.32
+
+  GreenNIRNorm     10m   -0.099    75    0.237    77  cent+0.57 lead+0.16 oura-0.27 silv-0.60
+  GreenNIRNorm     20m   -0.103    75    0.281    77  cent+0.56 lead+0.19 oura-0.37 silv-0.51
+  GreenNIRNorm     30m   -0.075    75    0.250    77  cent+0.55 lead+0.24 oura-0.37 silv-0.55
+  GreenNIRNorm     60m   -0.088    75    0.051    77  cent+0.42 lead+0.02 oura-0.09 silv-0.50
+  GreenNIRNorm    100m    0.157    75   -0.234    77  cent+0.48 lead+0.21 oura-0.32 silv-0.25
+
+  NDVI_stress      10m    0.025    75    0.082    77  cent-0.40 lead-0.04 oura+0.14 silv+0.16
+  NDVI_stress      20m    0.023    75    0.080    77  cent-0.37 lead-0.08 oura+0.18 silv+0.09
+  NDVI_stress      30m    0.008    75    0.097    77  cent-0.42 lead-0.08 oura+0.15 silv+0.11
+  NDVI_stress      60m    0.040    75    0.105    77  cent-0.42 lead-0.07 oura+0.14 silv+0.18
+  NDVI_stress     100m    0.125    75    0.050    77  cent-0.44 lead+0.10 oura+0.13 silv+0.21
+
+Read DOWN each index: if |rho| rises as GSD falls, finer pixels help
+and the drone case is quantitative. If flat, resolution is not the
+limiting factor and the ceiling is spectral, not spatial.

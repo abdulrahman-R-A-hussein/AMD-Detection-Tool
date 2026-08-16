@@ -1,0 +1,110 @@
+============================================================================================
+ARM B2 - seep/precipitate detection, PRE-REGISTERED test
+radius=60m  statistic=p90  perms=10000  seed=20260814
+Criterion: worst-case leave-one-REGION-out Youden J (NOT pooled AUC).
+Decision rule: J >= 0.25 vs ALL THREE tiers AND BH p < 0.05.
+============================================================================================
+targets n=86 across 4 regions; controls C1=446 C2=575 C3=447
+C3b (NLCD barren, AMENDMENT - fixes C3's NDVI circularity): 115
+targets with ZERO surviving land pixels after water mask: 0/86 (0%)
+
+BH family = 36 tests (9 indices x 3 tiers x 1 sensors, minus untestable)
+Bonferroni threshold = 0.00139
+
+  sensor  index           tier     AUC  worstJ   perm_p     BH_q     n+     n-
+  S2      NDVI_stress     C3b    0.962   0.700   0.0001   0.0003     86    350
+  S2      FerricIron1     C3     0.810   0.318   0.0001   0.0003     86    578
+  S2      FerricIron1     C3b    0.793   0.318   0.0001   0.0003     86    350
+  S2      FerricIron1     C2     0.800   0.310   0.0001   0.0003     86    575
+  S2      ClaySulfateMica C2     0.809   0.308   0.0001   0.0003     86    575
+  S2      NDVI_stress     C3     0.884   0.259   0.0001   0.0003     86    578
+  S2      FerricIron1     C1     0.723   0.234   0.0001   0.0003     86    446
+  S2      FerricIron2     C2     0.786   0.210   0.0001   0.0003     86    575
+  S2      GreenNIR        C2     0.783   0.206   0.0001   0.0003     86    575
+  S2      GreenNIRNorm    C2     0.783   0.206   0.0001   0.0003     86    575
+  S2      IronSulfate     C2     0.826   0.202   0.0001   0.0003     86    575
+  S2      FerricIron2     C1     0.703   0.126   0.0005   0.0015     86    446
+  S2      IronSulfate     C3     0.589   0.074   0.0027   0.0075     86    578
+  S2      FerrousIron     C2     0.572   0.050   0.0139   0.0357     86    575
+  S2      ClaySulfateMica C1     0.613   0.023   0.0426   0.1022     86    446
+  S2      AMDclassFrac    C1     0.586   0.000   0.1649   0.3382     86    446
+  S2      AMDclassFrac    C2     0.745   0.000   0.1691   0.3382     86    575
+  S2      AMDclassFrac    C3b    0.442   0.000   0.1178   0.2650     86    350
+  S2      ClaySulfateMica C3b    0.223  -0.019   0.1876   0.3554     86    350
+  S2      FerrousIron     C3     0.484  -0.029   0.2808   0.4813     86    578
+  S2      FerricIron2     C3     0.633  -0.037   0.2537   0.4566     86    578
+  S2      GreenNIR        C3b    0.125  -0.050   0.3454   0.5406     86    350
+  S2      GreenNIRNorm    C3b    0.125  -0.050   0.3358   0.5406     86    350
+  S2      FerrousIron     C1     0.589  -0.077   0.5614   0.8422     86    446
+  S2      FerrousIron     C3b    0.440  -0.100   0.5911   0.8512     86    350
+  S2      NDVI_stress     C1     0.532  -0.121   0.6464   0.8951     86    446
+  S2      IronSulfate     C1     0.627  -0.170   0.8792   1.0000     86    446
+  S2      IronSulfate     C3b    0.490  -0.200   0.8813   1.0000     86    350
+  S2      FerricIron2     C3b    0.476  -0.200   0.9178   1.0000     86    350
+  S2      GreenNIR        C1     0.547  -0.217   0.9581   1.0000     86    446
+  S2      GreenNIRNorm    C1     0.547  -0.217   0.9532   1.0000     86    446
+  S2      AMDclassFrac    C3     0.465  -0.285   0.9918   1.0000     86    578
+  S2      NDVI_stress     C2     0.515  -0.316   0.9964   1.0000     86    575
+  S2      ClaySulfateMica C3     0.385  -0.419   0.9999   1.0000     86    578
+  S2      GreenNIR        C3     0.303  -0.519   1.0000   1.0000     86    578
+  S2      GreenNIRNorm    C3     0.303  -0.519   1.0000   1.0000     86    578
+
+--------------------------------------------------------------------------------------------
+DECISION RULE APPLIED (pre-registered)
+--------------------------------------------------------------------------------------------
+  null  S2      IronSulfate      fails: C1,C2,C3
+  null  S2      FerricIron1      fails: C1
+  null  S2      FerricIron2      fails: C1,C2,C3
+  null  S2      FerrousIron      fails: C1,C2,C3
+  null  S2      ClaySulfateMica  fails: C1,C3
+  null  S2      GreenNIR         fails: C1,C2,C3
+  null  S2      GreenNIRNorm     fails: C1,C2,C3
+  null  S2      NDVI_stress      fails: C1,C2
+  null  S2      AMDclassFrac     fails: C1,C2,C3
+
+  NO INDEX MEETS THE PRE-REGISTERED CRITERION -> Arm B2 is a NULL.
+  Reported as prominently as a positive would be, per project rule.
+
+--------------------------------------------------------------------------------------------
+DOSE-RESPONSE at source points (secondary)
+between-region variance share reported per the sulfate sign-reversal rule
+--------------------------------------------------------------------------------------------
+  S2      IronSulfate     Iron_mgL_dissolved   rho=+0.069 n=75  between-region var=24%
+  S2      IronSulfate     Iron_mgL_any         rho=+0.060 n=82  between-region var=25%
+  S2      IronSulfate     Sulfate_mgL          rho=-0.007 n=63  between-region var=22%
+  S2      IronSulfate     pH                   rho=+0.243 n=77  between-region var=46%
+  S2      FerricIron1     Iron_mgL_dissolved   rho=+0.549 n=75  between-region var=24%
+  S2      FerricIron1     Iron_mgL_any         rho=+0.480 n=82  between-region var=25%
+  S2      FerricIron1     Sulfate_mgL          rho=+0.264 n=63  between-region var=22%
+  S2      FerricIron1     pH                   rho=-0.517 n=77  between-region var=46%
+  S2      FerricIron2     Iron_mgL_dissolved   rho=+0.441 n=75  between-region var=24%
+  S2      FerricIron2     Iron_mgL_any         rho=+0.377 n=82  between-region var=25%
+  S2      FerricIron2     Sulfate_mgL          rho=+0.184 n=63  between-region var=22%
+  S2      FerricIron2     pH                   rho=-0.353 n=77  between-region var=46%
+  S2      FerrousIron     Iron_mgL_dissolved   rho=+0.301 n=75  between-region var=24%
+  S2      FerrousIron     Iron_mgL_any         rho=+0.224 n=82  between-region var=25%
+  S2      FerrousIron     Sulfate_mgL          rho=+0.263 n=63  between-region var=22%
+  S2      FerrousIron     pH                   rho=-0.450 n=77  between-region var=46%
+  S2      ClaySulfateMica Iron_mgL_dissolved   rho=-0.012 n=75  between-region var=24%
+  S2      ClaySulfateMica Iron_mgL_any         rho=-0.028 n=82  between-region var=25%
+  S2      ClaySulfateMica Sulfate_mgL          rho=-0.138 n=63  between-region var=22%
+  S2      ClaySulfateMica pH                   rho=+0.130 n=77  between-region var=46%
+  S2      GreenNIR        Iron_mgL_dissolved   rho=-0.100 n=75  between-region var=24%
+  S2      GreenNIR        Iron_mgL_any         rho=-0.126 n=82  between-region var=25%
+  S2      GreenNIR        Sulfate_mgL          rho=-0.205 n=63  between-region var=22%
+  S2      GreenNIR        pH                   rho=+0.224 n=77  between-region var=46%
+  S2      GreenNIRNorm    Iron_mgL_dissolved   rho=-0.100 n=75  between-region var=24%
+  S2      GreenNIRNorm    Iron_mgL_any         rho=-0.126 n=82  between-region var=25%
+  S2      GreenNIRNorm    Sulfate_mgL          rho=-0.205 n=63  between-region var=22%
+  S2      GreenNIRNorm    pH                   rho=+0.224 n=77  between-region var=46%
+  S2      NDVI_stress     Iron_mgL_dissolved   rho=+0.013 n=75  between-region var=24%
+  S2      NDVI_stress     Iron_mgL_any         rho=+0.027 n=82  between-region var=25%
+  S2      NDVI_stress     Sulfate_mgL          rho=-0.205 n=63  between-region var=22%
+  S2      NDVI_stress     pH                   rho=+0.099 n=77  between-region var=46%
+  S2      AMDclassFrac    Iron_mgL_dissolved   rho=+0.441 n=75  between-region var=24%
+  S2      AMDclassFrac    Iron_mgL_any         rho=+0.397 n=82  between-region var=25%
+  S2      AMDclassFrac    Sulfate_mgL          rho=+0.244 n=63  between-region var=22%
+  S2      AMDclassFrac    pH                   rho=-0.249 n=77  between-region var=46%
+
+CAVEAT: this tests LAND-SURFACE ferric precipitate, never dissolved
+iron or sulfate. Sulfate has no VNIR absorption.

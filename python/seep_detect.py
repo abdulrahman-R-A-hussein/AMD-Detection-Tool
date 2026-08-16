@@ -718,12 +718,25 @@ def spearman(x, y):
 # ------------------------------------------------------------------ analyse
 
 def load_extracted(paths):
+    """Load extracted CSVs, DEDUPED on (sensor, radius, tier, pid).
+
+    The C3b amendment was extracted in a separate pass that also re-extracted
+    the targets (a control tier is meaningless without something to compare it
+    to), so target rows appear in two files. Without deduping they would be
+    counted twice, inflating n+ and every statistic built on it.
+    """
     rows = []
+    seen = set()
     for p in paths:
         if not os.path.isfile(p):
             continue
         with open(p, encoding="utf-8") as fh:
             for r in csv.DictReader(fh):
+                key = (r.get("sensor"), r.get("radius"), r.get("tier"),
+                       r.get("region"), r.get("pid"))
+                if key in seen:
+                    continue
+                seen.add(key)
                 for k, v in list(r.items()):
                     if k in ("region", "sensor", "tier", "pid", "name", "site_type"):
                         continue
@@ -983,7 +996,8 @@ DEGRADE_SCALES = [10, 20, 30, 60, 100]
 DEGRADE_INDICES = ["FerricIron1", "GreenNIR", "GreenNIRNorm", "NDVI_stress"]
 
 
-def run_degrade(slugs, out_txt=None, radius=PRIMARY_RADIUS):
+def run_degrade(slugs, out_txt=None, radius=PRIMARY_RADIUS,
+                with_controls=False):
     """Resolution-degradation ladder on the DOSE-RESPONSE, Sentinel-2.
 
     Applied to the dose-response rather than to detection because detection is
@@ -1010,7 +1024,7 @@ def run_degrade(slugs, out_txt=None, radius=PRIMARY_RADIUS):
     say("buffer=%dm, targets only, indices natively 10m on S2" % radius)
     say("=" * 88)
 
-    per_scale = {}
+    per_scale, det = {}, {}
     for slug in slugs:
         region = region_geometry(ee, REGIONS[slug])
         targets, _ = load_region_points(slug)
@@ -1018,16 +1032,36 @@ def run_degrade(slugs, out_txt=None, radius=PRIMARY_RADIUS):
         if n_scenes < MIN_SCENES:
             continue
         img = index_image(ee, comp)
-        proj = img.select("FerricIron1").projection()
+        # A median composite carries no default projection, so reduceResolution
+        # refuses it. Anchor at 10 m in UTM 13N (EPSG:32613) - Colorado's zone,
+        # metric and true-scale here. EPSG:3857 would be wrong: at latitude 38
+        # its metres are inflated ~1.27x, so a nominal "10 m" would really be
+        # ~7.9 m on the ground and every rung of the ladder would be mislabelled.
+        base = img.select(DEGRADE_INDICES).setDefaultProjection(
+            crs="EPSG:32613", scale=10)
         for sc in DEGRADE_SCALES:
             if sc <= 10:
-                deg = img
+                deg = base
             else:
-                deg = (img.select(DEGRADE_INDICES)
-                       .reduceResolution(ee.Reducer.mean(), maxPixels=1024)
-                       .reproject(crs=proj.crs(), scale=sc))
+                deg = (base.reduceResolution(ee.Reducer.mean(), maxPixels=1024)
+                       .reproject(crs="EPSG:32613", scale=sc))
+            if with_controls:
+                _, instream = load_region_points(slug)
+                cvals = extract_buffers(ee, deg, instream, radius, sc,
+                                        DEGRADE_INDICES, batch=15)
+                for c in instream:
+                    v = cvals.get(c["pid"], {})
+                    for idx in DEGRADE_INDICES:
+                        det.setdefault((sc, idx), []).append(
+                            (v.get(idx + "_p90"), 0, slug))
             vals = extract_buffers(ee, deg, targets, radius, sc,
                                    DEGRADE_INDICES, batch=15)
+            if with_controls:
+                for t in targets:
+                    v = vals.get(t["pid"], {})
+                    for idx in DEGRADE_INDICES:
+                        det.setdefault((sc, idx), []).append(
+                            (v.get(idx + "_p90"), 1, slug))
             for t in targets:
                 v = vals.get(t["pid"], {})
                 for idx in DEGRADE_INDICES:
@@ -1057,6 +1091,26 @@ def run_degrade(slugs, out_txt=None, radius=PRIMARY_RADIUS):
                 % (idx, sc, rho_fe, n_fe, rho_ph, n_ph,
                    " ".join("%s%+.2f" % (g[:4], v) for g, v in signs.items())))
         say()
+    if det:
+        say()
+        say("DETECTION vs GSD - within ONE sensor, so resolution is the ONLY")
+        say("variable. This is the test the L8-vs-S2 comparison could not make,")
+        say("because that one confounds sensor with pixel size.")
+        say("  %-14s %5s %8s %8s  %s" % ("index", "GSD", "AUC", "worstJ", "n+/n-"))
+        for idx in DEGRADE_INDICES:
+            for sc in DEGRADE_SCALES:
+                rows = [r for r in det.get((sc, idx), []) if r[0] is not None]
+                if len(rows) < 40:
+                    continue
+                sc_v = [r[0] for r in rows]
+                lb = [r[1] for r in rows]
+                rg = [r[2] for r in rows]
+                pos = [v for v, l in zip(sc_v, lb) if l]
+                neg = [v for v, l in zip(sc_v, lb) if not l]
+                wj, _ = loro_worst_j(sc_v, lb, rg)
+                say("  %-14s %4dm %8.3f %8.3f  %d/%d"
+                    % (idx, sc, auc(pos, neg), wj, len(pos), len(neg)))
+            say()
     say("Read DOWN each index: if |rho| rises as GSD falls, finer pixels help")
     say("and the drone case is quantitative. If flat, resolution is not the")
     say("limiting factor and the ceiling is spectral, not spatial.")
@@ -1072,6 +1126,7 @@ if __name__ == "__main__":
     ap.add_argument("--analyse", action="store_true")
     ap.add_argument("--dose-loro", action="store_true")
     ap.add_argument("--degrade", action="store_true")
+    ap.add_argument("--detection-ladder", action="store_true")
     ap.add_argument("--tiers", default="", help="limit extraction to these tiers")
     ap.add_argument("--radii", default="", help="limit extraction to these radii (m)")
     ap.add_argument("--sensor", default="L8", choices=["L8", "S2"])
@@ -1090,7 +1145,7 @@ if __name__ == "__main__":
                     [t for t in a.tiers.split(",") if t] or None,
                     [int(x) for x in a.radii.split(",") if x] or None)
     elif a.degrade:
-        run_degrade(slugs, a.out)
+        run_degrade(slugs, a.out, with_controls=a.detection_ladder)
     elif a.dose_loro:
         paths = [p for p in a.inputs.split(",") if p]
         run_dose_loro(paths, a.radius, a.stat, a.out)

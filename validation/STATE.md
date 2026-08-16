@@ -75,7 +75,27 @@ retraction is the load-bearing update this file exists to carry forward.
   paper2's `GreenNIR`/`GreenNIRNorm` **fail** sign consistency (+0.51, +0.16,
   −0.25, −0.35) — their pooled value is not a relationship.
   → [`ARM_B2_SEEP_DETECTION_2026-08-14.md`](ARM_B2_SEEP_DETECTION_2026-08-14.md)
-- **RESOLUTION IS THE BINDING CONSTRAINT — shown with numbers (2026-08-15).**
+- **SEVERITY RANKING DOES NOT NEED FINE RESOLUTION (2026-08-15).** The
+  resolution ladder — which varies **only** pixel size inside one sensor — shows
+  the dose-response is **FLAT from 10 m to 100 m**: `FerricIron1` vs dissolved
+  Fe = +0.494/+0.526/+0.493/+0.523/+0.517 at 10/20/30/60/100 m; vs pH
+  −0.575 → −0.658, marginally *stronger* at coarser pixels. The severity signal
+  lives at scales ≥100 m, so **free 30 m Landsat suffices for ranking** and a
+  drone adds nothing to that specific use. → [`report_seep_b2_ladder_2026-08-15.txt`](report_seep_b2_ladder_2026-08-15.txt)
+- **⚠ The "resolution is the binding constraint" claim below is CORRECTED and
+  currently UNPROVEN for detection.** The 30 m→20 m jump is Landsat vs
+  Sentinel-2, which confounds **sensor** with pixel size. A within-Sentinel-2
+  detection ladder is required and was still running when this was written.
+  Cite the corrected version, not the original.
+- **C3b amendment CONFIRMS rather than overturns (2026-08-15).** With bare
+  ground redefined from NLCD class 31 (independent of our imagery, fixing C3's
+  NDVI circularity): `FerricIron1` vs C3b J = **+0.318**, identical to its
+  circular-C3 value — so that separation was **not** an artifact. And
+  `AMDclassFrac` vs C3b = **0.000, AUC 0.442**, confirming with a non-circular
+  control that the shipped classifier cannot tell mine discharge from bare
+  ground.
+- **RESOLUTION IS THE BINDING CONSTRAINT — as originally claimed, now corrected
+  above (2026-08-15).**
   Same 86 points, same controls, same pre-registered test; only pixel size
   changes. `FerricIron1` worst-case LORO Youden J, **Landsat 30 m → Sentinel-2
   20 m**: vs C1 in-stream **−0.018 → +0.234**, vs C2 **−0.101 → +0.291**, vs C3

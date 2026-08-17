@@ -1,0 +1,73 @@
+======================================================================================
+B2c CONTINUOUS DETECTOR - PRE-REGISTERED (6af0b5b, before any fitting)
+sensor=S2  radius=60m  stat=p90  features=8  model-perms=500
+Rule: J>=0.25 vs C1+C2+C3b, BH p<0.05, AND beat FerricIron1 alone.
+======================================================================================
+n targets=86  tiers present: C1clean=222, C1dirty=133, C1grey=86, C2=378, C3=430, C3b=350
+
+--- C1 CHEMISTRY RELABELLING (EPA thresholds, pre-registered) ---
+  central_city_co  clean=80   dirty=49   grey=14  
+  leadville_co     clean=39   dirty=13   grey=19  
+  ouray_co         clean=64   dirty=23   grey=20  
+  silverton_co     clean=39   dirty=48   grey=33  
+  ORIGINAL C1 (station-type) result stays in the record: J = 0.178
+
+--- REPRODUCTION CHECK (must match prior runs before judging models) ---
+  FerricIron1 alone vs C1clean worst-case LORO J = +0.298   cent=+0.61 lead=+0.46 oura=+0.30 silv=+0.58
+  FerricIron1 alone vs C1dirty worst-case LORO J = -0.067   cent=+0.14 lead=-0.07 oura=+0.15 silv=-0.03
+  FerricIron1 alone vs C1grey worst-case LORO J = +0.086   cent=+0.32 lead=+0.44 oura=+0.09 silv=+0.32
+  FerricIron1 alone vs C2   worst-case LORO J = +0.291   cent=+0.66 lead=+0.35 oura=+0.29 silv=+0.34
+  FerricIron1 alone vs C3   worst-case LORO J = +0.318   cent=+0.44 lead=+0.58 oura=+0.32 silv=+0.54
+  FerricIron1 alone vs C3b  worst-case LORO J = +0.318   cent=+0.50 lead=+0.36 oura=+0.32 silv=+0.56
+
+--- MODEL vs BASELINE, leave-one-region-out ---
+  tier   model_J   base_J    perm_p      BH_q  per-region model J
+  C1clean    0.297    0.298    0.0020         -  cent=+0.51 lead=+0.30 oura=+0.60 silv=+0.55
+  C1dirty   -0.311   -0.067    0.9641         -  cent=-0.03 lead=-0.31 oura=+0.59 silv=+0.06
+  C1grey    0.252    0.086    0.0020         -  cent=+0.39 lead=+0.25 oura=+0.26 silv=+0.36
+  C2       0.319    0.291    0.0020         -  cent=+0.64 lead=+0.32 oura=+0.59 silv=+0.63
+  C3       0.420    0.318    0.0020         -  cent=+0.42 lead=+0.70 oura=+0.68 silv=+0.85
+  C3b      0.617    0.318    0.0020         -  cent=+0.65 lead=+0.62 oura=+0.75 silv=+0.88
+
+  BH_q C1clean = 0.0024
+  BH_q C1dirty = 0.9641
+  BH_q C1grey = 0.0024
+  BH_q C2    = 0.0024
+  BH_q C3    = 0.0024
+  BH_q C3b   = 0.0024
+
+--- WHAT THE MODEL LEARNED (per-fold coefficients, standardised) ---
+  feature          central_ leadvill ouray_co silverto
+  IronSulfate        +0.240   -0.324   +0.333   +0.243  <-- SIGN FLIPS
+  FerricIron1        +1.321   +1.183   +1.981   +1.316
+  FerricIron2        +1.057   +1.696   +0.427   +1.102
+  FerrousIron        -0.384   -1.331   -0.432   -0.541
+  ClaySulfateMica    -1.519   -0.271   -1.212   -1.238
+  GreenNIR           +1.531   +0.950   +1.284   +0.808
+  GreenNIRNorm       +0.137   +0.092   -0.387   -0.011  <-- SIGN FLIPS
+  NDVI_stress        +0.098   +0.260   -0.135   -0.222  <-- SIGN FLIPS
+
+  SIGN INSTABILITY in 3/8 features: IronSulfate, GreenNIRNorm, NDVI_stress
+  Reported, not smoothed - this is the diagnostic that exposed Arm A.
+
+--- DISCRIMINATING TEST: does the score track CHEMISTRY or MINING? ---
+  C1dirty = contaminated streams that are NOT mine infrastructure.
+  target    n=86   median score = +0.899
+  C1clean   n=222  median score = -0.718
+  C1dirty   n=133  median score = +1.157
+  C1grey    n=86   median score = -0.211
+
+  Registered prediction: if the dose-response result is real,
+  C1dirty MUST score above C1clean.
+
+--- LEAKAGE POSITIVE CONTROL (a deliberate leak MUST inflate J) ---
+  C1clean clean J=+0.297   leaked J=+0.273   *** NO INFLATION - guard suspect ***
+  C1dirty clean J=-0.311   leaked J=-0.121   as expected
+  C1grey clean J=+0.252   leaked J=+0.259   as expected
+  C2    clean J=+0.319   leaked J=+0.360   as expected
+  C3    clean J=+0.420   leaked J=+0.410   *** NO INFLATION - guard suspect ***
+  C3b   clean J=+0.617   leaked J=+0.700   as expected
+
+--- VERDICT (pre-registered vocabulary) ---
+  PARTIAL
+  model beats FerricIron1 alone on: C2, C3b

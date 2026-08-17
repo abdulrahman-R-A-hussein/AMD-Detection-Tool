@@ -39,7 +39,32 @@ from seep_detect import (REGIONS, OUTDIR, SEED, PRIMARY_RADIUS, PRIMARY_STAT,
 FEATURES = ["IronSulfate", "FerricIron1", "FerricIron2", "FerrousIron",
             "ClaySulfateMica", "GreenNIR", "GreenNIRNorm", "NDVI_stress"]
 BASELINE = "FerricIron1"
-DECISION_TIERS = ("C1", "C2", "C3b")     # C3 reported but excluded (circular)
+DECISION_TIERS = ("C1clean", "C2", "C3b")   # C3 excluded (NDVI-circular)
+
+# Phase B2d. PUBLISHED EPA thresholds, deliberately external so they cannot be
+# accused of being fitted: 0.3 mg/L Fe is the secondary drinking water standard,
+# pH 6.5-9.0 the aquatic-life criteria. The grey band between clean and dirty is
+# excluded from BOTH rather than forced into one.
+FE_CLEAN, PH_CLEAN_LO, PH_CLEAN_HI = 0.3, 6.5, 9.0
+FE_DIRTY, PH_DIRTY = 1.0, 6.0
+
+
+def chem_class(fe, ph):
+    """'clean' | 'dirty' | 'grey' | None (insufficient measurement).
+
+    WHY THIS EXISTS: C1 was defined by station TYPE, which is a proxy. Verified
+    2026-08-16, 104 of 446 in-stream "negative controls" carry measured
+    Fe >= 1.0 mg/L - they are AMD-affected water being used as the negative
+    class, and every model has been penalised for declining to call them clean.
+    """
+    has_fe, has_ph = fe == fe, ph == ph
+    if not (has_fe or has_ph):
+        return None
+    if (has_fe and fe >= FE_DIRTY) or (has_ph and ph < PH_DIRTY):
+        return "dirty"
+    if (has_fe and fe < FE_CLEAN) and (has_ph and PH_CLEAN_LO <= ph <= PH_CLEAN_HI):
+        return "clean"
+    return "grey"
 
 
 def load_points(paths, sensor, radius=PRIMARY_RADIUS, stat=PRIMARY_STAT):
@@ -53,10 +78,16 @@ def load_points(paths, sensor, radius=PRIMARY_RADIUS, stat=PRIMARY_STAT):
         feats = {f: r.get("%s_%s" % (f, stat), float("nan")) for f in FEATURES}
         if any(v != v for v in feats.values()):
             continue
-        out.append(dict(x=feats, tier=r["tier"], region=r["region"],
-                        pid=r["pid"],
-                        fe=r.get("Iron_mgL_dissolved", float("nan")),
-                        ph=r.get("pH", float("nan"))))
+        fe = r.get("Iron_mgL_any", float("nan"))
+        ph = r.get("pH", float("nan"))
+        tier = r["tier"]
+        if tier == "C1":
+            k = chem_class(fe, ph)
+            if k is None:
+                continue                      # unmeasured: cannot classify
+            tier = {"clean": "C1clean", "dirty": "C1dirty", "grey": "C1grey"}[k]
+        out.append(dict(x=feats, tier=tier, region=r["region"], pid=r["pid"],
+                        fe=fe, ph=ph))
     return out
 
 
@@ -261,6 +292,15 @@ def main(argv=None):
                      for t in tiers)))
     say()
 
+    say("--- C1 CHEMISTRY RELABELLING (EPA thresholds, pre-registered) ---")
+    for g in sorted(REGIONS):
+        c = {t: sum(1 for r in rows if r["region"] == g and r["tier"] == t)
+             for t in ("C1clean", "C1dirty", "C1grey")}
+        say("  %-16s clean=%-4d dirty=%-4d grey=%-4d"
+            % (g, c["C1clean"], c["C1dirty"], c["C1grey"]))
+    say("  ORIGINAL C1 (station-type) result stays in the record: J = 0.178")
+    say()
+
     say("--- REPRODUCTION CHECK (must match prior runs before judging models) ---")
     for t in tiers:
         bj, bper = baseline_loro(rows, t)
@@ -306,6 +346,26 @@ def main(argv=None):
         say("  Reported, not smoothed - this is the diagnostic that exposed Arm A.")
     else:
         say("  All coefficient signs stable across folds.")
+    say()
+
+    say("--- DISCRIMINATING TEST: does the score track CHEMISTRY or MINING? ---")
+    say("  C1dirty = contaminated streams that are NOT mine infrastructure.")
+    prim_t = "C1clean"
+    mj, _, coef = loro_evaluate(rows, prim_t)
+    if coef:
+        w = [sum(c[1][j] for c in coef) / len(coef) for j in range(len(FEATURES))]
+        par = zscore_params(rows, sorted(REGIONS))
+        for t in ("target", "C1clean", "C1dirty", "C1grey"):
+            sub = [r for r in rows if r["tier"] == t]
+            if not sub:
+                continue
+            sc = score(apply_z(sub, par), w, 0.0)
+            sc.sort()
+            say("  %-9s n=%-4d median score = %+.3f"
+                % (t, len(sub), sc[len(sc) // 2]))
+        say()
+        say("  Registered prediction: if the dose-response result is real,")
+        say("  C1dirty MUST score above C1clean.")
     say()
 
     say("--- LEAKAGE POSITIVE CONTROL (a deliberate leak MUST inflate J) ---")

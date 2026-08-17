@@ -1,6 +1,6 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-08-16 · **Current tag:** `v3.4.0`
+**Last updated:** 2026-08-16 · **Current tag:** `v3.5.0`
 
 This file is the canonical "where are we right now". It is maintained under
 the logging rule in [`../CLAUDE.md`](../CLAUDE.md). It should be sufficient to
@@ -131,6 +131,31 @@ retraction is the load-bearing update this file exists to carry forward.
   terrain-matched land (C2) and collapses to ~0 against in-stream stations in
   the same region (C1). **Imagery ranks severity at known sites; it does not
   find sites.**
+- **★★ THE WATER-ARM RESULT: the score tracks CONTAMINATION, and the in-stream
+  failure was our own control design (2026-08-16, B2d).** Pre-registered
+  `56aa3aa` before any analysis, with published EPA thresholds.
+  **(a) The failure was an artifact.** 104 of 446 in-stream "controls" had
+  measured Fe ≥ 1.0 mg/L — AMD-affected water used as a *negative class*. With
+  controls defined by chemistry instead of station type, worst-case LORO J goes
+  **0.178 → 0.297**, clearing the 0.25 bar. *(Original 0.178 retained.)*
+  **(b) The discriminating test — never run before — settles what the score
+  responds to.** Median score is **monotone in measured contamination**:
+  C1clean −0.718 (n=222) < C1grey −0.211 (n=86) < **target +0.899** (n=86) <
+  **C1dirty +1.157** (n=133). Contaminated streams *without* mine
+  infrastructure score **above the mine discharge points themselves**. → **the
+  score responds to WATER CHEMISTRY, not to the presence of a mine.** This also
+  explains J = −0.311 vs C1dirty: it cannot separate targets from contaminated
+  streams *because both are AMD-affected* — correct behaviour the old control
+  design scored as failure.
+  **(c) THE CLEANEST CLAIM IS ONE BAND RATIO.** `FerricIron1` (red/blue) used
+  **continuously** clears the bar unaided on all three decision tiers:
+  **C1clean +0.298, C2 +0.291, C3b +0.318**. The 8-feature model ties it on the
+  primary tier (0.297 vs 0.298) so the verdict is **PARTIAL** by the letter of
+  the rule — but the single index is the simpler, more transferable headline.
+  **MAY claim:** separates AMD-affected from chemically-verified clean water at
+  monitored locations, out-of-region, monotone in contamination.
+  **MAY NOT claim:** finds unknown sources in blind search — untested.
+  → [`ARM_B2D_CHEM_CONTROLS_2026-08-16.md`](ARM_B2D_CHEM_CONTROLS_2026-08-16.md)
 - **⭐ GOING CONTINUOUS SOLVES THE BARE-GROUND PROBLEM (2026-08-16, B2c).**
   Pre-registered `6af0b5b` before any fitting. Against NLCD bare ground, an
   8-index continuous model scores worst-case LORO **J = +0.617** (all folds

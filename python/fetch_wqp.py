@@ -117,6 +117,50 @@ REGIONS = {
     # >=3-sample station counts are what actually matters for a chemistry
     # median; verify per-region distinct-catchment count once delineated,
     # same as Silverton was - do not assume more stations means more n.
+    # ------------------------------------------------------------------
+    # Added 2026-08-16. OHIO APPALACHIAN COAL BASIN - the PhD's actual target.
+    # Colorado is ACID metal-mine drainage; these are COAL mine drainage (CMD)
+    # watersheds where the diagnostic problem is different and harder:
+    # sulfate contamination HIDDEN UNDER NEUTRAL pH. Alkaline overburden
+    # buffers the acid, so pH reads 6.5-8 while sulfate and conductivity stay
+    # elevated - and our own B2d "clean water" definition (Fe<0.3 AND pH
+    # 6.5-9.0) would file exactly those sites as CLEAN. For CMD, contamination
+    # must be keyed on SULFATE and specific conductance, never pH.
+    #
+    # Mechanistic reason this is worth testing rather than assuming it fails:
+    # at neutral pH, Fe(II) oxidises and hydrolyses FAST, so ochre precipitates
+    # at the discharge instead of staying in solution and dispersing as it does
+    # in acid drainage. Neutral CMD may therefore produce a MORE localised,
+    # MORE optically visible iron deposit than the Colorado sites - the
+    # opposite of the intuitive expectation.
+    #
+    # All five are long-monitored CMD restoration watersheds (Ohio EPA, ODNR,
+    # local watershed groups), chosen for monitoring density, not for outcome.
+    "Monday Creek, OH": (
+        39.45, -82.40, 39.72, -82.10, None,
+        "Monday Creek, Hocking/Perry/Athens Co. Classic Ohio CMD restoration "
+        "watershed. Probe before relying on counts.",
+    ),
+    "Sunday Creek, OH": (
+        39.42, -82.12, 39.70, -81.85, None,
+        "Sunday Creek, Athens/Perry/Morgan Co. CMD, incl. Corning/San Toy "
+        "discharges. Probe before relying on counts.",
+    ),
+    "Raccoon Creek, OH": (
+        38.85, -82.60, 39.20, -82.25, None,
+        "Raccoon Creek, Vinton/Gallia/Jackson Co. Large CMD watershed with a "
+        "long Ohio EPA record. Probe before relying on counts.",
+    ),
+    "Huff Run, OH": (
+        40.45, -81.30, 40.72, -81.00, None,
+        "Huff Run / Conotton Creek, Carroll/Tuscarawas Co. CMD restoration. "
+        "Probe before relying on counts.",
+    ),
+    "Leading Creek, OH": (
+        38.95, -82.20, 39.22, -81.90, None,
+        "Leading Creek, Meigs Co. CMD watershed. Probe before relying on "
+        "counts.",
+    ),
     "Ouray, CO": (
         37.95, -107.90, 38.20, -107.55, None,
         "Uncompahgre River watershed (Gunnison system). Probed 2026-08-10: "

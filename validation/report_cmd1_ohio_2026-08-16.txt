@@ -1,0 +1,38 @@
+========================================================================================
+PHASE CMD1 - neutral-pH COAL mine drainage, Ohio (PRE-REGISTERED)
+Dose-response over in-stream stations. pH is NOT used to classify.
+CAVEAT (binding): sulfate has NO VNIR absorption. Any association is
+with iron precipitate / turbidity / vegetation that CO-VARIES with it.
+========================================================================================
+
+--- CANOPY DIAGNOSTIC (required before any null is interpreted) ---
+  n stations extracted : 159
+  median buffer NDVI   : 0.870  (limit 0.60)
+  *** ABOVE LIMIT - buffers are forest canopy. A null here is a
+      MEASUREMENT LIMITATION, not evidence against the hypothesis.
+
+--- DOSE-RESPONSE: index vs measured chemistry ---
+  index            analyte               pooled     n   btw%   perm_p  per-watershed sign
+  NDVI_stress      Sulfate_mgL           +0.242   131     11   0.0574  huff+0.40 lead-0.08 mond-0.46 racc+0.17 signs disagree
+  FerrousIron      SpecificConductance   -0.182   154      6   0.0218  huff-0.33 lead+0.30 mond+0.13 racc-0.29 signs disagree
+  NDVI_stress      SpecificConductance   +0.174   154      6   0.0458  huff+0.42 lead-0.30 mond-0.05 racc+0.12 signs disagree
+  ClaySulfateMica  SpecificConductance   -0.161   154      6   0.0418  huff-0.28 lead+0.28 mond+0.04 racc-0.28 signs disagree
+  GreenNIR         SpecificConductance   -0.159   154      6   0.0396  huff-0.30 lead+0.24 mond+0.08 racc-0.29 signs disagree
+  GreenNIRNorm     SpecificConductance   -0.159   154      6   0.0436  huff-0.30 lead+0.24 mond+0.08 racc-0.29 signs disagree
+  FerrousIron      Sulfate_mgL           -0.124   131     11   0.1410  huff-0.29 lead+0.29 mond+0.40 racc-0.26 signs disagree
+  IronSulfate      SpecificConductance   -0.114   154      6   0.1512  huff-0.23 lead+0.31 mond+0.07 racc-0.24 signs disagree
+  ClaySulfateMica  Sulfate_mgL           -0.113   131     11   0.1744  huff-0.26 lead+0.37 mond+0.40 racc-0.26 signs disagree
+  FerricIron2      SpecificConductance   -0.112   154      6   0.1486  huff-0.20 lead+0.27 mond+0.05 racc-0.24 signs disagree
+  FerricIron1      Sulfate_mgL           +0.102   131     11   0.1588  huff+0.25 lead+0.16 mond+0.49 racc-0.04 signs disagree
+  GreenNIR         Sulfate_mgL           -0.096   131     11   0.2314  huff-0.27 lead+0.36 mond+0.31 racc-0.26 signs disagree
+  GreenNIRNorm     Sulfate_mgL           -0.096   131     11   0.2300  huff-0.27 lead+0.36 mond+0.31 racc-0.26 signs disagree
+  IronSulfate      Sulfate_mgL           -0.059   131     11   0.4349  huff-0.22 lead+0.46 mond+0.51 racc-0.25 signs disagree
+  FerricIron2      Sulfate_mgL           -0.051   131     11   0.5311  huff-0.19 lead+0.29 mond+0.46 racc-0.19 signs disagree
+  FerricIron1      SpecificConductance   +0.009   154      6   0.9260  huff+0.18 lead-0.01 mond-0.05 racc-0.17 signs disagree
+
+--- VERDICT (pre-registered) ---
+  UNINTERPRETABLE - canopy-limited (median NDVI 0.870 > 0.60).
+  Reported as a measurement limitation, NOT as evidence.
+
+  Colorado comparison: FerricIron1 vs dissolved Fe rho=+0.568.
+  H-CMD2 predicted Ohio would NOT be weaker.

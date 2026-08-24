@@ -1,6 +1,6 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-08-16 · **Current tag:** `v3.5.0`
+**Last updated:** 2026-08-16 · **Current tag:** `v3.6.0`
 
 This file is the canonical "where are we right now". It is maintained under
 the logging rule in [`../CLAUDE.md`](../CLAUDE.md). It should be sufficient to
@@ -131,6 +131,33 @@ retraction is the load-bearing update this file exists to carry forward.
   terrain-matched land (C2) and collapses to ~0 against in-stream stations in
   the same region (C1). **Imagery ranks severity at known sites; it does not
   find sites.**
+- **★ CMD/OHIO: THE CANOPY BLOCKS THE MEASUREMENT — terrain-dependent finding
+  (2026-08-16, CMD1).** Pre-registered before extraction, including the canopy
+  diagnostic that produced this verdict. At 30 m over Ohio coal-basin streams,
+  60 m buffers are **closed forest canopy**: median NDVI **0.870** (p90) /
+  **0.791** (mean), p10 0.660, only 5.1% below 0.4. Pixels survive the water
+  mask (median 26/buffer) — they are trees. **Verdict UNINTERPRETABLE, NOT a
+  null**: the measurement never reached the water, so H-CMD1/H-CMD2 are
+  **untested, not refuted**. Every index shows inconsistent signs across
+  watersheds, exactly as looking at canopy should.
+  **Why this beats a null:** placed beside Colorado it gives a TERRAIN-DEPENDENT
+  result. Open alpine Colorado → detection J +0.30, dose-response +0.568, and
+  resolution provably NOT the constraint. Forested Ohio → not measurable at all,
+  and the barrier is **optical access**, not chemistry or bands.
+  **Instrumentation consequence, and it is terrain-specific:** the 2026-08-16
+  refutation of "resolution is the constraint" is **Colorado-only**. Under
+  closed canopy no band configuration and no nadir pixel size helps; what
+  changes the measurement is imaging **beneath/between canopy** — low-altitude
+  UAV along the channel, off-nadir, or **leaf-off timing**. This is a stronger
+  and more specific drone justification than the resolution argument ever was,
+  and it applies to the terrain the PhD targets.
+  **Also confirmed on real data:** Ohio CMD is genuinely neutral-pH (median
+  7.46–7.72, five watersheds), and Ohio has **1** mine-discharge source point vs
+  Colorado's 86, so the target-vs-control design does not transfer.
+  **NEXT, cheap and obvious: leaf-off (Nov–Mar) composites** — a declared
+  departure from the SIM 3466 May–Jul season, which exists for mineral mapping
+  in open terrain, not for seeing under a canopy.
+  → [`ARM_CMD1_OHIO_2026-08-16.md`](ARM_CMD1_OHIO_2026-08-16.md)
 - **★★ THE WATER-ARM RESULT: the score tracks CONTAMINATION, and the in-stream
   failure was our own control design (2026-08-16, B2d).** Pre-registered
   `56aa3aa` before any analysis, with published EPA thresholds.

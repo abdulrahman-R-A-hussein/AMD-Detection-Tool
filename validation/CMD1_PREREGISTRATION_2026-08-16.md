@@ -139,3 +139,37 @@ design, and the within-region permutation null.
 **Stated risk:** leaf-off in Ohio brings low sun angle, longer shadows, wetter
 ground and possible snow. A *positive* found only in leaf-off must be checked
 against seasonal illumination artifacts before being believed.
+
+---
+
+# AMENDMENT 2 — buffer-geometry test (registered 2026-08-16, before the run)
+
+The leaf-off run returned a **real NULL** with the canopy removed (median NDVI
+0.496). The report named **sampling geometry** as the leading remaining
+explanation: Ohio streams are metres wide, so a 60 m circular buffer is mostly
+floodplain even leaf-off, and neutral-pH ochre is concentrated at the seep face.
+
+**Change:** extract the identical leaf-off composite at **three radii — 30 m,
+60 m, 100 m** — instead of 60 m alone. Nothing else changes.
+
+**This is a two-sided test, deliberately.** It can refute the geometry
+explanation as easily as support it:
+
+| observation | conclusion |
+|---|---|
+| \|rho\| rises as radius **shrinks** (30 > 60 > 100) | **geometry-limited** — the target is near the channel and the buffer was diluting it. Supports a finer-geometry/UAV argument. |
+| \|rho\| flat across radii | **not geometry** — the null stands for a different reason, and shrinking the footprint will not rescue it. |
+| \|rho\| rises as radius **grows** | the association is with **catchment-scale land cover**, not the seep — which would be a different (and weaker) claim entirely. |
+
+**Sign consistency across the five watersheds remains the headline check at
+every radius.** A radius that produces a larger pooled \|rho\| with inconsistent
+signs is not evidence, exactly as at 60 m.
+
+**Registered prediction:** if the geometry explanation is right, the 30 m radius
+should show both larger \|rho\| **and** better sign consistency than 60 m.
+
+**Stated risk — and it bounds what a positive can mean.** At 30 m Landsat
+pixels, a 30 m-radius buffer contains only ~3 pixels, so estimates are noisier
+and a spurious correlation is easier to draw. Any positive found only at 30 m
+must be checked against the surviving-pixel count before being believed, and
+`n_px` is reported per radius for that reason.

@@ -116,7 +116,7 @@ def load_cmd_stations(slug):
     return out
 
 
-def run_extract(slugs, out_csv, season="leafon"):
+def run_extract(slugs, out_csv, season="leafon", radii=None):
     from gee_classify import init_ee
     ee = init_ee()
     rows = []
@@ -133,10 +133,11 @@ def run_extract(slugs, out_csv, season="leafon"):
             print("  SKIP - too few scenes")
             continue
         img = index_image(ee, comp)
-        got = extract_buffers(ee, img, pts, PRIMARY_RADIUS, 30, INDEX_BANDS)
-        for p in pts:
+        for radius in (radii or [PRIMARY_RADIUS]):
+          got = extract_buffers(ee, img, pts, radius, 30, INDEX_BANDS)
+          for p in pts:
             v = got.get(p["pid"], {})
-            row = dict(region=slug, sensor="L8", radius=PRIMARY_RADIUS,
+            row = dict(region=slug, sensor="L8", radius=radius,
                        tier="cmd", season=season, pid=p["pid"],
                        lat=p["lat"], lon=p["lon"],
                        n_px=v.get("IronSulfate_count"))
@@ -146,7 +147,7 @@ def run_extract(slugs, out_csv, season="leafon"):
             for a in ANALYTES:
                 row[a] = p.get(a)
             rows.append(row)
-        print("  extracted %d" % len(pts))
+          print("  r=%3dm extracted %d" % (radius, len(pts)))
     os.makedirs(OUTDIR, exist_ok=True)
     keys = sorted({k for r in rows for k in r})
     with open(out_csv, "w", newline="", encoding="utf-8") as fh:
@@ -278,13 +279,15 @@ if __name__ == "__main__":
     ap.add_argument("--regions", default="")
     ap.add_argument("--inputs", default="")
     ap.add_argument("--perms", type=int, default=5000)
+    ap.add_argument("--radii", default="")
     ap.add_argument("--season", default="leafon",
                     choices=["leafon", "leafoff"])
     ap.add_argument("--out")
     a = ap.parse_args()
     slugs = [s for s in a.regions.split(",") if s] or list(CMD_REGIONS)
     if a.extract:
-        run_extract(slugs, a.out or os.path.join(OUTDIR, "cmd_l8.csv"), a.season)
+        run_extract(slugs, a.out or os.path.join(OUTDIR, "cmd_l8.csv"), a.season,
+                    [int(x) for x in a.radii.split(",") if x] or None)
     elif a.analyse:
         import glob
         paths = ([p for p in a.inputs.split(",") if p] or

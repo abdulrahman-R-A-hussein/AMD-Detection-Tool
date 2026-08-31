@@ -106,3 +106,36 @@ measurement-limitation, not a negative result.
 | H-CMD2 (neutral ochre is more visible) | Ohio rho materially weaker than Colorado's +0.568 |
 | "the method generalises beyond Colorado" | Ohio null while Colorado holds |
 | any sulfate claim | it is not permitted at all — see §3 |
+
+---
+
+# AMENDMENT 1 — leaf-off retest (registered 2026-08-16, before the run)
+
+The May–Jul run returned **UNINTERPRETABLE** (median buffer NDVI 0.870): closed
+deciduous canopy. The CMD1 report named leaf-off imagery as the next move
+*before* this amendment was written, so the prediction is already on record.
+
+**Change:** composite months **Nov–Mar** instead of May–Jul. This is a
+**declared departure** from the SIM 3466 mineral-mapping season, justified
+because that season exists for mapping minerals in open terrain, not for seeing
+a streambed under a deciduous canopy.
+
+**Additional masking required by winter imagery:** Landsat C2 `QA_PIXEL`
+**bit 5 (snow/ice)** must be masked. Snow is bright, spectrally distinctive and
+seasonal; leaving it in would create a season-dependent artifact that could
+masquerade as either signal or canopy relief.
+
+**Unchanged:** every decision rule, the 0.6 canopy threshold, the published
+contamination thresholds, the sulfate wording constraint, the dose-response
+design, and the within-region permutation null.
+
+**Registered predictions:**
+1. **Median buffer NDVI drops below 0.6.** If it does not, deciduous canopy was
+   not the explanation and the Ohio result stands as unexplained rather than
+   canopy-limited.
+2. **If (1) holds, the phase becomes interpretable** and the §7 decision rule
+   applies unchanged — including NULL as a live outcome.
+
+**Stated risk:** leaf-off in Ohio brings low sun angle, longer shadows, wetter
+ground and possible snow. A *positive* found only in leaf-off must be checked
+against seasonal illumination artifacts before being believed.

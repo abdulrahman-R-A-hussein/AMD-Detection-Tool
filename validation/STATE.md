@@ -1,6 +1,6 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-08-16 · **Current tag:** `v3.7.0`
+**Last updated:** 2026-08-16 · **Current tag:** `v3.8.0`
 
 This file is the canonical "where are we right now". It is maintained under
 the logging rule in [`../CLAUDE.md`](../CLAUDE.md). It should be sufficient to
@@ -131,6 +131,31 @@ retraction is the load-bearing update this file exists to carry forward.
   terrain-matched land (C2) and collapses to ~0 against in-stream stations in
   the same region (C1). **Imagery ranks severity at known sites; it does not
   find sites.**
+- **★ CMD/OHIO GEOMETRY: the null WAS geometry-limited, and the signal is
+  VEGETATION not iron (2026-08-16, amendment 2, two-sided test registered
+  first).** Shrinking the buffer strengthens the association **monotonically**:
+  `NDVI_stress` vs sulfate **−0.255 (100 m) → −0.253 (60 m) → −0.354 (30 m)**,
+  p **0.119 → 0.083 → 0.0013**, sign pattern mixed → mixed → **4 of 5 negative**
+  (5th = +0.03, essentially zero not a reversal). **Verdict PARTIAL at 30 m**
+  (was NULL at 60 m) — the strict all-five sign rule was fixed in advance and is
+  applied as written.
+  **The registered pixel-count risk did not materialise:** median 9 surviving
+  pixels at 30 m, only 5% below 3 px (vs 4% at 60 m).
+  **The signal is `NDVI_stress`, NEGATIVE — vegetation, not iron.** Iron indices
+  stay weak and sign-inconsistent at every radius. This is the **first time
+  paper2's vegetation-proxy framing has held up anywhere in this project**
+  (their green:NIR ratios have now failed sign consistency 3 times), and it runs
+  **opposite** to Colorado where iron carried everything and NDVI carried
+  nothing. Mechanistically coherent for neutral CMD: no acid signature, iron
+  precipitating locally, so the landscape expression is stressed riparian
+  vegetation rather than ochre.
+  **⚠ UNTESTED CONFOUND, and it gates the whole finding:** high-sulfate stations
+  may simply sit in more heavily mined catchments with less vegetation overall —
+  land cover, not a seep signal. **Until tested, this is "vegetation index
+  tracks sulfate", NOT "we detect CMD seeps."**
+  **NEXT: mining-extent confound test**, then tighter/channel-masked sampling
+  (the gradient has not bottomed out).
+  → [`ARM_CMD1_GEOMETRY_2026-08-16.md`](ARM_CMD1_GEOMETRY_2026-08-16.md)
 - **★ CMD/OHIO LEAF-OFF: canopy removed, and the signal is NOT there — a REAL
   null (2026-08-16, amendment 1, registered before the run).** Median buffer
   NDVI fell **0.870 → 0.496** (p90) / 0.791 → 0.426 (mean), below the 0.6 limit;

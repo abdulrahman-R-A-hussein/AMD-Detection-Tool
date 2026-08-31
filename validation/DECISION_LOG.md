@@ -46,6 +46,7 @@ terrain, and does not transfer to forested neutral-pH coal drainage.**
 | 2026-08-16 | **B2d** chemistry controls | Were the in-stream controls contaminated? | **Yes** — 104/446 had Fe ≥1 mg/L. J 0.178→0.297. Score tracks *contamination* | v3.5.0 |
 | 2026-08-16 | **CMD1** Ohio leaf-on | Does it transfer to neutral-pH coal drainage? | **UNINTERPRETABLE** — canopy (NDVI 0.870) | v3.6.0 |
 | 2026-08-16 | CMD1 leaf-off | Same, with the canopy off | **NULL** — NDVI 0.496, no index sign-consistent | v3.7.0 |
+| 2026-08-16 | CMD1 geometry | Was the null a sampling-geometry artifact? | **Yes, partly** — monotone gradient; PARTIAL at 30 m; signal is *vegetation* | v3.8.0 |
 
 ---
 
@@ -151,9 +152,13 @@ run *before* any parameter sweep so a wrong diagnosis cannot be tuned away.
 
 ## Open, in priority order
 
-1. **Riparian-only sampling (Ohio).** Circular 60 m buffers around metre-wide
-   streams are mostly floodplain even leaf-off. Directly tests the leading
-   explanation for the CMD null. Cheap.
+1. **Mining-extent confound test (Ohio).** The 30 m vegetation-sulfate
+   association may be land cover: high-sulfate stations may sit in more heavily
+   mined catchments with less vegetation overall. **This gates whether the CMD
+   result means anything.** Until tested, the claim is "vegetation index tracks
+   sulfate", not "we detect seeps".
+2. **Tighter / channel-masked sampling (Ohio).** The radius gradient has not
+   bottomed out at 30 m.
 2. **Blind-search test (Colorado).** The gap between "scores known points
    correctly" and "finds unknown sites" is the difference between a severity
    tool and a discovery tool.

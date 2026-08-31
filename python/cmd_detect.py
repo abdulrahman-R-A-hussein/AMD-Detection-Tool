@@ -157,8 +157,9 @@ def run_extract(slugs, out_csv, season="leafon", radii=None):
     print("\n-> %s (%d rows)" % (out_csv, len(rows)))
 
 
-def run_analyse(paths, n_perm=5000, out_txt=None):
-    rows = [r for r in load_extracted(paths) if r.get("tier") == "cmd"]
+def run_analyse(paths, n_perm=5000, out_txt=None, radius=None):
+    rows = [r for r in load_extracted(paths) if r.get("tier") == "cmd"
+            and (radius is None or r.get("radius") == radius)]
     rng = random.Random(SEED)
     lines = []
 
@@ -292,6 +293,7 @@ if __name__ == "__main__":
         import glob
         paths = ([p for p in a.inputs.split(",") if p] or
                  glob.glob(os.path.join(OUTDIR, "cmd_l8*.csv")))
-        run_analyse(paths, a.perms, a.out)
+        run_analyse(paths, a.perms, a.out,
+                    float(a.radii) if a.radii else None)
     else:
         ap.print_help()

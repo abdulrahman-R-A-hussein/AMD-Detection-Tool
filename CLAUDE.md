@@ -21,7 +21,14 @@ Every session that produces a finding must, **before it ends**:
 1. append the finding to a dated report in `validation/` — with its numbers,
    its **n**, and its caveat;
 2. update `validation/STATE.md` (proven / retracted / open / next);
-3. commit and push.
+3. add a row to `validation/DECISION_LOG.md` — the chronological journey:
+   what was asked, what was done, what happened, what was decided, and **why**.
+   `STATE.md` says where we are; `DECISION_LOG.md` says how we got here, wrong
+   turns included. A phase that produced a null or a retraction gets the same
+   detail as one that produced a positive;
+4. mirror any plan used into `docs/plans/` (machine-local plan files do not
+   survive a reinstall; the repo copy does);
+5. commit and push.
 
 > **A finding that exists only in chat does not exist.**
 

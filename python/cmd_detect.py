@@ -56,6 +56,46 @@ CANOPY_NDVI_LIMIT = 0.6                 # above this, a null is uninterpretable
 
 ANALYTES = ["Sulfate_mgL", "SpecificConductance", "Iron_mgL_any", "pH"]
 
+# Cap on scenes entering the median. The recurring "User memory limit exceeded"
+# is about compute-GRAPH size: a median over hundreds of scenes, each with
+# add_indices mapped onto it, is too large to BUILD, so no downstream tiling or
+# batch-shrinking can rescue it. Capping at the N least-cloudy scenes is
+# deterministic, gives every watershed the same compositing depth, and caps the
+# graph directly. This is the fix that finally made Silverton S2 complete after
+# four failures; applied here to Landsat for the same reason.
+L8_MAX_SCENES = 120
+
+
+def l8_composite_season(ee, region, season="leafoff", max_scenes=L8_MAX_SCENES):
+    """Landsat composite for a named season, with snow masked and scenes capped.
+
+    season="leafoff" -> Nov-Mar. That range WRAPS the year boundary, so it needs
+    an Or of two calendarRange filters; calendarRange(11, 3) is empty, not
+    inclusive, and would silently return nothing.
+
+    SNOW MASKING is required for winter imagery and is not in the standard
+    process_landsat() path: QA_PIXEL bit 5 is snow/ice. Snow is bright and
+    seasonal, so leaving it in would create a season-dependent artifact that
+    could masquerade as either signal or canopy relief - registered in
+    CMD1 amendment 1 before this was run.
+    """
+    from gee_classify import process_landsat, add_indices, START, END
+
+    if season == "leafoff":
+        mfilter = ee.Filter.Or(ee.Filter.calendarRange(11, 12, "month"),
+                               ee.Filter.calendarRange(1, 3, "month"))
+    else:
+        mfilter = ee.Filter.calendarRange(5, 7, "month")
+
+    def prep(img):
+        snow = img.select("QA_PIXEL").bitwiseAnd(1 << 5).eq(0)
+        return add_indices(ee, process_landsat(ee, img).updateMask(snow))
+
+    col = (ee.ImageCollection("LANDSAT/LC08/C02/T1_L2")
+           .filterBounds(region).filterDate(START, END).filter(mfilter)
+           .sort("CLOUD_COVER").limit(max_scenes).map(prep))
+    return col.median().clip(region), int(col.size().getInfo())
+
 
 def load_cmd_stations(slug):
     from watershed_nap import load_station_chemistry
@@ -76,7 +116,7 @@ def load_cmd_stations(slug):
     return out
 
 
-def run_extract(slugs, out_csv):
+def run_extract(slugs, out_csv, season="leafon"):
     from gee_classify import init_ee
     ee = init_ee()
     rows = []
@@ -86,7 +126,8 @@ def run_extract(slugs, out_csv):
         if not pts:
             print("%s: no stations with sulfate/conductance" % slug)
             continue
-        comp, n_scenes = l8_composite(ee, region)
+        comp, n_scenes = (l8_composite(ee, region) if season == "leafon"
+                          else l8_composite_season(ee, region, season))
         print("\n%s: %d stations, %d scenes" % (slug, len(pts), n_scenes))
         if n_scenes < MIN_SCENES:
             print("  SKIP - too few scenes")
@@ -96,7 +137,8 @@ def run_extract(slugs, out_csv):
         for p in pts:
             v = got.get(p["pid"], {})
             row = dict(region=slug, sensor="L8", radius=PRIMARY_RADIUS,
-                       tier="cmd", pid=p["pid"], lat=p["lat"], lon=p["lon"],
+                       tier="cmd", season=season, pid=p["pid"],
+                       lat=p["lat"], lon=p["lon"],
                        n_px=v.get("IronSulfate_count"))
             for b in INDEX_BANDS:
                 row[b + "_p90"] = v.get(b + "_p90")
@@ -236,11 +278,13 @@ if __name__ == "__main__":
     ap.add_argument("--regions", default="")
     ap.add_argument("--inputs", default="")
     ap.add_argument("--perms", type=int, default=5000)
+    ap.add_argument("--season", default="leafon",
+                    choices=["leafon", "leafoff"])
     ap.add_argument("--out")
     a = ap.parse_args()
     slugs = [s for s in a.regions.split(",") if s] or list(CMD_REGIONS)
     if a.extract:
-        run_extract(slugs, a.out or os.path.join(OUTDIR, "cmd_l8.csv"))
+        run_extract(slugs, a.out or os.path.join(OUTDIR, "cmd_l8.csv"), a.season)
     elif a.analyse:
         import glob
         paths = ([p for p in a.inputs.split(",") if p] or

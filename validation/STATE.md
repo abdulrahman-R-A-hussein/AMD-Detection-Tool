@@ -1,6 +1,6 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-08-16 · **Current tag:** `v3.6.0`
+**Last updated:** 2026-08-16 · **Current tag:** `v3.7.0`
 
 This file is the canonical "where are we right now". It is maintained under
 the logging rule in [`../CLAUDE.md`](../CLAUDE.md). It should be sufficient to
@@ -131,6 +131,33 @@ retraction is the load-bearing update this file exists to carry forward.
   terrain-matched land (C2) and collapses to ~0 against in-stream stations in
   the same region (C1). **Imagery ranks severity at known sites; it does not
   find sites.**
+- **★ CMD/OHIO LEAF-OFF: canopy removed, and the signal is NOT there — a REAL
+  null (2026-08-16, amendment 1, registered before the run).** Median buffer
+  NDVI fell **0.870 → 0.496** (p90) / 0.791 → 0.426 (mean), below the 0.6 limit;
+  coverage 159 → **187 stations, 5/5 watersheds**. Registered prediction 1
+  CONFIRMED: deciduous canopy was the May–Jul barrier. **With the ground
+  visible, no index is sign-consistent across the five watersheds** vs sulfate
+  or conductance (best |rho| 0.253, p 0.075, signs disagree). **NULL.**
+  July said "we cannot see"; this says "we can see, and it is not there" — only
+  the second is evidence.
+  **H-CMD2 REFUTED as stated:** Ohio is weaker than Colorado, not equal.
+  **The Colorado method does NOT transfer to neutral-pH coal drainage.**
+  **Boundary, not a dead end — this is a null at 30 m in 60 m circular buffers.**
+  Leading remaining explanations, both testable: (a) sampling geometry — Ohio
+  streams are metres wide, so the buffer is mostly floodplain even leaf-off;
+  (b) neutral-pH ochre is concentrated at the seep face, i.e. a few square
+  metres, sub-pixel at Landsat. Both point the same way and give the **most
+  specific UAV justification yet** — not the generic resolution claim Colorado
+  refuted, but a measured geometry argument in a watershed where the satellite
+  has now been shown to see the ground and still find nothing.
+  **NEXT: riparian-only sampling** (channel-adjacent pixels, not circular
+  buffers) — cheap, and directly tests the leading explanation.
+  **Also fixed: the recurring GEE memory failure. 5/5 completed including
+  Sunday Creek** (failed twice before). Cause was compute-GRAPH size, not batch
+  size — a median over hundreds of scenes cannot be BUILT; capping at the 120
+  least-cloudy scenes fixes it deterministically. Same fix that completed
+  Silverton S2 after four failures.
+  → [`ARM_CMD1_LEAFOFF_2026-08-16.md`](ARM_CMD1_LEAFOFF_2026-08-16.md)
 - **★ CMD/OHIO: THE CANOPY BLOCKS THE MEASUREMENT — terrain-dependent finding
   (2026-08-16, CMD1).** Pre-registered before extraction, including the canopy
   diagnostic that produced this verdict. At 30 m over Ohio coal-basin streams,

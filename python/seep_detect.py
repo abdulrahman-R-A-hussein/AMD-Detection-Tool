@@ -745,7 +745,8 @@ def load_extracted(paths):
                     continue
                 seen.add(key)
                 for k, v in list(r.items()):
-                    if k in ("region", "sensor", "tier", "pid", "name", "site_type"):
+                    if k in ("region", "sensor", "tier", "pid", "name",
+                             "site_type", "season"):
                         continue
                     r[k] = float(v) if v not in ("", None, "None") else float("nan")
                 rows.append(r)

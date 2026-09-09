@@ -1,6 +1,6 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-09-08 · **Current tag:** `v3.9.0`
+**Last updated:** 2026-09-09 · **Current tag:** `v3.9.0` (tool: `v3.1.0`)
 
 This file is the canonical "where are we right now". It is maintained under
 the logging rule in [`../CLAUDE.md`](../CLAUDE.md). It should be sufficient to
@@ -23,6 +23,57 @@ loading model, on dissolved Fe. This is reported as prominently as the
 original finding was, per this project's own rule that a collapse is as
 valuable as a confirmation. See "RETRACTED" below before "OPEN" — the
 retraction is the load-bearing update this file exists to carry forward.
+
+---
+
+## TOOL STATE (what can actually be run, 2026-09-09)
+
+**The tool can now be pointed at any area of interest.** Before this it could
+not: the GEE tool accepted only its 30 hardcoded `studyAreas`, and the Python
+pipeline needed edits to five hand-synced dicts.
+
+- **GEE `v3.1.0`** — free-form AOI (lat/lon/radius) alongside the 30 presets.
+- **Python `--bbox`** — `fetch_wqp.py --region "<Name>" --bbox "..."` writes a
+  `data/regions.json` overlay that `seep_detect`, `cmd_detect` and
+  `watershed_nap` all resolve through. Curated regions always win on conflict.
+  One `region_slug()` replaces the inline expression `watershed_nap` admitted
+  was hand-kept. **Proven end-to-end**: three new PA regions registered and
+  fetched with no source edit.
+- **`docs/OPERATOR_GUIDE.md`** — what every layer means and what may/may not be
+  concluded. **Supersedes** the Nov 2025 `earth-engine/*.md` guides, which
+  document v2.x behaviour the code no longer has.
+
+**⚠ Three defects were fixed that would have misled anyone testing a new area:**
+
+1. **The adaptive-threshold checkbox rendered `false` while the setting was
+   `true`** — the tool booted in scene-relative mode while the UI claimed
+   otherwise, so the first click was a silent no-op and the *second* switched
+   the whole classification to absolute thresholds.
+2. **The σ sliders started at 2.0/1.5 against calibrated 0.5/0.25, with a
+   slider MINIMUM of 1.0** — so *any* drag silently applied what the file's own
+   comment measures as **worst-case J = 0.000**. Now staged behind an Apply
+   button, with the two missing controls (`clayStdMult`, `ferrousStdMult`)
+   added. `resetButton` restores σ too.
+3. **The date filter defaulted to 2024**, outside the 2013–2020 collection
+   window, so switching it on returned zero images.
+
+**⚠ And the scientific one underneath them: the AOI extent WAS a classification
+parameter.** `applyStdDevThresholding` reduced over `currentRegion`, so the same
+pixel changed class depending on how large a circle the operator drew. σ
+statistics now come from a **fixed 12 km circle on the AOI centre** — inside the
+8–15 km LOSO band (Summitville 8, Red Mountain Pass 10, Silverton 15) — while
+display and export keep the AOI. `statsRadiusMode = 'matchAOI'` reproduces
+pre-v3.1.0 figures. **This changes output for all 30 presets** (Ganau's σ was
+computed over 1 km, Lake Naser's over 100 km); that is a correction, announced
+at startup.
+**Verify it yourself:** run one centre at r = 8, 12, 20 km — the printed σ cut
+must be identical. In `matchAOI` mode it moves; that is the defect, live.
+
+Still open on the tool, tracked in `docs/OPERATOR_GUIDE.md` §7: the statistics
+panel, click inspector and accuracy masks use absolute thresholds
+unconditionally and so disagree with the map; classes 6/10 unreachable; two
+legend swatches disagree with the palette; the legend omits water class 3
+(grey = INDETERMINATE, which must never be pooled with clean).
 
 ---
 

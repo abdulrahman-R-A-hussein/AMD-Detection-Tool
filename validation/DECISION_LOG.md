@@ -48,10 +48,11 @@ terrain, and does not transfer to forested neutral-pH coal drainage.**
 | 2026-08-16 | CMD1 leaf-off | Same, with the canopy off | **NULL** — NDVI 0.496, no index sign-consistent | v3.7.0 |
 | 2026-08-16 | CMD1 geometry | Was the null a sampling-geometry artifact? | **Yes, partly** — monotone gradient; PARTIAL at 30 m; signal is *vegetation* | v3.8.0 |
 | 2026-09-08 | **CMD2** confound | Is the Ohio vegetation–sulfate link just mining land cover? | **Confound REAL** (+0.519 / −0.283). Primary **PARTIAL by 0.004**. **T2 REFUTES the near-channel reading** — \|rho\| peaks at 1 km | v3.9.0 |
+| 2026-09-09 | **Tool v3.1.0** | Can the tool be pointed at any area of interest? | **It could not** — 30 hardcoded AOIs + 5 hand-synced dicts. Now free-form on both surfaces. **3 UI defects fixed**; the AOI extent was silently a classification parameter | tool `v3.1.0` |
 
 ---
 
-## The six corrections that shaped the method
+## The seven corrections that shaped the method
 
 Each was a case where **we** were wrong, not the data. They are the most
 transferable content in this project.
@@ -109,6 +110,37 @@ plateaus**, and a direction of effect may not be claimed from an interior
 window. It also cost the second of two UAV arguments this project has had to
 withdraw, both of which had felt like the most concrete instrumentation case
 available at the time.
+
+### 7. A widget that hard-codes state next to the state it mirrors will drift from it (tool v3.1.0)
+`settings.useStdDevThresholds` was `true`; the checkbox that displays it
+rendered `value: false`. GEE's `ui.Checkbox` does not fire `onChange` from its
+constructor, so the two simply disagreed: the tool booted in adaptive mode
+while the UI claimed fixed, the first click was a silent no-op, and the
+**second** click switched the whole classification to the absolute thresholds
+that measured worst-case J 0.107. The same defect appeared twice more in the
+same file — the date boxes armed `useSpecificDate` from a partially-typed
+range, and the σ sliders started at 2.0/1.5 against calibrated 0.5/0.25 with a
+slider *minimum* of 1.0, so any drag silently applied a configuration this
+project had measured at **J = 0.000**.
+
+**Consequence:** a widget's initial value is always **read** from the setting it
+displays, never written beside it; and a control whose calibrated value is not
+inside its own range is a trap, not a control. Threshold edits are now staged
+behind an Apply button, so no single gesture can silently replace a calibrated
+classification.
+
+**The deeper one, found underneath those three.** `applyStdDevThresholding`
+reduced over `settings.currentRegion`, which made the **AOI extent a
+classification parameter** — the same pixel changed class depending on how big a
+circle the operator drew, and nothing in the UI said so. The calibration was
+fitted at 8–15 km; the shipped presets ranged 1 km to 100 km. Statistics now
+come from a fixed 12 km circle on the AOI centre.
+
+**Consequence, and it generalises past this file:** this is the same family as
+"never put an absolute cutoff on a non-normalised index" — a *scene-relative*
+cutoff is only meaningful if the scene is fixed. Any statistic used as a
+threshold must be computed over a region recorded as a parameter, never over
+whatever the operator happened to be looking at.
 
 ---
 

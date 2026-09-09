@@ -116,8 +116,20 @@ def load_cmd_stations(slug):
     return out
 
 
-def run_extract(slugs, out_csv, season="leafon", radii=None):
+def run_extract(slugs, out_csv, season="leafon", radii=None, bands=None):
+    """bands=None means all INDEX_BANDS (unchanged default).
+
+    A band SUBSET exists for one reason: at large buffer radii the per-request
+    compute graph is proportional to the band count, and Sunday Creek - which
+    has now failed three separate times on "User memory limit exceeded" - dies
+    at the batch=2 floor for 1000 m buffers with all 8 bands. Selecting only
+    the band under test shrinks the graph without touching the composite, the
+    buffer, the reducer or the scene cap, so a per-band statistic extracted
+    this way is IDENTICAL to one extracted with the full panel. It is a
+    request-size fix, not a method change.
+    """
     from gee_classify import init_ee
+    use_bands = list(bands) if bands else list(INDEX_BANDS)
     ee = init_ee()
     rows = []
     for slug in slugs:
@@ -134,14 +146,16 @@ def run_extract(slugs, out_csv, season="leafon", radii=None):
             continue
         img = index_image(ee, comp)
         for radius in (radii or [PRIMARY_RADIUS]):
-          got = extract_buffers(ee, img, pts, radius, 30, INDEX_BANDS)
+          got = extract_buffers(ee, img, pts, radius, 30, use_bands)
           for p in pts:
             v = got.get(p["pid"], {})
             row = dict(region=slug, sensor="L8", radius=radius,
                        tier="cmd", season=season, pid=p["pid"],
                        lat=p["lat"], lon=p["lon"],
-                       n_px=v.get("IronSulfate_count"))
-            for b in INDEX_BANDS:
+                       # IronSulfate is INDEX_BANDS[0], so this is unchanged
+                       # for the full panel and still defined for a subset
+                       n_px=v.get(use_bands[0] + "_count"))
+            for b in use_bands:
                 row[b + "_p90"] = v.get(b + "_p90")
                 row[b + "_mean"] = v.get(b + "_mean")
             for a in ANALYTES:
@@ -283,12 +297,16 @@ if __name__ == "__main__":
     ap.add_argument("--radii", default="")
     ap.add_argument("--season", default="leafon",
                     choices=["leafon", "leafoff"])
+    ap.add_argument("--bands", default="",
+                    help="comma-separated band subset; default all INDEX_BANDS."
+                         " Shrinks the per-request compute graph only.")
     ap.add_argument("--out")
     a = ap.parse_args()
     slugs = [s for s in a.regions.split(",") if s] or list(CMD_REGIONS)
     if a.extract:
         run_extract(slugs, a.out or os.path.join(OUTDIR, "cmd_l8.csv"), a.season,
-                    [int(x) for x in a.radii.split(",") if x] or None)
+                    [int(x) for x in a.radii.split(",") if x] or None,
+                    [b for b in a.bands.split(",") if b] or None)
     elif a.analyse:
         import glob
         paths = ([p for p in a.inputs.split(",") if p] or

@@ -47,10 +47,11 @@ terrain, and does not transfer to forested neutral-pH coal drainage.**
 | 2026-08-16 | **CMD1** Ohio leaf-on | Does it transfer to neutral-pH coal drainage? | **UNINTERPRETABLE** — canopy (NDVI 0.870) | v3.6.0 |
 | 2026-08-16 | CMD1 leaf-off | Same, with the canopy off | **NULL** — NDVI 0.496, no index sign-consistent | v3.7.0 |
 | 2026-08-16 | CMD1 geometry | Was the null a sampling-geometry artifact? | **Yes, partly** — monotone gradient; PARTIAL at 30 m; signal is *vegetation* | v3.8.0 |
+| 2026-09-08 | **CMD2** confound | Is the Ohio vegetation–sulfate link just mining land cover? | **Confound REAL** (+0.519 / −0.283). Primary **PARTIAL by 0.004**. **T2 REFUTES the near-channel reading** — \|rho\| peaks at 1 km | v3.9.0 |
 
 ---
 
-## The five corrections that shaped the method
+## The six corrections that shaped the method
 
 Each was a case where **we** were wrong, not the data. They are the most
 transferable content in this project.
@@ -90,6 +91,24 @@ The bare-ground threshold diagnosis passed its falsifiable pre-check **16/16**,
 and fixing it changed *nothing* (J stayed 0.000). **Consequence:** a mechanism
 check licenses a fix attempt; it does not predict success, and the pre-check is
 run *before* any parameter sweep so a wrong diagnosis cannot be tuned away.
+
+### 6. A monotone trend inside a narrow window is not a trend (CMD2, and the second time)
+CMD1 measured `NDVI_stress` vs sulfate at 30, 60 and 100 m, saw 0.354 → 0.253 →
+0.255 as the radius grew, and concluded the target was **near the channel** —
+"geometry-limited", with a UAV justification drawn from it. Extending the same
+ladder to 500 m and 1000 m gave **0.393 and 0.438**: the curve is a **U**, and
+its maximum is at the *largest* footprint tested. The three-point window had
+been sitting on the descending left arm.
+
+**This is the second time in this project.** The Colorado "resolution is the
+binding constraint" claim failed the same way — clean inside 30 m → 20 m,
+reversed once the ladder was extended within one sensor.
+
+**Consequence:** a ladder must be extended until the trend **turns or
+plateaus**, and a direction of effect may not be claimed from an interior
+window. It also cost the second of two UAV arguments this project has had to
+withdraw, both of which had felt like the most concrete instrumentation case
+available at the time.
 
 ---
 
@@ -138,6 +157,9 @@ run *before* any parameter sweep so a wrong diagnosis cannot be tuned away.
   districts, with a score **monotone in measured contamination**.
 - Continuous scoring separates mine discharge from bare ground (J +0.617) where
   the binarised classifier cannot (0.000).
+- In Ohio coal watersheds, a **vegetation** index tracks measured sulfate at
+  **landscape scale**, and the mining-extent confound is **real** (mine extent
+  → sulfate +0.519, → `NDVI_stress` −0.283) and carries ~42% of it.
 
 **MAY NOT claim**
 - Finding unknown sources in blind scene-wide search — **untested**.
@@ -145,6 +167,13 @@ run *before* any parameter sweep so a wrong diagnosis cannot be tuned away.
   absorption. Ever.
 - That resolution is the constraint — **refuted** for 10–100 m in Colorado.
 - That the method works for neutral-pH coal drainage — **measured null**.
+- That the Ohio vegetation signal is **near-channel** or seep-scale —
+  **refuted 2026-09-08**: |rho| peaks at 1 km, which is CMD1's own
+  pre-registered signature of catchment-scale land cover. **The UAV argument
+  drawn from the CMD1 geometry gradient is withdrawn** — the second UAV
+  argument this project has had to withdraw.
+- That the Ohio mining-extent confound has been **cleared** — the primary test
+  missed its pre-registered bar by 0.004 (PARTIAL, not rejected).
 - That agreement with Rockwell's map means accuracy — it is an automated
   product, not ground truth.
 
@@ -152,13 +181,18 @@ run *before* any parameter sweep so a wrong diagnosis cannot be tuned away.
 
 ## Open, in priority order
 
-1. **Mining-extent confound test (Ohio).** The 30 m vegetation-sulfate
-   association may be land cover: high-sulfate stations may sit in more heavily
-   mined catchments with less vegetation overall. **This gates whether the CMD
-   result means anything.** Until tested, the claim is "vegetation index tracks
-   sulfate", not "we detect seeps".
-2. **Tighter / channel-masked sampling (Ohio).** The radius gradient has not
-   bottomed out at 30 m.
+1. ~~**Mining-extent confound test (Ohio).**~~ **DONE 2026-09-08 (CMD2).**
+   The confound is **real and operative**; the primary test came back
+   **PARTIAL by 0.004**; and T2 refuted the near-channel reading outright.
+   The claim stays "vegetation index tracks sulfate", now qualified as
+   **landscape-scale**, and never "we detect seeps".
+   **Successor:** a better disturbance covariate (ODNR historic coverage is
+   incomplete, so the surviving −0.246 is most plausibly land cover it missed),
+   and the 1 km/5 km disc sign consistency tested on data that did not
+   generate it.
+2. ~~**Tighter / channel-masked sampling (Ohio).** The radius gradient has not
+   bottomed out at 30 m.~~ **Superseded 2026-09-08.** It *had* bottomed out —
+   the ladder is U-shaped and tightening further sampled the wrong end.
 2. **Blind-search test (Colorado).** The gap between "scores known points
    correctly" and "finds unknown sites" is the difference between a severity
    tool and a discovery tool.

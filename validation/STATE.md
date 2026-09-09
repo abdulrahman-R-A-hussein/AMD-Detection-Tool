@@ -1,6 +1,6 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-08-16 · **Current tag:** `v3.8.0`
+**Last updated:** 2026-09-08 · **Current tag:** `v3.9.0`
 
 This file is the canonical "where are we right now". It is maintained under
 the logging rule in [`../CLAUDE.md`](../CLAUDE.md). It should be sufficient to
@@ -131,11 +131,57 @@ retraction is the load-bearing update this file exists to carry forward.
   terrain-matched land (C2) and collapses to ~0 against in-stream stations in
   the same region (C1). **Imagery ranks severity at known sites; it does not
   find sites.**
+- **⛔ THE "GEOMETRY-LIMITED / NEAR-CHANNEL" READING BELOW IS REFUTED
+  (2026-09-08, CMD2). Read that entry only together with this one.** Extending
+  the radius ladder past 100 m shows it is **U-shaped**, with the strongest
+  association at the **largest** footprint tested: `NDVI_stress` vs sulfate
+  **−0.354 (30 m) / −0.253 (60 m) / −0.255 (100 m) / −0.393 (500 m) /
+  −0.438 (1000 m)**. CMD1 amendment 2 registered the reading in advance —
+  *|rho| rising as radius grows ⇒ catchment-scale land cover, not the seep* —
+  so the registered conclusion is **landscape-scale land cover**. CMD1 saw a
+  clean monotone gradient only because its window stopped at 100 m and sat on
+  the descending left arm of a U. **Same failure mode as the Colorado
+  resolution claim**, which also looked monotone inside a narrow window and
+  reversed once the window was widened.
+  **Consequence: the UAV argument CMD1 drew from the geometry gradient is
+  WITHDRAWN.** The measured trend, extended, points away from the seep face.
+  → [`ARM_CMD2_CONFOUND_2026-09-08.md`](ARM_CMD2_CONFOUND_2026-09-08.md)
+- **★ CMD/OHIO CONFOUND TEST: the mining-extent confound is REAL and operative
+  (2026-09-08, CMD2, pre-registered `a452446` before any join).** Covariate is
+  ODNR `MinesOfOhio` — 14,578 coal polygons from permit records and historic
+  topo/geology maps, owing **nothing** to satellite reflectance, which matters
+  because the signal under test is a *vegetation* index. Upstream catchments by
+  MERIT D8 (174/187 clean).
+  **Both legs present:** mine extent → sulfate **+0.519**, mine extent →
+  `NDVI_stress` **−0.283**. The confound path carries ~**42% of the raw
+  covariance**.
+  **Registered primary verdict: PARTIAL, by 0.004.** Partial rho **−0.246**
+  (n=131, within-region perm p = 0.0254) against a registered
+  "confound rejected" bar of |rho| ≥ 0.25. The bar was fixed in advance and is
+  **not moved**.
+  Conditioning on **surface** mining attenuates most (45%, p = 0.12);
+  **underground**, least (20%) — coherent, since surface mining is what removes
+  vegetation. The 1 km/5 km disc arms are stronger (−0.372 / −0.338) and are the
+  **first sign-consistent result anywhere in the Ohio arm**, but they are
+  registered *secondary* and are a **lead, not a finding** — the same data
+  generated them.
+  **Standing claim:** *"a vegetation index tracks sulfate in Ohio CMD
+  watersheds, at landscape scale, partly explained by catchment mining
+  extent."* **NOT** *"we detect CMD seeps."*
+  **Also fixed, and verified rather than assumed: the recurring GEE memory
+  trap has a second lever — BAND COUNT.** Sunday Creek failed a third time at
+  the batch=2 floor with the 120-scene cap already in place; extracting only
+  the band under test completed it. Re-extracting Monday Creek one-band vs
+  eight-band gives **max abs difference 0.000 over 27 stations**, so it is a
+  request-size fix, not a method change.
+  → [`ARM_CMD2_CONFOUND_2026-09-08.md`](ARM_CMD2_CONFOUND_2026-09-08.md)
 - **★ CMD/OHIO GEOMETRY: the null WAS geometry-limited, and the signal is
   VEGETATION not iron (2026-08-16, amendment 2, two-sided test registered
-  first).** Shrinking the buffer strengthens the association **monotonically**:
+  first).** ⛔ **The "geometry-limited / near-channel" half of this is REFUTED —
+  see the CMD2 entry above.** The *vegetation rather than iron* half stands.
+  Shrinking the buffer strengthens the association **monotonically**:
   `NDVI_stress` vs sulfate **−0.255 (100 m) → −0.253 (60 m) → −0.354 (30 m)**,
-  p **0.119 → 0.083 → 0.0013**, sign pattern mixed → mixed → **4 of 5 negative**
+  p **0.119 → 0.083 → 0.0028**, sign pattern mixed → mixed → **4 of 5 negative**
   (5th = +0.03, essentially zero not a reversal). **Verdict PARTIAL at 30 m**
   (was NULL at 60 m) — the strict all-five sign rule was fixed in advance and is
   applied as written.
@@ -153,8 +199,11 @@ retraction is the load-bearing update this file exists to carry forward.
   may simply sit in more heavily mined catchments with less vegetation overall —
   land cover, not a seep signal. **Until tested, this is "vegetation index
   tracks sulfate", NOT "we detect CMD seeps."**
-  **NEXT: mining-extent confound test**, then tighter/channel-masked sampling
-  (the gradient has not bottomed out).
+  ~~**NEXT: mining-extent confound test**, then tighter/channel-masked
+  sampling (the gradient has not bottomed out).~~ **DONE 2026-09-08 (CMD2).**
+  The confound is **real**; the primary test came back **PARTIAL by 0.004**; and
+  the gradient **had** bottomed out — extending it past 100 m reversed the
+  reading entirely. See the CMD2 entry above.
   → [`ARM_CMD1_GEOMETRY_2026-08-16.md`](ARM_CMD1_GEOMETRY_2026-08-16.md)
 - **★ CMD/OHIO LEAF-OFF: canopy removed, and the signal is NOT there — a REAL
   null (2026-08-16, amendment 1, registered before the run).** Median buffer
@@ -348,6 +397,20 @@ Both from [`ARM_A_CROSS_REGION_RETEST_2026-08-13.md`](ARM_A_CROSS_REGION_RETEST_
 
 Ordered by value.
 
+0. **Reframe the Ohio arm as landscape-scale, and test it as such.** After CMD2
+   the honest question is no longer "can we see seeps" — T2 refuted the
+   near-channel reading — but **"does a catchment-scale vegetation metric carry
+   information about CMD loading beyond mapped mine extent?"** That is a
+   different, weaker and still useful claim, and it is the one the data
+   supports. Two concrete steps:
+   a. **A better disturbance covariate.** ODNR historic coverage is incomplete
+      by construction, so T1's surviving −0.246 is most plausibly land cover the
+      covariate missed. Reclamation-era / spoil mapping tests that directly.
+   b. **The 1 km and 5 km disc sign consistency, on data that did not generate
+      it.** It is the only sign-consistent result the Ohio arm has produced, and
+      it is currently circular — the same data suggested it and scored it.
+   Also: **more Ohio sulfate coverage.** Two of five watersheds run at n=12, and
+   n=12 is what decides sign consistency there.
 1. **Test whether Arm A's sign-flip tracks geology** (see "OPEN QUESTION"
    above). Silverton+Ouray (San Juan calderas) vs Central
    City+Creede+Leadville — no new fetching needed, the 31-catchment dataset
@@ -409,10 +472,30 @@ Ordered by value.
 
 - **Two venvs.** GEE work needs `D:/dev/VPCA+STEPWISE-REGRESSION/.venv`
   (`ee` + `rasterio`); the repo `.venv` has no `ee`. Cost a wasted run already.
+- **⚠ BOTH VENVS BREAK ON A MACHINE REINSTALL, and the error does not say so.**
+  `pyvenv.cfg` pins `home` to an absolute path under the *old* user profile, so
+  after a reinstall every interpreter call dies with
+  `No Python at '...\ahusse12\...'` — while `site-packages` is perfectly intact.
+  **Fix (2026-09-08, done):** install a matching CPython (`uv python install
+  3.11` — the wheels are cp311, so 3.11 specifically) and repoint `home` and
+  `executable` in both `pyvenv.cfg` files. Nothing needs reinstalling.
+  Two wrinkles: uv's minor-version **junction** (`cpython-3.11-...`) does not
+  execute reliably here, so point at the **versioned** directory; and `git`
+  refuses the repo for "dubious ownership" after the SID change, fixed with
+  `git config --global --add safe.directory D:/dev/Sulfate-Methos`.
 - **EE "User memory limit exceeded" is about compute-graph size, not pixel
   count** — `bestEffort=True` does not help. Fix by tiling the reducer
   (`tile_geoms` + `tiled_mean_stddev`) and materialising stats to Python floats
   so downstream calls don't re-evaluate them.
+- **The memory trap has THREE levers, not one (2026-09-08).** Scene depth (cap
+  at 120), batch size (halve to a floor of 2) — **and BAND COUNT**, which was
+  not previously recorded. Sunday Creek failed a *third* time at the batch floor
+  on 1000 m buffers with the scene cap already applied; extracting only the band
+  under test (`cmd_detect.py --bands NDVI_stress`) completed it with one retry.
+  **Verified identical, not assumed:** one-band vs eight-band extraction of the
+  same stations gives max absolute difference **0.000**. Reach for the band
+  subset before touching the composite — it is the only one of the three levers
+  that provably does not change the numbers.
 - **WQP's `siteType` filter parameter uses a narrower vocabulary than
   `MonitoringLocationTypeName`** and returns HTTP 400 on real values like
   `"River/Stream"` or `"Mine/Mine Discharge Adit"`. Fetch unfiltered, exclude

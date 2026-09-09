@@ -14,7 +14,13 @@ Amendment 2, committed **before the run**, as a deliberately two-sided test
 > |---|---|---|---|
 > | 100 m | −0.255 | 0.119 | mixed |
 > | 60 m | −0.253 | 0.083 | mixed |
-> | **30 m** | **−0.354** | **0.0013** | **4 of 5 negative**, 5th = +0.03 |
+> | **30 m** | **−0.354** | **0.0028** | **4 of 5 negative**, 5th = +0.03 |
+>
+> *(The 30 m p-value was written as 0.0013 here and in `STATE.md` until
+> 2026-09-08. The raw output `report_cmd1_geo30_2026-08-16.txt` says **0.0028**,
+> and re-running the analysis reproduces 0.0028 exactly. Transcription error,
+> corrected during the CMD2 baseline-reproduction check. No verdict changes —
+> both are below 0.05 — but the record should be right.)*
 >
 > The pre-registered verdict at 30 m is **PARTIAL**, not success: the strict
 > sign-consistency rule requires *all five* watersheds to agree, and Monday

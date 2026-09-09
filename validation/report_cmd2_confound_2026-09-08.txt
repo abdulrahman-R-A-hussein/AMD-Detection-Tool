@@ -1,0 +1,60 @@
+========================================================================================
+PHASE CMD2 - MINING-EXTENT CONFOUND TEST (PRE-REGISTERED a452446)
+Covariate: ODNR MinesOfOhio - permit records + historic topo/geology
+maps. Owes NOTHING to satellite reflectance, which is why it was
+chosen: the signal under test is a VEGETATION index.
+CAVEAT (binding): sulfate has NO VNIR absorption. Any association is
+with vegetation / iron precipitate / turbidity that CO-VARIES with it.
+========================================================================================
+
+--- SAMPLE ---
+  stations with NDVI_stress + sulfate at 30 m : 137
+  catchment CLIPPED - dropped from primary arm : 6
+  dropped - no catchment record                : 0
+  rows carried (disc arms keep the clipped)    : 137
+  ANALYSED in PRIMARY arm                      : 131
+  mined fraction of catchment: min 0.000  median 0.079  max 0.818
+
+--- T0 (REQUIRED GUARD): does mining extent predict the exposure? ---
+  A variable that does not move sulfate CANNOT confound it. If this
+  leg is absent, T1 is UNINFORMATIVE, not supportive.
+  mine_frac vs sulfate       rho=+0.519  n=131  btw%=13  signs disagree
+      per-watershed: huff+0.50 lead+0.24 mond+0.95 racc+0.19 sund-0.06
+  mine_frac vs NDVI_stress   rho=-0.283  n=131  btw%=20  signs disagree
+      per-watershed: huff-0.44 lead-0.15 mond-0.02 racc+0.08 sund-0.06
+  => mine_frac->sulfate leg |rho|=0.519 : present, confound is structurally possible
+
+--- T1 (PRIMARY): NDVI_stress vs sulfate, conditioning on mine extent ---
+  raw     rho=-0.354  n=137   per-watershed: huff-0.21 lead-0.10 mond+0.03 racc-0.25 sund-0.19  signs disagree
+  catchment (PRIMARY)      partial rho=-0.246  n=131  perm_p=0.0254  (raw -0.348, atten +29%)  signs disagree
+      per-watershed: huff+0.00 lead-0.07 mond+0.74 racc-0.27 sund+0.39
+  catchment surface-only   partial rho=-0.191  n=131  perm_p=0.1224  (raw -0.348, atten +45%)  signs disagree
+      per-watershed: huff-0.05 lead-0.07 mond-0.05 racc-0.02 sund+0.23
+  catchment underground    partial rho=-0.279  n=131  perm_p=0.0124  (raw -0.348, atten +20%)  signs disagree
+      per-watershed: huff-0.12 lead-0.10 mond+0.67 racc-0.26 sund+0.39
+  disc disc1km             partial rho=-0.372  n=137  perm_p=0.0004  (raw -0.354, atten -5%)  CONSISTENT
+      per-watershed: huff-0.26 lead-0.10 mond-0.17 racc-0.24 sund-0.34
+  disc disc5km             partial rho=-0.338  n=137  perm_p=0.0014  (raw -0.354, atten +5%)  CONSISTENT
+      per-watershed: huff-0.14 lead-0.11 mond-0.19 racc-0.25 sund-0.28
+
+--- T2 (SECONDARY): far-field radius ladder, independent machinery ---
+  CMD1 amendment 2 registered the reading in advance: |rho| RISING as
+  radius grows => catchment-scale land cover, not the seep.
+  r=    30m  rho=-0.354  n=137  median n_px=9  signs disagree
+      per-watershed: huff-0.21 lead-0.10 mond+0.03 racc-0.25 sund-0.19
+  r=    60m  rho=-0.253  n=140  median n_px=26  signs disagree
+      per-watershed: huff-0.12 lead+0.01 mond+0.36 racc-0.18 sund-0.27
+  r=   100m  rho=-0.255  n=141  median n_px=59  signs disagree
+      per-watershed: huff-0.14 lead+0.07 mond+0.05 racc-0.22 sund-0.26
+  r=   500m  rho=-0.393  n=146  median n_px=1184  signs disagree
+      per-watershed: huff-0.37 lead+0.18 mond+0.19 racc-0.37 sund+0.09
+  r=  1000m  rho=-0.438  n=146  median n_px=4591  signs disagree
+      per-watershed: huff-0.43 lead+0.02 mond+0.26 racc-0.44 sund+0.13
+
+--- VERDICT (pre-registered, section 5) ---
+  PARTIAL - partial |rho|=0.246 (29% attenuation), p=0.0254.
+  Materially attenuated. The claim is WEAKENED, not withdrawn,
+  and must be reported as weakened wherever it is cited.
+
+  Sign consistency remains the headline check, as at every radius:
+  raw signs disagree / partial signs disagree

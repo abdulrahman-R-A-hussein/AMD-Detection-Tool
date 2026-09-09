@@ -424,12 +424,14 @@ def run(region_key, chem_dir, min_samples, max_stations, out_csv, radius_km=60,
 
 
 # Every fetch_wqp.py REGIONS key that has been fetched, mapped to its
-# data/chemistry/<slug>/ dir (slug = fetch_wqp.py's own convention:
-# lower(), ", "->"_", " "->"_" - kept in sync manually since the two modules
-# don't share that helper). "colorado" is kept as a backward-compatible alias
-# for "Silverton, CO" so existing commands/CSVs from before 2026-08-13 still
-# work. rockwell=True for every Colorado region (all within Rockwell's
-# published SouthWest raster footprint); Ohio has no Rockwell coverage.
+# data/chemistry/<slug>/ dir. The slug now comes from fetch_wqp.region_slug()
+# rather than a hand-copied expression - that hand-sync is what this comment
+# used to warn about. "colorado" is kept as a backward-compatible alias for
+# "Silverton, CO" so existing commands/CSVs from before 2026-08-13 still work.
+#
+# rockwell=True for every Colorado region (all within Rockwell's published
+# SouthWest raster footprint); Ohio has no Rockwell coverage, and neither does
+# anywhere else outside the US Southwest - see resolve_region().
 KNOWN_REGIONS = {
     "colorado":        ("silverton_co",     True),   # alias, see above
     "Silverton, CO":   ("silverton_co",     True),
@@ -443,6 +445,32 @@ KNOWN_REGIONS = {
 }
 
 
+def resolve_region(name, ap=None):
+    """(slug, rockwell_available) for a region name, overlay included.
+
+    Falls back to the data/regions.json overlay written by
+    `fetch_wqp.py --bbox`, so Arm A can run on a region that was never added
+    to KNOWN_REGIONS.
+
+    rockwell_available is False for any overlay region. Rockwell's published
+    raster is a US-Southwest mosaic; claiming coverage we do not have would
+    silently produce an empty zonal read rather than an error, which is worse
+    than refusing.
+    """
+    if name in KNOWN_REGIONS:
+        return KNOWN_REGIONS[name]
+    from fetch_wqp import all_regions, region_slug
+    if name in all_regions():
+        return region_slug(name), False
+    msg = ("unknown --region %r.\n  known: %s\n"
+           "  to add one: python/fetch_wqp.py --region %r "
+           "--bbox 'lat_lo,lon_lo,lat_hi,lon_hi'"
+           % (name, ", ".join(sorted(KNOWN_REGIONS)), name))
+    if ap is not None:
+        ap.error(msg)
+    raise SystemExit(msg)
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--region", required=True,
@@ -453,10 +481,7 @@ def main(argv=None):
     ap.add_argument("--out")
     args = ap.parse_args(argv)
 
-    if args.region not in KNOWN_REGIONS:
-        ap.error("unknown --region %r. Known: %s"
-                 % (args.region, ", ".join(sorted(KNOWN_REGIONS))))
-    slug, rockwell_available = KNOWN_REGIONS[args.region]
+    slug, rockwell_available = resolve_region(args.region, ap)
     if args.region == "ohio":
         chem_dir = os.path.join(ROOT, "data", "chemistry")
     else:

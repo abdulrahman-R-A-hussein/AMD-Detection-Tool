@@ -166,8 +166,11 @@ def region_geometry(ee, region_key):
     pulled from, so region-relative statistics (scene std-dev thresholds, the
     C3 NDVI percentile) are computed over exactly the area the points came
     from."""
-    from fetch_wqp import REGIONS as WQP_REGIONS
-    lat_lo, lon_lo, lat_hi, lon_hi = WQP_REGIONS[region_key][:4]
+    # all_regions() = curated REGIONS + the data/regions.json overlay written
+    # by `fetch_wqp.py --bbox`, so a region added at the command line resolves
+    # here without a source edit. Curated entries always win on conflict.
+    from fetch_wqp import all_regions
+    lat_lo, lon_lo, lat_hi, lon_hi = all_regions()[region_key][:4]
     return ee.Geometry.Rectangle([lon_lo, lat_lo, lon_hi, lat_hi])
 
 

@@ -48,6 +48,28 @@ CMD_REGIONS = {
     "leading_creek_oh": "Leading Creek, OH",
 }
 
+
+def cmd_region_name(slug):
+    """slug -> fetch_wqp region name, falling back to the --bbox overlay.
+
+    The five Ohio watersheds above are the curated CMD set. A region added with
+    `fetch_wqp.py --region "<Name>" --bbox ...` resolves here too, so running
+    the dose-response on a new coal basin needs no source edit.
+    """
+    if slug in CMD_REGIONS:
+        return CMD_REGIONS[slug]
+    from fetch_wqp import all_regions, region_slug
+    for name in all_regions():
+        if region_slug(name) == slug:
+            return name
+    raise SystemExit(
+        "Unknown region slug %r.\n"
+        "  known CMD slugs: %s\n"
+        "  to add one:      python/fetch_wqp.py --region \"<Name>, <ST>\" "
+        "--bbox 'lat_lo,lon_lo,lat_hi,lon_hi'\n"
+        "  then list them:  python/fetch_wqp.py --list-regions"
+        % (slug, ", ".join(sorted(CMD_REGIONS))))
+
 # Published thresholds, pre-registered. pH deliberately NOT used - that is the
 # entire point of this phase.
 SO4_DIRTY, SO4_CLEAN = 250.0, 25.0      # EPA secondary MCL / Appalachian background
@@ -133,7 +155,7 @@ def run_extract(slugs, out_csv, season="leafon", radii=None, bands=None):
     ee = init_ee()
     rows = []
     for slug in slugs:
-        region = region_geometry(ee, CMD_REGIONS[slug])
+        region = region_geometry(ee, cmd_region_name(slug))
         pts = load_cmd_stations(slug)
         if not pts:
             print("%s: no stations with sulfate/conductance" % slug)

@@ -41,6 +41,7 @@ Usage:
 import argparse
 import csv
 import io
+import json
 import os
 import sys
 import time
@@ -91,6 +92,86 @@ EXCLUDE_SITE_TYPES = {
     "Well: Test hole not completed as a well",
     "Facility: Laboratory or sample-preparation area",
 }
+
+def region_slug(name):
+    """Canonical slug for a region name: "Silverton, CO" -> "silverton_co".
+
+    This lived as an inline expression in four modules, kept in sync by hand -
+    watershed_nap.py said so in a comment. One copy, imported everywhere.
+    """
+    return name.lower().replace(", ", "_").replace(" ", "_")
+
+
+# ---------------------------------------------------------------------------
+# Region registry.
+#
+# REGIONS below is the CURATED set: hand-checked bounding boxes whose notes
+# record actual probed station counts. It stays authoritative.
+#
+# Regions added at the command line with --bbox land in a JSON overlay at
+# data/regions.json instead, so pointing the pipeline at a new area no longer
+# needs a source edit here (nor in seep_detect.REGIONS, cmd_detect.CMD_REGIONS
+# or watershed_nap.KNOWN_REGIONS, which all resolve through this module).
+#
+# Lookup order is curated-first: an overlay entry can never shadow a curated
+# one, so a stray --bbox cannot silently redefine Silverton.
+# ---------------------------------------------------------------------------
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+REGIONS_OVERLAY_PATH = os.path.join(REPO_ROOT, "data", "regions.json")
+
+
+def load_overlay():
+    """Read data/regions.json. Returns {} when absent or unreadable."""
+    try:
+        with open(REGIONS_OVERLAY_PATH, encoding="utf-8") as fh:
+            raw = json.load(fh)
+    except (IOError, OSError, ValueError):
+        return {}
+    out = {}
+    for name, e in raw.items():
+        try:
+            out[name] = (float(e["lat_lo"]), float(e["lon_lo"]),
+                         float(e["lat_hi"]), float(e["lon_hi"]),
+                         e.get("site_types"),
+                         e.get("note", "added via --bbox"))
+        except (KeyError, TypeError, ValueError):
+            continue          # a malformed entry is skipped, never fatal
+    return out
+
+
+def all_regions():
+    """Curated REGIONS plus the overlay. Curated entries win on conflict."""
+    merged = dict(load_overlay())
+    merged.update(REGIONS)
+    return merged
+
+
+def save_overlay_entry(name, lat_lo, lon_lo, lat_hi, lon_hi, note=""):
+    """Add/replace one overlay region. Refuses to shadow a curated region."""
+    if name in REGIONS:
+        raise ValueError(
+            "%r is a curated region; edit REGIONS in fetch_wqp.py to change it"
+            % name)
+    if not (-90 <= lat_lo < lat_hi <= 90):
+        raise ValueError("need -90 <= lat_lo < lat_hi <= 90, got %s..%s"
+                         % (lat_lo, lat_hi))
+    if not (-180 <= lon_lo < lon_hi <= 180):
+        raise ValueError("need -180 <= lon_lo < lon_hi <= 180, got %s..%s"
+                         % (lon_lo, lon_hi))
+    try:
+        with open(REGIONS_OVERLAY_PATH, encoding="utf-8") as fh:
+            raw = json.load(fh)
+    except (IOError, OSError, ValueError):
+        raw = {}
+    raw[name] = {"lat_lo": lat_lo, "lon_lo": lon_lo,
+                 "lat_hi": lat_hi, "lon_hi": lon_hi,
+                 "site_types": None,
+                 "note": note or "added via --bbox"}
+    os.makedirs(os.path.dirname(REGIONS_OVERLAY_PATH), exist_ok=True)
+    with open(REGIONS_OVERLAY_PATH, "w", encoding="utf-8") as fh:
+        json.dump(raw, fh, indent=2, sort_keys=True)
+    return REGIONS_OVERLAY_PATH
+
 
 REGIONS = {
     "Silverton, CO": (
@@ -479,16 +560,55 @@ def main(argv=None):
                                   "regions)")
     ap.add_argument("--consolidate-only", action="store_true",
                     help="skip downloading; just rebuild consolidated.csv")
+    ap.add_argument("--bbox",
+                    help="register a NEW region by bounding box, as "
+                         "'lat_lo,lon_lo,lat_hi,lon_hi', then fetch it. "
+                         "Requires --region to supply the name. The entry is "
+                         "written to data/regions.json so the rest of the "
+                         "pipeline can resolve it without a source edit.")
+    ap.add_argument("--list-regions", action="store_true",
+                    help="print known regions (curated + overlay) and exit")
     args = ap.parse_args(argv)
+
+    if args.list_regions:
+        overlay = load_overlay()
+        for name in sorted(all_regions()):
+            print("  %-32s %-9s %s" % (
+                name, "[curated]" if name in REGIONS else "[overlay]",
+                region_slug(name)))
+        print("\n%d curated, %d overlay" % (len(REGIONS), len(overlay)))
+        return
 
     if args.region and args.lake:
         sys.exit("--region and --lake are mutually exclusive")
 
+    if args.bbox:
+        if not args.region:
+            sys.exit("--bbox needs --region to name the new region, e.g.\n"
+                     '  --region "West Branch Susquehanna, PA" '
+                     '--bbox "40.6,-78.6,41.4,-77.2"')
+        parts = [p.strip() for p in args.bbox.split(",")]
+        if len(parts) != 4:
+            sys.exit("--bbox must be 'lat_lo,lon_lo,lat_hi,lon_hi'")
+        try:
+            lat_lo, lon_lo, lat_hi, lon_hi = [float(p) for p in parts]
+        except ValueError:
+            sys.exit("--bbox values must all be numbers")
+        try:
+            path = save_overlay_entry(args.region, lat_lo, lon_lo, lat_hi, lon_hi)
+        except ValueError as exc:
+            sys.exit(str(exc))
+        print("registered %r -> %s" % (args.region, path))
+        print("  bbox  %.4f,%.4f .. %.4f,%.4f" % (lat_lo, lon_lo, lat_hi, lon_hi))
+        print("  slug  %s" % region_slug(args.region))
+
+    known = all_regions()
     if args.region:
-        if args.region not in REGIONS:
-            sys.exit("Unknown region %r. Known: %s" % (args.region, ", ".join(REGIONS)))
-        out_dir = args.out or os.path.join(
-            OUT_DIR, args.region.lower().replace(", ", "_").replace(" ", "_"))
+        if args.region not in known:
+            sys.exit("Unknown region %r.\nKnown: %s\n"
+                     "To add one: --region %r --bbox 'lat_lo,lon_lo,lat_hi,lon_hi'"
+                     % (args.region, ", ".join(sorted(known)), args.region))
+        out_dir = args.out or os.path.join(OUT_DIR, region_slug(args.region))
     else:
         out_dir = args.out or OUT_DIR
 
@@ -501,8 +621,8 @@ def main(argv=None):
     station_rows, total = [], 0
 
     if args.region:
-        lat_lo, lon_lo, lat_hi, lon_hi, site_types, _note = REGIONS[args.region]
-        slug = args.region.lower().replace(", ", "_").replace(" ", "_")
+        lat_lo, lon_lo, lat_hi, lon_hi, site_types, _note = known[args.region]
+        slug = region_slug(args.region)
         try:
             results, stations = fetch_region(args.region, lat_lo, lon_lo,
                                              lat_hi, lon_hi, site_types)

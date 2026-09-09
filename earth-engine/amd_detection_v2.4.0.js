@@ -24,33 +24,40 @@
  * Sensing for Environmental Monitoring. GitHub. https://github.com/coodawy/AMD-Detection-Tool
  */
 
-var TOOL_VERSION = 'v2.4.0';
+var TOOL_VERSION = 'v3.1.0';
 
 // =============================================================================
 // STUDY AREAS
 // =============================================================================
 
 
-var studyAreas = {
+// v3.1.0: presets are stored as CLIENT-SIDE specs [lon, lat, radius_m] and the
+// ee.Geometry objects are derived from them below.
+//
+// Why: an ee.Geometry cannot be read back client-side, so under the old
+// structure a preset could not prefill the custom-AOI boxes, could not be
+// checked against the calibration band, and could not name an export by
+// radius. The geometries and every coordinate are unchanged.
+var STUDY_AREA_SPECS = {
 
-  'Ganau Pond, Iraq': ee.Geometry.Point([44.940463, 36.214839]).buffer(1000),
-  'Iron Mountain, CA': ee.Geometry.Point([-122.5278, 40.6722]).buffer(12000),
-  'Summitville, CO': ee.Geometry.Point([-106.5978, 37.4361]).buffer(8000),
-  'Silverton, CO': ee.Geometry.Point([-107.665, 37.812]).buffer(15000),
-  'Red Mountain Pass, CO': ee.Geometry.Point([-107.72, 37.89]).buffer(10000),
-  'Goldfield, NV': ee.Geometry.Point([-117.233, 37.708]).buffer(10000),
-  'Bauer Mill, UT': ee.Geometry.Point([-112.388, 40.492]).buffer(3000),
-  'Marysvale, UT': ee.Geometry.Point([-112.233, 38.450]).buffer(10000),
-  'Atwood Lake, OH': ee.Geometry.Point([-81.246189, 40.549551]).buffer(10000),
-  'Piedmont Lake, OH': ee.Geometry.Point([-81.222, 40.154]).buffer(10000),
-  'Clendening Lake, OH': ee.Geometry.Point([-81.25360, 40.27006]).buffer(10000),
-  'Delaware, OH': ee.Geometry.Point([-83.168502, 40.264754]).buffer(50000),
-  'Berkeley Pit, MT': ee.Geometry.Point([-112.5010, 46.0136]).buffer(5000),
-  'Penn Mine, CA': ee.Geometry.Point([-120.82, 38.23]).buffer(5000),
-  'Leadville, CO': ee.Geometry.Point([-106.30, 39.25]).buffer(15000),
-  'Tab-Simco, IL': ee.Geometry.Point([-89.1, 37.7]).buffer(3000),
-  'Dukan Lake, Iraq': ee.Geometry.Point([44.921183, 36.125888]).buffer(20000),
-  'Monday Creek, OH': ee.Geometry.Point([-82.20948,39.48279]).buffer(15000),
+  'Ganau Pond, Iraq':        [  44.940463,  36.214839,   1000],
+  'Iron Mountain, CA':       [-122.5278,    40.6722,    12000],
+  'Summitville, CO':         [-106.5978,    37.4361,     8000],
+  'Silverton, CO':           [-107.665,     37.812,     15000],
+  'Red Mountain Pass, CO':   [-107.72,      37.89,      10000],
+  'Goldfield, NV':           [-117.233,     37.708,     10000],
+  'Bauer Mill, UT':          [-112.388,     40.492,      3000],
+  'Marysvale, UT':           [-112.233,     38.450,     10000],
+  'Atwood Lake, OH':         [ -81.246189,  40.549551,  10000],
+  'Piedmont Lake, OH':       [ -81.222,     40.154,     10000],
+  'Clendening Lake, OH':     [ -81.25360,   40.27006,   10000],
+  'Delaware, OH':            [ -83.168502,  40.264754,  50000],
+  'Berkeley Pit, MT':        [-112.5010,    46.0136,     5000],
+  'Penn Mine, CA':           [-120.82,      38.23,       5000],
+  'Leadville, CO':           [-106.30,      39.25,      15000],
+  'Tab-Simco, IL':           [ -89.1,       37.7,        3000],
+  'Dukan Lake, Iraq':        [  44.921183,  36.125888,  20000],
+  'Monday Creek, OH':        [ -82.20948,   39.48279,   15000],
 
   // -- v2.5.1: southeastern Ohio AMD lakes with PUBLISHED water chemistry --
   // Selected 2026-07-25 from the Water Quality Portal (USGS NWIS + EPA STORET
@@ -60,24 +67,65 @@ var studyAreas = {
   // data/chemistry/, matched to imagery by python/match_scenes.py.
   // CAUTION: WQP station coordinates sit on shore access points and dams, not
   // open water - sample lake water near them, not the station pixel itself.
-  'Somerset Reservoir, OH': ee.Geometry.Point([-82.2919, 39.7839]).buffer(1500),   // Fe 1440/8510 - highest; small
-  'Burr Oak Reservoir, OH': ee.Geometry.Point([-82.0572, 39.5422]).buffer(5000),   // Fe 205/6860; 2.7 km2 - best size/signal
-  'Lake Logan, OH': ee.Geometry.Point([-82.4494, 39.5361]).buffer(3000),           // Fe 290/6050; 1.6 km2
-  'Lake Hope, OH': ee.Geometry.Point([-82.3544, 39.3206]).buffer(2000),            // Fe 348/5780; Carbondale AMD legacy
-  'New Lexington Res 1, OH': ee.Geometry.Point([-82.2158, 39.7336]).buffer(1500),  // Fe 318/3600; small
-  'Lake Rupert, OH': ee.Geometry.Point([-82.5203, 39.1775]).buffer(3000),          // Fe 146/2550; 1.3 km2
-  'St Joseph Lake, OH': ee.Geometry.Point([-82.2889, 39.7700]).buffer(1500),       // Fe 345/1230; small
-  'Leesville Lake, OH': ee.Geometry.Point([-81.1897, 40.4586]).buffer(4000),       // Fe 80/603; Muskingum district
-  'Lake Alma, OH': ee.Geometry.Point([-82.4767, 39.1717]).buffer(1500),            // SO4 63 mg/L; Fe low
+  'Somerset Reservoir, OH':  [ -82.2919,    39.7839,     1500],  // Fe 1440/8510 - highest; small
+  'Burr Oak Reservoir, OH':  [ -82.0572,    39.5422,     5000],  // Fe 205/6860; 2.7 km2 - best size/signal
+  'Lake Logan, OH':          [ -82.4494,    39.5361,     3000],  // Fe 290/6050; 1.6 km2
+  'Lake Hope, OH':           [ -82.3544,    39.3206,     2000],  // Fe 348/5780; Carbondale AMD legacy
+  'New Lexington Res 1, OH': [ -82.2158,    39.7336,     1500],  // Fe 318/3600; small
+  'Lake Rupert, OH':         [ -82.5203,    39.1775,     3000],  // Fe 146/2550; 1.3 km2
+  'St Joseph Lake, OH':      [ -82.2889,    39.7700,     1500],  // Fe 345/1230; small
+  'Leesville Lake, OH':      [ -81.1897,    40.4586,     4000],  // Fe 80/603; Muskingum district
+  'Lake Alma, OH':           [ -82.4767,    39.1717,     1500],  // SO4 63 mg/L; Fe low
 
-  'Lake Superior, Oh': ee.Geometry.Point([-87.060472,47.548672]).buffer(5000),
-  'Lake Toshka, Egypt': ee.Geometry.Point([31.27994, 23.09845]).buffer(100000),
-  'Lake Naser, Egypt': ee.Geometry.Point([32.21471, 22.73580]).buffer(100000)
+  'Lake Superior, Oh':       [ -87.060472,  47.548672,   5000],
+  'Lake Toshka, Egypt':      [  31.27994,   23.09845,  100000],
+  'Lake Naser, Egypt':       [  32.21471,   22.73580,  100000]
 };
 
-var areaNames = Object.keys(studyAreas);
+function makeAoi(lon, lat, radiusM) {
+  return ee.Geometry.Point([lon, lat]).buffer(radiusM);
+}
+
+var areaNames = Object.keys(STUDY_AREA_SPECS);
+
+// Kept for backward compatibility: everything downstream still reads
+// studyAreas[name] and gets the same geometry it always did.
+var studyAreas = {};
+areaNames.forEach(function(n) {
+  var s = STUDY_AREA_SPECS[n];
+  studyAreas[n] = makeAoi(s[0], s[1], s[2]);
+});
+
 var currentAreaName = areaNames[0];
 var currentRegion = studyAreas[currentAreaName];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AOI / THRESHOLD DECOUPLING  (v3.1.0)
+//
+// applyStdDevThresholding() makes the AOI extent a CLASSIFICATION PARAMETER:
+// the cutoff is mean(region) + k*sd(region), so the same pixel changes class
+// when the operator draws a bigger circle. The LOSO calibration (worst-case
+// Youden J 0.440 vs Rockwell's published map) was fitted at 8-15 km buffers:
+// Summitville 8 km, Red Mountain Pass 10 km, Silverton 15 km.
+//
+// So the STATISTICS region is pinned to a fixed radius on the AOI centre and
+// is NOT the display/export region. See settings.statsRegion and setAoi().
+// ─────────────────────────────────────────────────────────────────────────────
+var CUSTOM_AOI_LABEL = '— Custom AOI (set below) —';
+var CALIB_RADIUS_MIN_M     = 8000;
+var CALIB_RADIUS_MAX_M     = 15000;
+var STATS_RADIUS_DEFAULT_M = 12000;   // mid-band
+var AOI_RADIUS_MAX_M       = 200000;
+
+// Client-side description of the active AOI. Anything needing the centre or
+// the radius reads this, never the ee.Geometry.
+var aoiSpec = {
+  source: 'preset',
+  name: currentAreaName,
+  lon: STUDY_AREA_SPECS[currentAreaName][0],
+  lat: STUDY_AREA_SPECS[currentAreaName][1],
+  radiusM: STUDY_AREA_SPECS[currentAreaName][2]
+};
 
 Map.centerObject(currentRegion, 13);
 
@@ -440,7 +488,11 @@ function loadImageCollection() {
   var sensorConfig = SENSOR_CONFIG[settings.currentSensor];
   
   var collection = ee.ImageCollection(sensorConfig.collection)
-    .filterBounds(settings.currentRegion)  // Filter by region FIRST
+    // v3.1.0: processRegion covers BOTH the display AOI and the statistics
+    // circle. Filtering on currentRegion alone would drop a scene that covers
+    // the statistics ring but not a small AOI centre, leaving the ring
+    // half-empty and the σ cutoff computed from partial data.
+    .filterBounds(settings.processRegion)  // Filter by region FIRST
     .filterDate(sensorConfig.dateRange[0], sensorConfig.dateRange[1])
     .filter(ee.Filter.lt(sensorConfig.cloudProperty, 30));  // Max 30% cloud cover
   
@@ -512,9 +564,14 @@ var settings = {
   compositingMethod: 'median',  // Options: 'median', 'mean', 'mosaic', 'latest', 'quality'
   
   // NEW: Date filtering
+  // v3.1.0 FIX: these were '2024-01-01' / '2024-12-31', which sit ENTIRELY
+  // outside the collection window START_DATE..END_DATE (2013-2020). The
+  // secondary filter is applied after the primary one, so switching the date
+  // filter on with the shipped defaults returned an empty collection and a
+  // bandless composite. Bound to the constants so the two cannot drift apart.
   useSpecificDate: false,
-  specificStartDate: '2024-01-01',
-  specificEndDate: '2024-12-31',
+  specificStartDate: START_DATE,
+  specificEndDate: END_DATE,
   
   // Seasonal filtering
   // v3.0.0: was 'Summer (Jul-Sep)', which SIM 3466 warns against for mineral
@@ -712,17 +769,131 @@ var settings = {
   // Current state
   currentComposite: null,
   currentRegion: currentRegion,
-  currentAreaName: currentAreaName
+  currentAreaName: currentAreaName,
+
+  // v3.1.0 AOI / THRESHOLD DECOUPLING — see the block above STUDY_AREA_SPECS.
+  // 'fixed'   : σ statistics come from a STATS_RADIUS_DEFAULT_M circle on the
+  //             AOI centre, so the cutoff does not move when the operator
+  //             changes the display radius. This is the default.
+  // 'matchAOI': pre-v3.1.0 behaviour (statistics = display AOI). Kept only so
+  //             figures made before v3.1.0 can be reproduced.
+  statsRadiusMode: 'fixed',
+  statsRadiusM:    STATS_RADIUS_DEFAULT_M,
+  statsRegion:     makeAoi(aoiSpec.lon, aoiSpec.lat, STATS_RADIUS_DEFAULT_M),
+  statsComposite:  null,
+  // Scenes must be filtered over whichever region is larger, or a scene that
+  // covers the statistics ring but not a small AOI centre gets dropped and the
+  // ring is silently half-empty.
+  processRegion:   makeAoi(aoiSpec.lon, aoiSpec.lat,
+                           Math.max(aoiSpec.radiusM, STATS_RADIUS_DEFAULT_M))
 };
+
+// The single place the active AOI is applied. Everything else calls this.
+function setAoi(spec) {
+  aoiSpec = spec;
+  settings.currentAreaName = spec.name;
+  settings.currentRegion   = makeAoi(spec.lon, spec.lat, spec.radiusM);
+  settings.statsRadiusM    = (settings.statsRadiusMode === 'matchAOI')
+                             ? spec.radiusM : STATS_RADIUS_DEFAULT_M;
+  settings.statsRegion     = makeAoi(spec.lon, spec.lat, settings.statsRadiusM);
+  settings.processRegion   = makeAoi(spec.lon, spec.lat,
+                               Math.max(spec.radiusM, settings.statsRadiusM));
+  refreshAoiStatus();
+}
+
+function calibrationNote(radiusM) {
+  var lines = [];
+  if (settings.statsRadiusMode === 'fixed') {
+    lines.push('Statistics region: ' + (settings.statsRadiusM / 1000).toFixed(1) +
+               ' km circle on the AOI centre (inside the 8-15 km LOSO band).');
+    lines.push('Display / export region: ' + (radiusM / 1000).toFixed(1) + ' km.');
+    if (radiusM > settings.statsRadiusM * 1.5) {
+      lines.push('NOTE: the mapped extent is ' +
+                 (radiusM / settings.statsRadiusM).toFixed(1) + '× the statistics ' +
+                 'sample. The cutoff is extrapolated beyond the ground it was ' +
+                 'measured on.');
+    }
+  } else if (radiusM >= CALIB_RADIUS_MIN_M && radiusM <= CALIB_RADIUS_MAX_M) {
+    lines.push('Statistics region = AOI (' + (radiusM / 1000).toFixed(1) +
+               ' km), inside the 8-15 km LOSO band.');
+  } else {
+    lines.push('WARNING: statistics region = AOI (' + (radiusM / 1000).toFixed(1) +
+               ' km), OUTSIDE the 8-15 km LOSO band. The σ multipliers and the ' +
+               'worst-case J = 0.440 result were not measured at this extent.');
+  }
+  return lines.join('\n');
+}
+
+// Export filenames used to be built with
+// currentAreaName.replace(/[^a-zA-Z0-9]/g,'_'), which strips the minus sign
+// from a custom AOI's longitude — silently losing the hemisphere and making
+// the file unreproducible from its own name.
+function aoiSlug() {
+  if (aoiSpec.source === 'preset') {
+    return aoiSpec.name.replace(/[^a-zA-Z0-9]/g, '_');
+  }
+  return 'Custom_' +
+    Math.abs(aoiSpec.lat).toFixed(4).replace('.', 'p') + (aoiSpec.lat >= 0 ? 'N' : 'S') + '_' +
+    Math.abs(aoiSpec.lon).toFixed(4).replace('.', 'p') + (aoiSpec.lon >= 0 ? 'E' : 'W') +
+    '_r' + Math.round(aoiSpec.radiusM / 1000) + 'km';
+}
+
+// GEE export descriptions are restricted to [A-Za-z0-9_-] and are short, so
+// they cannot carry provenance. Print it instead — without this, an exported
+// GeoTIFF cannot be tied back to the σ mode and multipliers that produced it.
+function printExportProvenance(kind) {
+  print(
+    'EXPORT PROVENANCE (' + kind + ')\n' +
+    '  tool         ' + TOOL_VERSION + '\n' +
+    '  sensor       ' + settings.currentSensor + '\n' +
+    '  dates        ' + (settings.useSpecificDate
+                          ? settings.specificStartDate + '..' + settings.specificEndDate
+                          : START_DATE + '..' + END_DATE) + '\n' +
+    '  season       ' + settings.seasonFilter + '\n' +
+    '  compositing  ' + settings.compositingMethod + '\n' +
+    '  AOI centre   ' + aoiSpec.lat.toFixed(5) + ', ' + aoiSpec.lon.toFixed(5) + '\n' +
+    '  AOI radius   ' + (aoiSpec.radiusM / 1000).toFixed(2) + ' km  (display/export)\n' +
+    '  stats radius ' + (settings.statsRadiusM / 1000).toFixed(2) + ' km  (mode ' +
+                        settings.statsRadiusMode + ')\n' +
+    '  thresholds   ' + (settings.useStdDevThresholds
+                          ? 'adaptive  k(iron)=' + settings.ironStdMult.toFixed(2) +
+                            '  k(clay)=' + settings.clayStdMult.toFixed(2) +
+                            '  k(ferric)=' + settings.ferric1StdMult.toFixed(2) +
+                            '  k(ferrous)=' + settings.ferrousStdMult.toFixed(2) +
+                            (sigmaIsCalibrated({iron: settings.ironStdMult,
+                                                clay: settings.clayStdMult,
+                                                ferric: settings.ferric1StdMult,
+                                                ferrous: settings.ferrousStdMult})
+                              ? '   [CALIBRATED]' : '   [UNCALIBRATED]')
+                          : 'absolute (v2.x constants; worst-case J 0.107)'));
+}
+
+function refreshAoiStatus() {
+  // setAoi() can run before the UI is built (var hoisting leaves the label
+  // undefined), so this guard is load-bearing, not defensive padding.
+  if (typeof aoiStatusLabel === 'undefined' || !aoiStatusLabel) return;
+  aoiStatusLabel.setValue(
+    'Active AOI: ' + aoiSpec.name + '\n' +
+    'Centre ' + aoiSpec.lat.toFixed(4) + ', ' + aoiSpec.lon.toFixed(4) +
+    '    radius ' + (aoiSpec.radiusM / 1000).toFixed(2) + ' km\n' +
+    calibrationNote(aoiSpec.radiusM));
+}
 
 // =============================================================================
 // NEW: ADAPTIVE THRESHOLDING FUNCTIONS
 // =============================================================================
 
 function applyStdDevThresholding(indexImage, bandName, multiplier) {
-  var stats = indexImage.reduceRegion({
+  // v3.1.0: statistics come from statsComposite over statsRegion (a fixed-radius
+  // circle on the AOI centre), so the cutoff does not move when the operator
+  // changes the DISPLAY radius. The comparison is still applied to the
+  // display-clipped index image passed in.
+  var statsImage = settings.statsComposite
+                 ? settings.statsComposite.select(bandName)
+                 : indexImage;
+  var stats = statsImage.reduceRegion({
     reducer: ee.Reducer.mean().combine(ee.Reducer.stdDev(), '', true),
-    geometry: settings.currentRegion,
+    geometry: settings.statsRegion,
     scale: 100,
     maxPixels: 1e9,
     bestEffort: true
@@ -736,9 +907,17 @@ function applyStdDevThresholding(indexImage, bandName, multiplier) {
 }
 
 function applyIndexClipping(indexImage, bandName, percentileClip) {
-  var stats = indexImage.reduceRegion({
+  // v3.1.0: same statistics region as applyStdDevThresholding, for the same
+  // reason. Residual, deliberately not code-branched: with useIndexClipping on
+  // AND adaptive thresholds on, the display path is percentile-clipped while
+  // the statistics path is not, so the two disagree slightly. A caveat is
+  // printed at startup rather than adding a third code path.
+  var statsImage = settings.statsComposite
+                 ? settings.statsComposite.select(bandName)
+                 : indexImage;
+  var stats = statsImage.reduceRegion({
     reducer: ee.Reducer.percentile([percentileClip]),
-    geometry: settings.currentRegion,
+    geometry: settings.statsRegion,
     scale: 100,
     maxPixels: 1e9,
     bestEffort: true
@@ -1105,8 +1284,21 @@ function updateComposite() {
     });
   }
   
-  var composite = createComposite(collection).clip(settings.currentRegion);
+  // v3.1.0: TWO clips of the same composite.
+  //
+  // The display/export composite is clipped exactly as before, so all eleven
+  // Map.addLayer sites are untouched. A second composite is clipped to the
+  // statistics region and used ONLY by applyStdDevThresholding /
+  // applyIndexClipping.
+  //
+  // This second clip is not optional. reduceRegion over a region larger than
+  // the image's clip sees masked pixels and quietly computes the statistic over
+  // the INTERSECTION - so a naive decoupling would appear to work and change
+  // nothing. Verify with the r=8/12/20 km regression test in the plan.
+  var raw = createComposite(collection);
+  var composite = raw.clip(settings.currentRegion);
   settings.currentComposite = composite;
+  settings.statsComposite = raw.clip(settings.statsRegion);
   return composite;
 }
 
@@ -1410,8 +1602,56 @@ function updateDetection() {
   if (settings.showAccuracyTools) {
     addAccuracyLayers();
   }
-  
+
+  reportStdDevThresholds();
+
   return classification;
+}
+
+// v3.1.0: surface the cutoff that was actually used.
+//
+// In adaptive mode the classification turns on mean + k*sd computed over the
+// statistics region, and until now nothing showed the operator that number.
+// This is also how you VERIFY the decoupling: run the same centre at r=8, 12
+// and 20 km. In 'matchAOI' mode the printed cut moves (that is the defect); in
+// 'fixed' mode it must be identical at all three.
+function reportStdDevThresholds() {
+  if (!settings.statsComposite || !settings.useStdDevThresholds) return;
+
+  var bands = ['IronSulfate', 'FerricIron1', 'FerricIron2', 'FerrousIron', 'ClaySulfateMica'];
+  var mults = [settings.ironStdMult, settings.ferric1StdMult, settings.ferric2StdMult,
+               settings.ferrousStdMult, settings.clayStdMult];
+
+  settings.statsComposite.select(bands).reduceRegion({
+    reducer: ee.Reducer.mean().combine(ee.Reducer.stdDev(), '', true),
+    geometry: settings.statsRegion,
+    scale: 100,
+    maxPixels: 1e9,
+    bestEffort: true
+  }).evaluate(function(r, err) {
+    if (err || !r) {
+      print('σ threshold report unavailable: ' + err);
+      return;
+    }
+    var out = ['ACTIVE σ CUTOFFS  (region: ' +
+               (settings.statsRadiusM / 1000).toFixed(1) + ' km circle at ' +
+               aoiSpec.lat.toFixed(4) + ', ' + aoiSpec.lon.toFixed(4) +
+               ', scale 100 m, mode ' + settings.statsRadiusMode + ')'];
+    bands.forEach(function(b, i) {
+      var m = r[b + '_mean'], s = r[b + '_stdDev'];
+      if (m === null || s === null || m === undefined || s === undefined) {
+        out.push('   ' + b + ': no data');
+        return;
+      }
+      out.push('   ' + b + ':  mean ' + m.toFixed(4) + '   sd ' + s.toFixed(4) +
+               '   k ' + mults[i].toFixed(2) +
+               '   → cut ' + (m + s * mults[i]).toFixed(4));
+    });
+    print(out.join('\n'));
+    if (typeof sigmaReportLabel !== 'undefined' && sigmaReportLabel) {
+      sigmaReportLabel.setValue(out.join('\n'));
+    }
+  });
 }
 
 // =============================================================================
@@ -1683,11 +1923,25 @@ function calculateStats() {
               'Check Landsat Collection version.\n';
           }
           
-          statsText += '\n' +
-            'THRESHOLDS:\n' +
-            '  Iron: > ' + settings.ironSulfateThreshold.toFixed(2) + '\n' +
-            '  Ferric1: > ' + settings.ferricIron1Threshold.toFixed(2) + '\n' +
-            '  Clay: > ' + settings.claySulfateMicaThreshold.toFixed(2);
+          // v3.1.0: this panel used to assert the ABSOLUTE thresholds
+          // unconditionally, which is false whenever adaptive mode is on (the
+          // default). The areas above are still computed with the absolute
+          // cutoffs — a known and separately-tracked mismatch — so say so
+          // rather than let the panel claim a cutoff the map did not use.
+          if (settings.useStdDevThresholds) {
+            statsText += '\n' +
+              'THRESHOLDS: adaptive (mean + k×σ over the ' +
+              (settings.statsRadiusM / 1000).toFixed(1) + ' km statistics region).\n' +
+              '  See the σ cutoff panel below for the values in force.\n' +
+              '  NOTE: the areas above are computed with the ABSOLUTE cutoffs\n' +
+              '  and therefore do NOT match the mapped classification.';
+          } else {
+            statsText += '\n' +
+              'THRESHOLDS (absolute):\n' +
+              '  Iron: > ' + settings.ironSulfateThreshold.toFixed(2) + '\n' +
+              '  Ferric1: > ' + settings.ferricIron1Threshold.toFixed(2) + '\n' +
+              '  Clay: > ' + settings.claySulfateMicaThreshold.toFixed(2);
+          }
           
           if (settings.useAdvancedWaterDetection) {
             statsText += '\n  Contaminated H2O: Iron > ' + 
@@ -2138,34 +2392,21 @@ var dateRangeLabel = ui.Label('Date Filter:', {
 
 // FIXED: Removed auto-update from date inputs (was too aggressive while typing)
 // Now uses "Apply Date Range" button instead
+// v3.1.0: the boxes are now PURE INPUT. They no longer set
+// settings.useSpecificDate, because typing only a start date used to arm the
+// filter while the end date was still stale - the same "widget state and
+// settings disagree" defect as the adaptive-threshold checkbox. The Apply and
+// Clear buttons own the flag, and only they write to settings.
 var startDateBox = ui.Textbox({
-  placeholder: 'Start: YYYY-MM-DD',
+  placeholder: 'Start: YYYY-MM-DD (>= ' + START_DATE + ')',
   value: '',
-  style: {stretch: 'horizontal', fontSize: '9px'},
-  onChange: function(value) {
-    if (value && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
-      settings.specificStartDate = value;
-      settings.useSpecificDate = true;
-      print('📅 Start date set: ' + value + ' (click Apply to update)');
-    } else if (!value) {
-      settings.useSpecificDate = false;
-    }
-  }
+  style: {stretch: 'horizontal', fontSize: '9px'}
 });
 
 var endDateBox = ui.Textbox({
-  placeholder: 'End: YYYY-MM-DD',
+  placeholder: 'End: YYYY-MM-DD (<= ' + END_DATE + ')',
   value: '',
-  style: {stretch: 'horizontal', fontSize: '9px'},
-  onChange: function(value) {
-    if (value && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
-      settings.specificEndDate = value;
-      settings.useSpecificDate = true;
-      print('📅 End date set: ' + value + ' (click Apply to update)');
-    } else if (!value) {
-      settings.useSpecificDate = false;
-    }
-  }
+  style: {stretch: 'horizontal', fontSize: '9px'}
 });
 
 // NEW: Apply Date Range button (replaces aggressive auto-update)
@@ -2175,16 +2416,36 @@ var applyDatesButton = ui.Button({
   onClick: function() {
     var startVal = startDateBox.getValue();
     var endVal = endDateBox.getValue();
-    var validStart = startVal && /^\d{4}-\d{2}-\d{2}$/.test(startVal);
-    var validEnd = endVal && /^\d{4}-\d{2}-\d{2}$/.test(endVal);
-    
-    if (validStart && validEnd) {
-      settings.useSpecificDate = true;
-      print('🔄 Applying date range: ' + startVal + ' to ' + endVal);
-      updateEverything();
-    } else {
-      print('⚠️ Please enter valid dates in YYYY-MM-DD format');
+    var re = /^\d{4}-\d{2}-\d{2}$/;
+
+    if (!re.test(startVal || '') || !re.test(endVal || '')) {
+      print('⚠️ Enter BOTH dates as YYYY-MM-DD.');
+      return;
     }
+    // ISO dates compare correctly as strings.
+    if (startVal > endVal) {
+      print('⚠️ Start date ' + startVal + ' is after end date ' + endVal + '.');
+      return;
+    }
+    // v3.1.0: refuse a window that cannot contain imagery, instead of applying
+    // it and leaving the operator with an empty collection and a bandless
+    // composite (which throws downstream before the async warning prints).
+    if (endVal < START_DATE || startVal > END_DATE) {
+      print('⚠️ Range ' + startVal + '..' + endVal + ' lies entirely outside ' +
+            'the collection window ' + START_DATE + '..' + END_DATE + '. ' +
+            'NOT applied - it would return zero images.');
+      return;
+    }
+    if (startVal < START_DATE || endVal > END_DATE) {
+      print('ℹ️ NOTE: the requested range extends beyond ' + START_DATE +
+            '..' + END_DATE + '; only the overlap contains imagery.');
+    }
+
+    settings.specificStartDate = startVal;
+    settings.specificEndDate = endVal;
+    settings.useSpecificDate = true;
+    print('🔄 Applying date range: ' + startVal + ' to ' + endVal);
+    updateEverything();
   }
 });
 
@@ -2193,9 +2454,13 @@ var clearDatesButton = ui.Button({
   style: {stretch: 'horizontal', fontSize: '9px', margin: '2px 0 6px 0'},
   onClick: function() {
     settings.useSpecificDate = false;
+    // Reset to the collection window so a later Apply cannot inherit a stale
+    // narrow range that the operator can no longer see in the boxes.
+    settings.specificStartDate = START_DATE;
+    settings.specificEndDate = END_DATE;
     startDateBox.setValue('');
     endDateBox.setValue('');
-    print('✅ Date filter cleared. Updating...');
+    print('✅ Date filter cleared (back to ' + START_DATE + '..' + END_DATE + '). Updating...');
     updateEverything();
   }
 });
@@ -2203,13 +2468,141 @@ var clearDatesButton = ui.Button({
 // Region selector
 var regionLabel = ui.Label('Study Area:', {fontWeight: 'bold', fontSize: '10px', margin: '6px 0 2px 0'});
 var regionSelect = ui.Select({
-  items: areaNames,
+  items: [CUSTOM_AOI_LABEL].concat(areaNames),
   value: currentAreaName,
   style: {stretch: 'horizontal'},
   onChange: function(selected) {
-    settings.currentAreaName = selected;
-    settings.currentRegion = studyAreas[selected];
-    Map.centerObject(settings.currentRegion, 12);
+    if (selected === CUSTOM_AOI_LABEL) {
+      // Re-apply whatever is in the boxes rather than leaving the previous
+      // preset silently active behind a label that says "Custom".
+      var spec = readAoiBoxes();
+      if (!spec.ok) {
+        print('⚠️ AOI rejected: ' + spec.msg + ' — reverting to ' + aoiSpec.name);
+        regionSelect.setValue(aoiSpec.name, false);
+        return;
+      }
+      setAoi(spec);
+    } else {
+      var s = STUDY_AREA_SPECS[selected];
+      setAoi({source: 'preset', name: selected, lon: s[0], lat: s[1], radiusM: s[2]});
+      // Keep the free-form boxes showing what is ACTUALLY active, so the two
+      // controls can never display different AOIs.
+      aoiLatBox.setValue(String(s[1]), false);
+      aoiLonBox.setValue(String(s[0]), false);
+      aoiRadiusBox.setValue(String(s[2] / 1000), false);
+    }
+    // Was a hard-coded zoom 12 — wrong for a 1.5 km lake and for a 100 km one.
+    Map.centerObject(settings.currentRegion);
+    updateEverything();
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FREE-FORM AOI  (v3.1.0)
+//
+// Point the tool at anywhere on Earth without editing source. The presets
+// above still work; exactly one AOI is active and regionSelect always shows
+// which one.
+//
+// Deliberately NOT the map viewport: viewport extent depends on the browser
+// window size, and (in matchAOI mode) the σ cutoff is computed over the AOI,
+// so a viewport AOI would make the classification depend on how wide your
+// browser is.
+// ═══════════════════════════════════════════════════════════════════════════
+var aoiHeader = ui.Label('Custom AOI:', {
+  fontWeight: 'bold', fontSize: '10px', margin: '8px 0 2px 0'
+});
+
+var aoiLatBox = ui.Textbox({
+  placeholder: 'Latitude    e.g. 37.812',
+  value: String(aoiSpec.lat),
+  style: {stretch: 'horizontal', fontSize: '9px'}
+});
+var aoiLonBox = ui.Textbox({
+  placeholder: 'Longitude   e.g. -107.665',
+  value: String(aoiSpec.lon),
+  style: {stretch: 'horizontal', fontSize: '9px'}
+});
+var aoiRadiusBox = ui.Textbox({
+  placeholder: 'Radius km   e.g. 12',
+  value: String(aoiSpec.radiusM / 1000),
+  style: {stretch: 'horizontal', fontSize: '9px'}
+});
+
+var aoiStatusLabel = ui.Label('', {
+  fontSize: '8px', whiteSpace: 'pre-wrap', margin: '2px 0 4px 0', color: '#444'
+});
+
+// Strict: rejects '', '12km', '1e9', '--3', 'NaN'. Scientific notation is
+// rejected on purpose — '1e9' as a radius in km is a footgun, not an input.
+function parseNum(s) {
+  if (s === null || s === undefined) return NaN;
+  s = String(s).trim();
+  if (!/^[-+]?(\d+\.?\d*|\.\d+)$/.test(s)) return NaN;
+  return parseFloat(s);
+}
+
+function readAoiBoxes() {
+  var lat = parseNum(aoiLatBox.getValue());
+  var lon = parseNum(aoiLonBox.getValue());
+  var km  = parseNum(aoiRadiusBox.getValue());
+
+  if (isNaN(lat) || lat < -90 || lat > 90) {
+    return {ok: false, msg: 'Latitude must be a number in -90..90'};
+  }
+  if (isNaN(lon) || lon < -180 || lon > 180) {
+    return {ok: false, msg: 'Longitude must be a number in -180..180'};
+  }
+  if (isNaN(km) || km <= 0) {
+    return {ok: false, msg: 'Radius must be a positive number of kilometres'};
+  }
+
+  var radiusM = Math.round(km * 1000);
+  if (radiusM < 300) {
+    return {ok: false, msg: 'Radius < 0.3 km gives fewer than ~30 pixels at the ' +
+                            'scale-100 m statistics reducer — too few for mean/sd'};
+  }
+  if (radiusM > AOI_RADIUS_MAX_M) {
+    return {ok: false, msg: 'Radius > ' + (AOI_RADIUS_MAX_M / 1000) + ' km not supported'};
+  }
+
+  return {
+    ok: true,
+    source: 'custom',
+    name: 'Custom ' + lat.toFixed(4) + ', ' + lon.toFixed(4) +
+          ' r' + (radiusM / 1000) + 'km',
+    lat: lat, lon: lon, radiusM: radiusM
+  };
+}
+
+var aoiCentreButton = ui.Button({
+  label: 'Fill lat/lon from map centre',
+  style: {stretch: 'horizontal', fontSize: '9px', margin: '2px 0 0 0'},
+  onClick: function() {
+    var b = Map.getBounds();          // client-side [west, south, east, north]
+    aoiLonBox.setValue(((b[0] + b[2]) / 2).toFixed(5), false);
+    aoiLatBox.setValue(((b[1] + b[3]) / 2).toFixed(5), false);
+    print('📍 AOI centre filled from the map view. The RADIUS box is ' +
+          'deliberately left alone: viewport extent depends on the browser ' +
+          'window size, so deriving a radius from it would make the ' +
+          'classification depend on how wide your browser is.');
+  }
+});
+
+var aoiApplyButton = ui.Button({
+  label: 'Set Custom AOI',
+  style: {stretch: 'horizontal', fontSize: '9px', margin: '2px 0 4px 0'},
+  onClick: function() {
+    var spec = readAoiBoxes();
+    if (!spec.ok) {
+      aoiStatusLabel.setValue('AOI REJECTED: ' + spec.msg);
+      print('⚠️ AOI rejected: ' + spec.msg);
+      return;
+    }
+    setAoi(spec);
+    regionSelect.setValue(CUSTOM_AOI_LABEL, false);   // reflect, do NOT re-fire
+    Map.centerObject(settings.currentRegion);
+    print('📍 Custom AOI set: ' + spec.name);
     updateEverything();
   }
 });
@@ -2390,50 +2783,184 @@ var advancedHelp = ui.Label({
   style: {fontSize: '8px', margin: '0 0 4px 0', color: '#666', fontStyle: 'italic'}
 });
 
-// Adaptive Thresholds Toggle (from paper Section 3.3)
+// ═══════════════════════════════════════════════════════════════════════════
+// ADAPTIVE (mean + k·σ) THRESHOLDS — v3.1.0 rebuild
+//
+// Two defects were fixed here.
+//
+// (1) The checkbox rendered value:false while settings.useStdDevThresholds was
+//     true, so the tool booted in adaptive mode while the UI said otherwise.
+//     The first click was a silent no-op; the SECOND click switched the whole
+//     classification to absolute thresholds. ui.Checkbox does not fire onChange
+//     from its constructor, so a widget's initial value must always be READ
+//     from settings, never hard-coded alongside it.
+//
+// (2) The σ sliders were {min:1.0, max:3.0, value:2.0} and 1.5 while the
+//     calibrated multipliers are 0.5 / 0.5 / 0.25. The slider MINIMUM was
+//     already outside the calibrated range, so any drag produced what this
+//     file's own comment records as worst-case Youden J = 0.000 - and it
+//     applied live, so a single drag silently replaced a calibrated
+//     classification with a useless one. clayStdMult and ferrousStdMult had no
+//     control at all.
+//
+// The fix: calibrated values are the default and are shown read-only; the
+// sliders live behind an Advanced reveal and are STAGED - a drag changes
+// nothing on the map until Apply is pressed.
+// ═══════════════════════════════════════════════════════════════════════════
+
+// The LOSO-fitted values. Source: validation/REPLICA_AUDIT_2026-07-26.md.
+var CALIBRATED_STD_MULTS = {iron: 0.5, clay: 0.25, ferric: 0.5, ferrous: 0.5};
+// Slider steps are floating point: -1.0 + n*0.05 does not land exactly on 0.25.
+// Every calibrated-value comparison uses this epsilon, never ===. Getting this
+// wrong would show "NOT CALIBRATED" on the default config and destroy trust in
+// the warning.
+var SIGMA_EPS = 1e-6;
+
 var adaptiveCheckbox = ui.Checkbox({
-  label: 'Use Adaptive Thresholds (mean + N×σ)',
-  value: false,
+  label: 'Use Adaptive Thresholds (mean + k×σ)',
+  value: settings.useStdDevThresholds,   // v3.1.0 FIX: read state, don't assume it
   style: {fontSize: '9px', margin: '0 0 4px 0'},
   onChange: function(checked) {
     settings.useStdDevThresholds = checked;
-    adaptiveMultPanel.style().set('shown', checked);
-    print(checked ? '📊 Adaptive thresholds ENABLED (recommended for heterogeneous terrain)' : 
-                    '📊 Fixed thresholds ENABLED (paper defaults)');
+    sigmaSummaryLabel.style().set('shown', checked);
+    sigmaAdvancedCheckbox.style().set('shown', checked);
+    adaptiveMultPanel.style().set('shown', checked && sigmaAdvancedCheckbox.getValue());
+    print(checked
+      ? '📊 Adaptive (mean + k×σ) thresholds ENABLED — the SIM 3466 method.'
+      : '📊 Fixed ABSOLUTE thresholds ENABLED. These are the v2.x constants ' +
+        'derived at Silverton; they measured worst-case J = 0.107 and did not ' +
+        'transfer between sites.');
     updateDetection();
   }
 });
 
-// Multiplier sliders (only shown when adaptive is enabled)
+var sigmaSummaryLabel = ui.Label(
+  'σ multipliers (LOSO-calibrated):\n' +
+  '   iron 0.50     clay 0.25     ferric 0.50     ferrous 0.50\n' +
+  'Worst-case Youden J 0.440, leave-one-site-out over Silverton /\n' +
+  'Summitville / Red Mountain Pass at 8–15 km. ferric and ferrous were\n' +
+  'NOT fitted (set to ironStdMult); clay is provisional (per-fold\n' +
+  'fits −0.5, −0.5, +1.0).',
+  {fontSize: '8px', whiteSpace: 'pre-wrap', color: '#444',
+   margin: '0 0 4px 0', shown: settings.useStdDevThresholds});
+
+var sigmaAdvancedCheckbox = ui.Checkbox({
+  label: 'Advanced: override σ multipliers',
+  value: false,
+  style: {fontSize: '9px', margin: '0 0 4px 0', shown: settings.useStdDevThresholds},
+  onChange: function(checked) {
+    adaptiveMultPanel.style().set('shown', checked);
+    if (checked) {
+      print('⚠️ Overriding the σ multipliers leaves the calibrated ' +
+            'configuration. The v2.x 2.0 / 1.5 values scored worst-case ' +
+            'J = 0.000 — they sit so far into the tail that almost nothing ' +
+            'is flagged.');
+    }
+  }
+});
+
 var adaptiveMultPanel = ui.Panel({style: {shown: false, margin: '0 0 4px 0'}});
 
-var ironMultLabel = ui.Label('Iron σ Mult: 2.0', {margin: '2px 0 2px 0', fontSize: '9px'});
-var ironMultSlider = ui.Slider({
-  min: 1.0, max: 3.0, value: 2.0, step: 0.1,
-  style: {stretch: 'horizontal'},
-  onChange: function(value) {
-    settings.ironStdMult = value;
-    ironMultLabel.setValue('Iron σ Mult: ' + value.toFixed(1));
-    if (settings.useStdDevThresholds) updateDetection();
-  }
-});
+// Staged values. Nothing here reaches `settings` until Apply is pressed.
+var pendingMults = {
+  iron:    settings.ironStdMult,
+  clay:    settings.clayStdMult,
+  ferric:  settings.ferric1StdMult,
+  ferrous: settings.ferrousStdMult
+};
 
-var ferricMultLabel = ui.Label('Ferric σ Mult: 1.5', {margin: '2px 0 2px 0', fontSize: '9px'});
-var ferricMultSlider = ui.Slider({
-  min: 1.0, max: 3.0, value: 1.5, step: 0.1,
-  style: {stretch: 'horizontal'},
-  onChange: function(value) {
-    settings.ferric1StdMult = value;
-    settings.ferric2StdMult = value;
-    ferricMultLabel.setValue('Ferric σ Mult: ' + value.toFixed(1));
-    if (settings.useStdDevThresholds) updateDetection();
-  }
-});
+function isCal(key, v) { return Math.abs(v - CALIBRATED_STD_MULTS[key]) < SIGMA_EPS; }
 
-adaptiveMultPanel.add(ironMultLabel);
-adaptiveMultPanel.add(ironMultSlider);
-adaptiveMultPanel.add(ferricMultLabel);
-adaptiveMultPanel.add(ferricMultSlider);
+function sigmaIsCalibrated(m) {
+  return isCal('iron', m.iron) && isCal('clay', m.clay) &&
+         isCal('ferric', m.ferric) && isCal('ferrous', m.ferrous);
+}
+
+var sigmaWarnLabel = ui.Label('', {fontSize: '8px', whiteSpace: 'pre-wrap',
+                                   margin: '2px 0 2px 0'});
+
+function refreshSigmaWarn() {
+  if (sigmaIsCalibrated(pendingMults)) {
+    sigmaWarnLabel.style().set('color', '#2E7D32');
+    sigmaWarnLabel.setValue('Pending values = calibrated values.');
+  } else {
+    sigmaWarnLabel.style().set('color', '#C62828');
+    sigmaWarnLabel.setValue(
+      'PENDING VALUES ARE NOT CALIBRATED.\n' +
+      'Nothing on the map has changed yet — press "Apply σ multipliers".\n' +
+      'The LOSO result (worst-case J 0.440) does not apply to these values.\n' +
+      'For reference, 2.0 / 1.5 measured worst-case J = 0.000.');
+  }
+}
+
+function makeMultSlider(key, labelText) {
+  var lab = ui.Label('', {margin: '2px 0 2px 0', fontSize: '9px'});
+  var sld = ui.Slider({
+    // Range covers the calibrated values AND the negative per-fold clay fits
+    // (−0.5), which the old minimum of 1.0 excluded entirely.
+    min: -1.0, max: 3.0, value: pendingMults[key], step: 0.05,
+    style: {stretch: 'horizontal'},
+    onChange: function(v) {
+      pendingMults[key] = v;             // staged only — no updateDetection()
+      lab.setValue(labelText + ' σ: ' + v.toFixed(2) +
+                   (isCal(key, v) ? '   (calibrated)' : ''));
+      refreshSigmaWarn();
+    }
+  });
+  lab.setValue(labelText + ' σ: ' + pendingMults[key].toFixed(2) +
+               (isCal(key, pendingMults[key]) ? '   (calibrated)' : ''));
+  adaptiveMultPanel.add(lab);
+  adaptiveMultPanel.add(sld);
+  return sld;
+}
+
+var ironMultSlider    = makeMultSlider('iron',    'Iron');
+var clayMultSlider    = makeMultSlider('clay',    'Clay');        // NEW — had no control
+var ferricMultSlider  = makeMultSlider('ferric',  'Ferric 1+2');
+var ferrousMultSlider = makeMultSlider('ferrous', 'Ferrous');     // NEW — had no control
+
+function commitMults() {
+  settings.ironStdMult    = pendingMults.iron;
+  settings.clayStdMult    = pendingMults.clay;
+  settings.ferric1StdMult = pendingMults.ferric;
+  settings.ferric2StdMult = pendingMults.ferric;
+  settings.ferrousStdMult = pendingMults.ferrous;
+  print(sigmaIsCalibrated(pendingMults)
+    ? '✅ σ multipliers = calibrated values.'
+    : '⚠️ UNCALIBRATED σ multipliers applied: iron ' + pendingMults.iron.toFixed(2) +
+      ', clay ' + pendingMults.clay.toFixed(2) +
+      ', ferric ' + pendingMults.ferric.toFixed(2) +
+      ', ferrous ' + pendingMults.ferrous.toFixed(2) +
+      '. Results are OUTSIDE the LOSO calibration.');
+  if (settings.useStdDevThresholds) updateDetection();
+}
+
+function restoreCalibratedMults() {
+  ironMultSlider.setValue(CALIBRATED_STD_MULTS.iron);
+  clayMultSlider.setValue(CALIBRATED_STD_MULTS.clay);
+  ferricMultSlider.setValue(CALIBRATED_STD_MULTS.ferric);
+  ferrousMultSlider.setValue(CALIBRATED_STD_MULTS.ferrous);
+  pendingMults = {
+    iron:    CALIBRATED_STD_MULTS.iron,
+    clay:    CALIBRATED_STD_MULTS.clay,
+    ferric:  CALIBRATED_STD_MULTS.ferric,
+    ferrous: CALIBRATED_STD_MULTS.ferrous
+  };
+  refreshSigmaWarn();
+}
+
+adaptiveMultPanel.add(sigmaWarnLabel);
+adaptiveMultPanel.add(ui.Button({
+  label: 'Apply σ multipliers',
+  style: {stretch: 'horizontal', fontSize: '9px'},
+  onClick: commitMults
+}));
+adaptiveMultPanel.add(ui.Button({
+  label: 'Restore calibrated σ',
+  style: {stretch: 'horizontal', fontSize: '9px'},
+  onClick: function() { restoreCalibratedMults(); commitMults(); }
+}));
+refreshSigmaWarn();
 
 // Index Clipping Toggle (from paper Section 3.4)
 var clippingCheckbox = ui.Checkbox({
@@ -2623,8 +3150,16 @@ var resetButton = ui.Button({
     depthSlider.setValue(1.3);
     scoreModSlider.setValue(3);
     scoreSevSlider.setValue(5);
-    
-    print('✅ All thresholds reset to defaults');
+
+    // v3.1.0: σ state must reset too. Leaving an uncalibrated σ in place after
+    // "Reset Defaults" is the same class of bug as the checkbox desync — the
+    // UI would claim defaults while the classification used something else.
+    restoreCalibratedMults();
+    commitMults();
+    adaptiveCheckbox.setValue(true);   // matches settings.useStdDevThresholds
+
+    print('✅ All thresholds reset to defaults (σ multipliers restored to ' +
+          'calibrated values). The AOI was left unchanged.');
   }
 });
 
@@ -2647,6 +3182,17 @@ var statsPanel = ui.Label('Loading...', {
   margin: '8px 0',
   border: '1px solid #ddd',
   backgroundColor: '#f9f9f9',
+  maxHeight: '150px'
+});
+
+// v3.1.0: the σ cutoffs actually in force, filled by reportStdDevThresholds().
+var sigmaReportLabel = ui.Label('', {
+  fontSize: '8px',
+  whiteSpace: 'pre-wrap',
+  padding: '6px',
+  margin: '4px 0',
+  border: '1px solid #ddd',
+  backgroundColor: '#f4f7fb',
   maxHeight: '150px'
 });
 
@@ -2684,6 +3230,13 @@ scrollPanel.add(applyDatesButton);
 scrollPanel.add(clearDatesButton);
 scrollPanel.add(regionLabel);
 scrollPanel.add(regionSelect);
+scrollPanel.add(aoiHeader);
+scrollPanel.add(aoiLatBox);
+scrollPanel.add(aoiLonBox);
+scrollPanel.add(aoiRadiusBox);
+scrollPanel.add(aoiCentreButton);
+scrollPanel.add(aoiApplyButton);
+scrollPanel.add(aoiStatusLabel);
 scrollPanel.add(ironLabel);
 scrollPanel.add(ironSlider);
 scrollPanel.add(ferric1Label);
@@ -2706,6 +3259,8 @@ scrollPanel.add(waterSlider);
 scrollPanel.add(advancedHeader);
 scrollPanel.add(advancedHelp);
 scrollPanel.add(adaptiveCheckbox);
+scrollPanel.add(sigmaSummaryLabel);
+scrollPanel.add(sigmaAdvancedCheckbox);
 scrollPanel.add(adaptiveMultPanel);
 scrollPanel.add(clippingCheckbox);
 scrollPanel.add(clippingHelp);
@@ -2746,6 +3301,7 @@ scrollPanel.add(ui.Button('Export Threshold CSV', exportForThresholds, false, {s
 scrollPanel.add(ui.Button('Export Classification (GeoTIFF)', exportClassification, false, {stretch: 'horizontal'}));
 scrollPanel.add(ui.Button('Export Indices (GeoTIFF)', exportIndices, false, {stretch: 'horizontal'}));
 scrollPanel.add(statsPanel);
+scrollPanel.add(sigmaReportLabel);
 scrollPanel.add(instructions);
 
 // Add scrollable panel to main panel, then add to map
@@ -2965,9 +3521,30 @@ print('════════════════════════�
 print('Author: Abdulrahman Hussein | Kent State University');
 print('Website: www.climtawy.com | ORCID: 0009-0003-0401-9219 | License: MIT');
 print('═══════════════════════════════════════════════════════════════');
+print(
+  'v3.1.0 — BEHAVIOUR CHANGE, please read:\n' +
+  '  σ thresholds are now computed over a fixed ' +
+  (STATS_RADIUS_DEFAULT_M / 1000) + ' km circle on the AOI\n' +
+  '  centre, NOT over the display AOI. Previously the AOI extent was a\n' +
+  '  classification parameter: the same pixel changed class when you drew a\n' +
+  '  bigger circle. The LOSO calibration (worst-case Youden J 0.440) was\n' +
+  '  fitted at 8-15 km, so a fixed 12 km statistics circle reproduces the\n' +
+  '  geometry it was measured on.\n' +
+  '  Classifications made by v3.0.x and earlier at any OTHER radius are not\n' +
+  "  reproducible under this default — set settings.statsRadiusMode =\n" +
+  "  'matchAOI' to reproduce them.\n" +
+  '  You can now point the tool anywhere on Earth: see "Custom AOI" in the\n' +
+  '  panel. The 30 presets still work.');
+if (settings.useIndexClipping && settings.useStdDevThresholds) {
+  print('⚠️ Index clipping AND adaptive thresholds are both on: the display ' +
+        'path is percentile-clipped while the statistics path is not, so the ' +
+        'two disagree slightly.');
+}
+print('═══════════════════════════════════════════════════════════════');
 print('Initializing...');
 
 // Run initial update
+refreshAoiStatus();
 updateEverything();
 
 // =============================================================================
@@ -2975,12 +3552,13 @@ updateEverything();
 // =============================================================================
 
 function exportClassification() {
+  printExportProvenance('classification GeoTIFF');
   if (!settings.currentComposite) return;
   
   var classification = createBooleanClassification();
   var region = settings.currentRegion;
   var name = 'AMD_Classification_' + settings.currentSensor.replace(/\s+/g, '') + 
-             '_' + settings.currentAreaName.replace(/[^a-zA-Z0-9]/g, '_') + 
+             '_' + aoiSlug() + 
              '_' + ee.Date(Date.now()).format('yyyyMMdd').getInfo();
   
   Export.image.toDrive({
@@ -3001,11 +3579,12 @@ function exportClassification() {
 }
 
 function exportIndices() {
+  printExportProvenance('indices GeoTIFF');
   if (!settings.currentComposite) return;
   
   var region = settings.currentRegion;
   var name = 'AMD_Indices_' + settings.currentSensor.replace(/\s+/g, '') + 
-             '_' + settings.currentAreaName.replace(/[^a-zA-Z0-9]/g, '_') + 
+             '_' + aoiSlug() + 
              '_' + ee.Date(Date.now()).format('yyyyMMdd').getInfo();
   
   // Select only the index bands for export
@@ -3037,6 +3616,7 @@ function exportIndices() {
 // and water-quality class, and lon/lat - exactly the columns documented in
 // specs/amd-v2/validation-protocol.md.
 function exportForVPCA() {
+  printExportProvenance('VPCA CSV');
   if (!settings.currentComposite) { print('No composite loaded.'); return; }
 
   // 7 SR bands (validator input), renamed exactly as the CSV expects.
@@ -3074,7 +3654,7 @@ function exportForVPCA() {
   });
 
   var name = 'VPCA_' + settings.currentSensor.replace(/\s+/g, '') + '_' +
-    settings.currentAreaName.replace(/[^a-zA-Z0-9]/g, '_') + '_' +
+    aoiSlug() + '_' +
     ee.Date(Date.now()).format('yyyyMMdd').getInfo();
 
   Export.table.toDrive({
@@ -3100,6 +3680,7 @@ function exportForVPCA() {
 // ground). Samples the 5 mineral-index bands inside each, tags label 1/0,
 // exports one CSV that derive_thresholds.py reads directly.
 function exportForThresholds() {
+  printExportProvenance('threshold CSV');
   if (!settings.currentComposite) { print('No composite loaded.'); return; }
 
   // Geometry imports are plain globals injected by the Code Editor; typeof is
@@ -3142,7 +3723,7 @@ function exportForThresholds() {
   var samples = sampleWith(1, amdPolygons).merge(sampleWith(0, cleanPolygons));
 
   var name = 'Thresh_' + settings.currentSensor.replace(/\s+/g, '') + '_' +
-    settings.currentAreaName.replace(/[^a-zA-Z0-9]/g, '_') + '_' +
+    aoiSlug() + '_' +
     ee.Date(Date.now()).format('yyyyMMdd').getInfo();
 
   Export.table.toDrive({

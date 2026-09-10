@@ -356,9 +356,32 @@ def extract_buffers(ee, img, points, radius_m, scale, bands, batch=25):
                         out[pr["pid"]] = pr
                 break
             except Exception as exc:                       # noqa: BLE001
-                if "memory" not in str(exc).lower() or size <= 2:
+                # 2026-09-09: floor lowered 2 -> 1. Moshannon Creek, PA (162
+                # stations, 120 scenes) failed the 500/1000 m ladder at
+                # batch=2 with the band subset ALREADY applied, so the two
+                # known request-size levers were exhausted.
+                #
+                # batch=1 is a request-size change, not a method change: each
+                # buffer's p90/mean/count is computed independently, so how
+                # many buffers share one reduceRegions call cannot affect any
+                # of their values. Only the HTTP request count changes.
+                #
+                # MEASURED, not assumed: batch=1 vs batch=25 over 20 Chest
+                # Creek stations at 500 m gives max abs difference 1.11e-16 -
+                # one double-precision ULP, i.e. float representation noise.
+                # Note this is NOT bit-identical the way the band subset is
+                # (that one measures exactly 0.000 over 27 stations). The
+                # difference is ~1e-16 relative and cannot move a Spearman
+                # rank, but say "identical to within float epsilon", never
+                # "identical".
+                #
+                # Contrast the SCENE CAP, which is the tempting next lever and
+                # is NOT safe: a shallower stack is a different median
+                # composite and different numbers. Never reduce it for one
+                # region and pool the result with regions that kept 120.
+                if "memory" not in str(exc).lower() or size <= 1:
                     raise
-                size = max(2, size // 2)
+                size = max(1, size // 2)
                 print("      memory limit - retrying at batch=%d" % size)
     return out
 

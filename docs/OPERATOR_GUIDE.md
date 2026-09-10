@@ -275,16 +275,32 @@ When in doubt use the VPCA venv; it has both.
 > user profile. Fix: install CPython 3.11 (the wheels are cp311) and repoint
 > `home`/`executable` in both `pyvenv.cfg`. Nothing needs reinstalling.
 
-### The GEE memory trap has three levers
+### The GEE memory trap has four levers — and only two are safe
 
 `User memory limit exceeded` is about **compute-graph size**, not pixel count —
 `bestEffort=True` does not help.
 
-1. **Scene depth** — cap at 120 least-cloudy scenes.
-2. **Batch size** — halve down to a floor of 2.
-3. **Band count** — `--bands NDVI_stress`. **Reach for this first.** It is the
-   only lever verified not to change the numbers: one-band vs eight-band
-   extraction of the same 27 stations gives **max absolute difference 0.000**.
+**Safe (request-size only — the numbers do not meaningfully change):**
+
+1. **Band count** — `--bands <one band>`. **Reach for this first.** Verified
+   **exactly bit-identical**: one-band vs eight-band extraction of the same 27
+   stations gives max absolute difference **0.000**.
+2. **Batch size** — halves down to a floor of **1**. Measured batch=1 vs
+   batch=25 over 20 stations at 500 m: max absolute difference **1.11e-16**,
+   one double-precision ULP. Say *"identical to within float epsilon"*, not
+   *"identical"* — unlike the band subset, this one is not bit-exact.
+
+**NOT safe — changes the result, not just the request:**
+
+3. **Scene depth** (the 120-scene cap). A shallower stack is a **different
+   median composite and different numbers.** Never reduce it for one region and
+   pool the result with regions that kept 120. If you must reduce it, reduce it
+   for *every* region in the comparison and say so in the report.
+4. **Coarser scale.** Same objection, more so.
+
+**The order matters.** Exhaust levers 1 and 2 before considering 3 — reaching
+for the scene cap first is the tempting mistake, and it silently converts a
+memory problem into a methodology problem.
 
 ### End-to-end on a new region
 

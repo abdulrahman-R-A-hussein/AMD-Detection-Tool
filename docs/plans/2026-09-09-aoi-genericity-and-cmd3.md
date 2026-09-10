@@ -293,3 +293,35 @@ caveat; `STATE.md` updated (proven / retracted / open / next); a
    **rho −0.354, n = 137, p = 0.0028** at 30 m — the committed baseline. Any
    drift means the refactor changed behaviour.
 10. `catchment_dem.py --self-test` still passes 6/6 within ±33%.
+
+---
+
+## Outcome (filled in after execution, 2026-09-09)
+
+**Parts 1–3 delivered.** GEE `v3.1.0` free-form AOI, all three defects fixed,
+the AOI/threshold coupling broken (σ statistics on a fixed 12 km circle),
+`--bbox` overlay on the Python side, and `docs/OPERATOR_GUIDE.md`.
+
+**Verification all green:** CMD1 baseline reproduces exactly (rho −0.354,
+n=137, p=0.0028), `catchment_dem --self-test` 6/6, all modules import clean.
+
+**Part 4 — CMD3 ran and FAILED TO REPLICATE**, on the falsifier named in the
+registration: |rho| peaks at 30 m and dies at landscape scale.
+
+| radius | 30 m | 60 m | 100 m | 500 m | 1000 m |
+|---|---|---|---|---|---|
+| vs sulfate | −0.143 | −0.135 | −0.114 | −0.010 | −0.050 |
+| vs conductance | −0.187 | −0.158 | −0.138 | −0.010 | **+0.003** |
+
+PA is **monotone declining** — the opposite of Ohio's U-rising-to-1 km. The
+**sign** replicates and is sign-consistent across three disjoint tiles
+(the CMD arm's first); the **scale** does not. CMD2 is **bounded to Ohio**, and
+**radius shape fails as a mechanism diagnostic** — it returns opposite
+mechanisms for the same drainage type.
+
+**Two unplanned findings:**
+- The memory trap has a **fourth lever** (batch floor 2 → 1, measured at
+  1.11e-16 — float epsilon, *not* bit-identical like the band subset), and
+  **only two of the four levers are safe**: scene depth and scale change the
+  composite, not just the request.
+- My own **verdict table had non-exclusive rows**. Logged as correction #8.

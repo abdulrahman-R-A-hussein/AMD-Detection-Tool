@@ -49,10 +49,11 @@ terrain, and does not transfer to forested neutral-pH coal drainage.**
 | 2026-08-16 | CMD1 geometry | Was the null a sampling-geometry artifact? | **Yes, partly** — monotone gradient; PARTIAL at 30 m; signal is *vegetation* | v3.8.0 |
 | 2026-09-08 | **CMD2** confound | Is the Ohio vegetation–sulfate link just mining land cover? | **Confound REAL** (+0.519 / −0.283). Primary **PARTIAL by 0.004**. **T2 REFUTES the near-channel reading** — \|rho\| peaks at 1 km | v3.9.0 |
 | 2026-09-09 | **Tool v3.1.0** | Can the tool be pointed at any area of interest? | **It could not** — 30 hardcoded AOIs + 5 hand-synced dicts. Now free-form on both surfaces. **3 UI defects fixed**; the AOI extent was silently a classification parameter | tool `v3.1.0` |
+| 2026-09-09 | **CMD3** PA replication | Does CMD2's landscape-scale reading hold in another coal basin? | **FAILS TO REPLICATE** on the named falsifier. **Sign replicates** (−0.187, n=443, p=0.0002, **first sign-consistent CMD result**); **scale does not** — PA is monotone *declining*, the opposite of Ohio. CMD2 **bounded to Ohio**; radius shape **fails as a mechanism diagnostic** | v3.10.0 |
 
 ---
 
-## The seven corrections that shaped the method
+## The eight corrections that shaped the method
 
 Each was a case where **we** were wrong, not the data. They are the most
 transferable content in this project.
@@ -110,6 +111,39 @@ plateaus**, and a direction of effect may not be claimed from an interior
 window. It also cost the second of two UAV arguments this project has had to
 withdraw, both of which had felt like the most concrete instrumentation case
 available at the time.
+
+**THIRD INSTANCE, and it goes further (CMD3, 2026-09-09).** Extending the
+ladder was not enough either. Pennsylvania's full 30→1000 m ladder is
+**monotone declining** (−0.143 → −0.050 on sulfate; −0.187 → **+0.003** on
+conductance) — the **opposite shape** from Ohio's U-rising-to-1 km. Each
+basin's result is the other's registered falsifier.
+
+So the deeper lesson is not about window width at all: **radius shape does not
+diagnose mechanism.** CMD1 amendment 2 registered it as the way to tell "seep"
+from "catchment-scale land cover", and it returns *opposite mechanisms for the
+same drainage type*. It is more plausibly measuring basin geometry — how
+disturbance sits relative to monitoring stations — than anything about seeps.
+
+**Consequence:** a shape-of-curve argument cannot carry a mechanism claim
+across sites unless the shape itself has been shown to transfer. If mechanism
+is the question, vary mechanism, not footprint. And CMD2's catchment-scale
+conclusion is **bounded to Ohio**, not withdrawn — the Ohio measurement stands;
+only its generality does not.
+
+### 8. A pre-registered verdict table must have MUTUALLY EXCLUSIVE rows (CMD3)
+CMD3's registration listed three outcomes: `(a) and (b) → REPLICATES`,
+`(a) or (b) not both → PARTIAL`, and `neither, or |rho| peaks at 30 m → FAILS`.
+The result satisfied **(a)**, failed **(b)**, *and* peaked at 30 m — so rows 2
+and 3 both applied and disagreed. Row 2 was the kinder one.
+
+**The specific named falsifier governed: FAILS TO REPLICATE.** But the
+registration should never have permitted the choice. Enumerating a named
+falsifier alongside a generic partial branch that the same data can satisfy
+leaves exactly the post-hoc latitude the registration exists to remove.
+
+**Consequence:** verdict rows are checked for mutual exclusivity *before*
+committing the registration, and where they can overlap, the registration states
+which row wins in advance.
 
 ### 7. A widget that hard-codes state next to the state it mirrors will drift from it (tool v3.1.0)
 `settings.useStdDevThresholds` was `true`; the checkbox that displays it
@@ -189,9 +223,13 @@ whatever the operator happened to be looking at.
   districts, with a score **monotone in measured contamination**.
 - Continuous scoring separates mine discharge from bare ground (J +0.617) where
   the binarised classifier cannot (0.000).
-- In Ohio coal watersheds, a **vegetation** index tracks measured sulfate at
-  **landscape scale**, and the mining-extent confound is **real** (mine extent
-  → sulfate +0.519, → `NDVI_stress` −0.283) and carries ~42% of it.
+- In coal watersheds a **vegetation** index tracks measured sulfate and
+  conductance **negatively**, and this replicates across two independent basins.
+  In Pennsylvania it is **sign-consistent across three disjoint sub-basins**
+  (conductance −0.187, n=443, p=0.0002) — the first sign-consistent result the
+  CMD arm has produced.
+- In **Ohio** the mining-extent confound is **real** (mine extent → sulfate
+  +0.519, → `NDVI_stress` −0.283) and carries ~42% of it.
 
 **MAY NOT claim**
 - Finding unknown sources in blind scene-wide search — **untested**.
@@ -204,6 +242,16 @@ whatever the operator happened to be looking at.
   pre-registered signature of catchment-scale land cover. **The UAV argument
   drawn from the CMD1 geometry gradient is withdrawn** — the second UAV
   argument this project has had to withdraw.
+- That the coal-basin association is **landscape-scale in general** — CMD3
+  bounded that to Ohio. Pennsylvania's ladder is monotone *declining* and dead
+  at 1 km (+0.003, p = 0.96). The scale is **basin-specific**.
+- That **radius shape diagnoses mechanism.** It returns opposite mechanisms for
+  the same drainage type in two basins, so it more plausibly measures basin
+  geometry. A shape-of-curve argument cannot carry a mechanism claim across
+  sites unless the shape has been shown to transfer.
+- That Pennsylvania's association is **conditioned** — it is not, and cannot be
+  with anything available. ODNR is Ohio-only; NLCD is rejected for sharing the
+  NDVI physics.
 - That the Ohio mining-extent confound has been **cleared** — the primary test
   missed its pre-registered bar by 0.004 (PARTIAL, not rejected).
 - That agreement with Rockwell's map means accuracy — it is an automated

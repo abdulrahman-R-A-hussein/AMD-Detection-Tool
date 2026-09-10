@@ -182,8 +182,52 @@ legend swatches disagree with the palette; the legend omits water class 3
   terrain-matched land (C2) and collapses to ~0 against in-stream stations in
   the same region (C1). **Imagery ranks severity at known sites; it does not
   find sites.**
+- **★ CMD3 — PENNSYLVANIA: the SIGN replicates, the SCALE does NOT, and the
+  radius ladder fails as a mechanism diagnostic (2026-09-09, pre-registered
+  `4765bca` before any PA data was fetched).** Three **spatially disjoint**
+  tiles over the upper West Branch Susquehanna (Chest / Clearfield / Moshannon
+  Creek), fixed with coordinates in advance. **274 sulfate-matched stations**
+  (Ohio had 137), **450** for conductance, **1–3% between-region variance**
+  (Ohio 13%). All three cleared the pre-registered n ≥ 8 bar. Registered and
+  fetched with **no source edit** — first use of the `--bbox` overlay.
+  **VERDICT: FAILS TO REPLICATE**, on the falsifier named in advance —
+  **|rho| peaks at 30 m** and collapses to nothing at landscape scale:
+
+  | radius | 30 m | 60 m | 100 m | 500 m | 1000 m |
+  |---|---|---|---|---|---|
+  | vs sulfate | **−0.143** | −0.135 | −0.114 | −0.010 | −0.050 |
+  | vs conductance | **−0.187** | −0.158 | −0.138 | −0.010 | **+0.003** |
+
+  Conductance is the better-powered arm (n=443, **p = 0.0002** at 30 m) and is
+  **sign-consistent at all three near radii** — Ohio read "signs disagree" at
+  every radius, so **this is the first sign-consistent result the CMD arm has
+  produced**. The canopy gate passed, so the far null is interpretable.
+  **PA's ladder is the OPPOSITE SHAPE from Ohio's** — monotone declining vs
+  U-rising-to-1 km. Each basin's result is the other's registered falsifier.
+  **Consequences:**
+  (i) **CMD2 is not withdrawn but BOUNDED** — catchment-scale *in Ohio*,
+  near-field *in Pennsylvania*; the general claim cannot be made.
+  (ii) **Radius shape does not diagnose mechanism.** CMD1 amendment 2
+  registered it as the way to tell "seep" from "catchment-scale land cover";
+  it returns opposite mechanisms for the same drainage type, so it is more
+  plausibly measuring basin geometry. **Third time a monotone-looking trend in
+  this project failed to generalise.**
+  (iii) **PA is UNCONDITIONED and cannot be conditioned** — ODNR is Ohio-only,
+  NLCD rejected for sharing the NDVI physics. Registered before the data; this
+  result cannot move CMD2's confound verdict either way.
+  (iv) **It is weak**: 0.143 / 0.187 are far below the |rho| ≥ 0.3 bar. A
+  weak *near-field* association in one basin against a strong *far-field* one
+  in another is evidence that radius tells us about basin geometry, **not**
+  about seeps — so this does **not** restore any near-channel claim.
+  **Also, honestly: my own verdict table had non-exclusive rows** (a generic
+  PARTIAL branch and a named falsifier the same data could satisfy). The
+  specific falsifier governs; taking the kinder row would have been choosing a
+  reading after seeing the outcome. Future tables must be mutually exclusive.
+  → [`ARM_CMD3_PA_REPLICATION_2026-09-09.md`](ARM_CMD3_PA_REPLICATION_2026-09-09.md)
 - **⛔ THE "GEOMETRY-LIMITED / NEAR-CHANNEL" READING BELOW IS REFUTED
-  (2026-09-08, CMD2). Read that entry only together with this one.** Extending
+  (2026-09-08, CMD2). Read that entry only together with this one.**
+  ⚠ **And CMD2's own catchment-scale conclusion is now BOUNDED TO OHIO by CMD3
+  — see the entry above.** Extending
   the radius ladder past 100 m shows it is **U-shaped**, with the strongest
   association at the **largest** footprint tested: `NDVI_stress` vs sulfate
   **−0.354 (30 m) / −0.253 (60 m) / −0.255 (100 m) / −0.393 (500 m) /
@@ -216,9 +260,12 @@ legend swatches disagree with the palette; the legend omits water class 3
   **first sign-consistent result anywhere in the Ohio arm**, but they are
   registered *secondary* and are a **lead, not a finding** — the same data
   generated them.
-  **Standing claim:** *"a vegetation index tracks sulfate in Ohio CMD
-  watersheds, at landscape scale, partly explained by catchment mining
-  extent."* **NOT** *"we detect CMD seeps."*
+  **Standing claim, as amended by CMD3 (2026-09-09):** *"a vegetation index
+  tracks sulfate in coal watersheds, negatively and sign-consistently, at a
+  scale that is BASIN-SPECIFIC — landscape-scale in Ohio, near-field in
+  Pennsylvania — and in Ohio is partly explained by catchment mining extent."*
+  **NOT** *"we detect CMD seeps"*, and **no longer** the unqualified
+  *"at landscape scale"* — CMD3 bounded that to Ohio.
   **Also fixed, and verified rather than assumed: the recurring GEE memory
   trap has a second lever — BAND COUNT.** Sunday Creek failed a third time at
   the batch=2 floor with the 120-scene cap already in place; extracting only
@@ -448,20 +495,30 @@ Both from [`ARM_A_CROSS_REGION_RETEST_2026-08-13.md`](ARM_A_CROSS_REGION_RETEST_
 
 Ordered by value.
 
-0. **Reframe the Ohio arm as landscape-scale, and test it as such.** After CMD2
-   the honest question is no longer "can we see seeps" — T2 refuted the
-   near-channel reading — but **"does a catchment-scale vegetation metric carry
-   information about CMD loading beyond mapped mine extent?"** That is a
-   different, weaker and still useful claim, and it is the one the data
-   supports. Two concrete steps:
-   a. **A better disturbance covariate.** ODNR historic coverage is incomplete
-      by construction, so T1's surviving −0.246 is most plausibly land cover the
+0. **Pursue the SIGN, not the scale — that is what replicated (post-CMD3).**
+   A negative vegetation–sulfate/conductance association now holds in **two**
+   independent coal basins and, in Pennsylvania, **across three disjoint
+   sub-basins** (conductance −0.187, n=443, p=0.0002, sign-consistent at
+   30/60/100 m). Its *scale* is basin-specific and its magnitude is weak
+   (0.14–0.19). The claim worth pursuing is the direction and its consistency.
+   a. **A Pennsylvania disturbance covariate — the single biggest gap.** PA DEP
+      mine-drainage / abandoned-mine-land data is the ODNR analogue and would
+      make the PA result conditionable. It is currently **unconditioned** and
+      cannot be conditioned with anything available.
+   b. **A better Ohio covariate.** ODNR historic coverage is incomplete by
+      construction, so CMD2's surviving −0.246 is most plausibly land cover the
       covariate missed. Reclamation-era / spoil mapping tests that directly.
-   b. **The 1 km and 5 km disc sign consistency, on data that did not generate
-      it.** It is the only sign-consistent result the Ohio arm has produced, and
-      it is currently circular — the same data suggested it and scored it.
-   Also: **more Ohio sulfate coverage.** Two of five watersheds run at n=12, and
-   n=12 is what decides sign consistency there.
+   c. **STOP using radius shape to infer mechanism.** It gave opposite answers
+      in two basins of the same drainage type. If mechanism is the question it
+      needs a design that varies mechanism, not footprint.
+   d. **The basin-geometry hypothesis** (Ohio's dissected plateau vs the West
+      Branch's broader valleys) was generated by looking at these two results
+      and **cannot be tested on them**. It needs a third basin with the
+      prediction fixed in advance.
+   e. **The 1 km / 5 km disc sign consistency, on data that did not generate
+      it.** Still circular — the same data suggested it and scored it.
+   Also: **more Ohio sulfate coverage.** Two of five watersheds run at n=12,
+   and n=12 is what decides sign consistency there.
 1. **Test whether Arm A's sign-flip tracks geology** (see "OPEN QUESTION"
    above). Silverton+Ouray (San Juan calderas) vs Central
    City+Creede+Leadville — no new fetching needed, the 31-catchment dataset

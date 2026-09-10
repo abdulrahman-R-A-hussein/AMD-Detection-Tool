@@ -1,0 +1,39 @@
+========================================================================================
+PHASE CMD1 - neutral-pH COAL mine drainage, Ohio (PRE-REGISTERED)
+Dose-response over in-stream stations. pH is NOT used to classify.
+CAVEAT (binding): sulfate has NO VNIR absorption. Any association is
+with iron precipitate / turbidity / vegetation that CO-VARIES with it.
+========================================================================================
+
+--- CANOPY DIAGNOSTIC (required before any null is interpreted) ---
+  n stations extracted : 490
+  median buffer NDVI   : 0.529  (limit 0.60)
+  below limit - buffers contain non-canopy surface; a null would
+  be interpretable as evidence.
+
+--- DOSE-RESPONSE: index vs measured chemistry ---
+  index            analyte               pooled     n   btw%   perm_p  per-watershed sign
+  NDVI_stress      SpecificConductance   -0.187   443      3   0.0002  ches-0.28 clea-0.13 mosh-0.20 CONSISTENT
+  NDVI_stress      Sulfate_mgL           -0.143   268      1   0.0200  ches-0.09 clea-0.06 mosh-0.18 CONSISTENT
+
+--- VERDICT (pre-registered) ---
+  PARTIAL - significant pooled but signs inconsistent or |rho|<0.3.
+
+  Colorado comparison: FerricIron1 vs dissolved Fe rho=+0.568.
+  H-CMD2 predicted Ohio would NOT be weaker.
+
+=== RADIUS LADDER (appended 2026-09-09) ===
+
+NDVI_stress vs Sulfate_mgL
+  30m  -0.143 n=268 p=0.0200  ches-0.09 clea-0.06 mosh-0.18 CONSISTENT
+  60m  -0.135 n=269 p=0.0326  ches+0.05 clea-0.00 mosh-0.18 disagree
+ 100m  -0.114 n=271 p=0.0676  ches-0.04 clea+0.09 mosh-0.20 disagree
+ 500m  -0.010 n=274 p=0.8758  ches+0.01 clea+0.08 mosh-0.04 disagree
+1000m  -0.050 n=274 p=0.4029  ches-0.34 clea+0.09 mosh-0.12 disagree
+
+NDVI_stress vs SpecificConductance
+  30m  -0.187 n=443 p=0.0002  ches-0.28 clea-0.13 mosh-0.20 CONSISTENT
+  60m  -0.158 n=445 p=0.0014  ches-0.16 clea-0.09 mosh-0.20 CONSISTENT
+ 100m  -0.138 n=447 p=0.0062  ches-0.11 clea-0.06 mosh-0.20 CONSISTENT
+ 500m  -0.010 n=450 p=0.8332  ches-0.13 clea+0.09 mosh-0.03 disagree
+1000m  +0.003 n=450 p=0.9618  ches-0.06 clea+0.10 mosh-0.04 disagree

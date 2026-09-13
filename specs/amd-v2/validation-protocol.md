@@ -1,3 +1,15 @@
+> # ⛔ SUPERSEDED
+> **Dated 2026-07-25. Retained as a historical record, not as a statement of
+> capability.** Banner added 2026-09-13.
+>
+> This file defines Tests A-D, including **Test D** — a water Fe(III) ground-truth regression with a pass criterion of R-squared >= 0.7.
+>
+> **What is now known:** **Test D was retracted in v2.4.1. Do not run it expecting a pass.** This file also sets kappa/AUC expectations by *within-site* standards, which is precisely the error finding L1 records: within-site AUCs of 0.99 collapsed to 0.63-0.67 pooled. Judge by worst-case leave-one-region-out instead. Its section 4 (deriving thresholds honestly) and its ferric-group resolution bound do still stand.
+>
+> Current state: [`validation/STATE.md`](validation/STATE.md) · how to run it and read it: [`docs/OPERATOR_GUIDE.md`](docs/OPERATOR_GUIDE.md) · every number with its sample size: [`validation/ACCURACY_ASSESSMENT.md`](validation/ACCURACY_ASSESSMENT.md)
+
+---
+
 # AMD Detection v2 — Validation Protocol
 
 **The test document.** Hand this to whoever runs the validation. It says exactly
@@ -59,7 +71,7 @@ Rockwell's San Juan map more faithfully than the old `(B2+B4)/B1` heuristic.
 matches the published SIM 3466 sheet's alteration footprint; clean valleys are
 not flagged. Record the class-% for the report.
 
-> Note: the old "expected 3–10% AMD" range in `validation_results.md` was tuned
+> Note: the old "expected 3–10% AMD" range in `validation_results_2025-11_SUPERSEDED.md` was tuned
 > to the *wrong* index and is **not** a valid v2 yardstick. Derive expected
 > ranges from Rockwell's own reported figures instead.
 

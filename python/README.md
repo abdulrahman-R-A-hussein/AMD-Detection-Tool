@@ -1,3 +1,11 @@
+> # ⚠️ This file is v1.5.1-era and partly stale
+>
+> **Banner added 2026-09-13.** Its spectral-index table has been corrected
+> (it previously gave wrong formulas), but the rest describes an early state of
+> the Python package. For current usage see
+> [`../docs/OPERATOR_GUIDE.md`](../docs/OPERATOR_GUIDE.md); for current state
+> see [`../validation/STATE.md`](../validation/STATE.md).
+
 # AMD Detection Tool - Python/Google Colab Edition
 
 **Version:** 1.5.1  
@@ -164,13 +172,25 @@ This tool implements the methodology from:
 
 ### Spectral Indices Used
 
-| Index | Formula | Purpose |
-|-------|---------|---------|
-| Iron Sulfate | B4/B2 | Detect jarosite, goethite |
-| Ferric Iron 1 | B4/B3 | Detect hematite |
-| Ferric Iron 2 | (B4+B1)/B3 | Oxidized iron |
-| Ferrous Iron | B6/B5 | Reduced iron |
-| Clay-Sulfate-Mica | (B6-B7)/(B6+B7) | Clay minerals |
+> **Corrected 2026-09-13.** The formulas previously listed here were wrong
+> — `Iron Sulfate = B4/B2`, `Ferric Iron 1 = B4/B3`,
+> `Clay = (B6-B7)/(B6+B7)`. Anyone calibrating against that table was
+> debugging a fiction. The values below are the SIM 3466 formulas as verified
+> against the published pamphlet and as implemented in
+> [`gee_classify.py`](gee_classify.py).
+
+| Index | Formula (Landsat 8 SR bands) | Purpose |
+|-------|------------------------------|---------|
+| Iron Sulfate | `(B2/B1) - (B5/B4)` | jarosite / iron sulfate; **signed**, roughly -3..+2 |
+| Ferric Iron 1 | `B4/B2` | redness — hematite / goethite |
+| Ferric Iron 2 | `(B4/B2) * ((B4+B6)/B5)` | oxidised iron |
+| Ferrous Iron | `(B3+B6)/(B4+B5)` | reduced iron |
+| Clay-Sulfate-Mica | `(B6/B7) - (B5/B4)` | clay minerals |
+| Green Vegetation | `B5/B4` | vegetation gate |
+
+**Note:** `Ferric Iron 1` (`B4/B2`) and the water-arm `Turbidity` index are
+the *same expression* — they read one physical quantity under two names, and
+cannot separate iron from turbidity.
 
 ---
 

@@ -7,6 +7,88 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Note on everything below v3.0.0
+Entries for v1.x record what was believed at the time. Several are
+**retracted** — in particular every "Ganau Lake validated" / "675 mg/L" /
+"correctly displays contamination" entry, and the `AWEINSH > 0.20` water-mask
+"fix". See the v3.x entries and [`validation/STATE.md`](validation/STATE.md).
+
+## [3.10.0] - 2026-09-13
+### Changed
+- Corrected the externally-facing record. `CITATION.cff`, `README.md`,
+  `PROJECT_OVERVIEW.md` rewritten; nine historical documents bannered as
+  superseded; `earth-engine/validation_results.md` renamed, because its
+  filename asserted a validation it does not contain.
+- Author name unified to **Abdulrahman Hussein** (six occurrences of a
+  different name in `PUBLIC_RELEASE_SUMMARY.md`).
+### Added
+- `validation/ACCURACY_ASSESSMENT.md` — every performance number with its
+  sample size and, critically, *which reference standard* it was measured
+  against.
+
+## [3.10.0-cmd3] - 2026-09-09
+### Added
+- **CMD3, Pennsylvania replication.** Pre-registered before any PA data was
+  fetched. Three spatially disjoint tiles, 274 sulfate-matched stations.
+### Findings
+- **FAILS TO REPLICATE** on the falsifier named in advance. The **sign**
+  replicates (conductance −0.187, n=443, p=0.0002, **first sign-consistent
+  CMD result**); the **scale** does not — PA is monotone *declining* and dead
+  at 1 km (+0.003), the opposite of Ohio's U-shape.
+- CMD2's landscape-scale reading is therefore **bounded to Ohio**.
+- **Radius shape fails as a mechanism diagnostic** — it returns opposite
+  mechanisms for the same drainage type.
+
+## [3.9.0] - 2026-09-08
+### Findings
+- **CMD2: the mining-extent confound is REAL** — mine extent predicts sulfate
+  (+0.519) and vegetation (−0.283), carrying ~42% of the raw covariance.
+- Primary partial test **PARTIAL by 0.004** (−0.246 vs a pre-registered bar of
+  0.25). The bar was fixed in advance and was not moved.
+- **The near-channel reading of CMD1 is REFUTED.** |rho| peaks at 1 km. The
+  UAV argument drawn from the CMD1 geometry gradient is **withdrawn** — the
+  second UAV argument withdrawn in this project.
+
+## [3.1.0] - 2026-09-09 (Earth Engine tool)
+### Added
+- **Free-form AOI** (latitude / longitude / radius) alongside the 30 presets —
+  the tool can now be pointed anywhere on Earth without editing source.
+### Fixed
+- Adaptive-threshold checkbox rendered `false` while the setting was `true`,
+  so the tool booted in one mode while the UI claimed the other.
+- σ multiplier sliders started at 2.0/1.5 against calibrated 0.5/0.25 with a
+  slider **minimum of 1.0** — any drag silently applied a configuration
+  measured at worst-case Youden J **0.000**. Now staged behind an Apply
+  button, with the two missing controls added.
+- Date filter defaulted to 2024, outside the 2013–2020 collection window, so
+  enabling it returned zero images.
+- **The AOI extent was a classification parameter.** σ statistics now come
+  from a fixed 12 km circle on the AOI centre (inside the 8–15 km calibration
+  band) rather than the display AOI, so the same pixel no longer changes class
+  when a larger circle is drawn.
+
+## [3.0.0 - 3.8.0] - 2026-07 to 2026-08
+### Findings (see validation/ for each, with sample sizes)
+- **Land replica verified**: all six SIM 3466 index formulas reproduce exactly.
+- **Three of our own "improvements" were regressions.** Fixing them took
+  worst-case leave-one-site-out Youden J **0.107 → 0.440**.
+- **Detection is a measured NULL** at 86 chemically confirmed source points:
+  nine indices, three control tiers, best case J 0.234 vs a bar of 0.25.
+- **Severity ranking is a ground-truth-validated positive**, bounded: rho
+  **+0.568** vs dissolved Fe (n=75, p=0.0004), but negative leave-one-region-out
+  R² for every pair → ranks within a district, does not predict across.
+- **Resolution is NOT the binding constraint** in 10–100 m — refuted. The
+  Landsat→Sentinel-2 gain was a *sensor* effect.
+- **Catchment delineation rebuilt** on MERIT Hydro D8: 6/6 within ±33% of
+  published USGS areas, versus 2/6 for the previous approach.
+### Retracted
+- The entire in-water contamination-scoring module (findings W1–W4).
+- "Our map predicts dissolved Fe better than Rockwell's" — collapsed at n=31.
+- "Our tool is more sensitive than Rockwell's" — the direction of disagreement
+  reverses between sites.
+- The Ganau Pond and Muskingum Watershed validation claims.
+
+
 ### Planned
 - Python workflow automation with batch processing
 - Temporal trend analysis for contamination monitoring

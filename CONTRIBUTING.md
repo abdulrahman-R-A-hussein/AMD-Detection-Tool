@@ -88,14 +88,26 @@ Before submitting code:
 
 **Example:**
 ```
-feat: Add AWEINSH threshold optimization for wet soil exclusion
+feat: per-scene sigma thresholding for the iron sulfate index
 
-Implements adaptive water masking using AWEINSH > 0.20 to separate
-true water bodies from wet bare soil. Validated against Ganau Lake
-ground truth measurements.
+Replaces the absolute > 0.10 cutoff with the paper's per-scene
+mean + k*sd method. The absolute cutoff did not transfer: it
+over-called 4.1x at the site where it was derived and under-called
+5.6x at an independent site.
+
+Worst-case leave-one-site-out Youden J 0.107 -> 0.440 over three
+sites against Rockwell's published map (replica fidelity, not
+accuracy). Report in validation/REPLICA_AUDIT_2026-07-26.md.
 
 Fixes #42
 ```
+
+> The previous example in this file read *"Implements adaptive water masking
+> using AWEINSH > 0.20 … Validated against Ganau Lake ground truth"*. It was
+> replaced 2026-09-13 because it modelled two habits this project has since
+> had to retract: putting an **absolute cutoff on a non-normalised index**, and
+> calling a **circularly tuned** result "validated". Commit messages here
+> should name the measurement, its **n**, and its reference standard.
 
 ## Pull Request Guidelines
 

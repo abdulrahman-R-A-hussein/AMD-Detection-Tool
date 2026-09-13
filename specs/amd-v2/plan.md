@@ -1,3 +1,15 @@
+> # ⛔ SUPERSEDED
+> **Dated 2026-07-18. Retained as a historical record, not as a statement of
+> capability.** Banner added 2026-09-13.
+>
+> This file a plan whose hypotheses have since been answered.
+>
+> **What is now known:** **H3 (water transfer) is refuted** — the water column is a measured null and Ganau has no ferric signature. **H2 (mineral separability) is answered NO** — jarosite, goethite and hematite collapse to one ferric group at 7 bands. And the statement that agreement between "VPCA says jarosite" and "classifier says class 17" *is the accuracy result* is wrong: agreement with an automated product is **replica fidelity, never accuracy**.
+>
+> Current state: [`validation/STATE.md`](validation/STATE.md) · how to run it and read it: [`docs/OPERATOR_GUIDE.md`](docs/OPERATOR_GUIDE.md) · every number with its sample size: [`validation/ACCURACY_ASSESSMENT.md`](validation/ACCURACY_ASSESSMENT.md)
+
+---
+
 # AMD Detection v2.0 — Upgrade & Validation Plan
 
 **Goal:** turn a heuristic that *looks* like Rockwell 2021 into a

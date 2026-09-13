@@ -1,3 +1,15 @@
+> # ⛔ SUPERSEDED
+> **Dated November 2025. Retained as a historical record, not as a statement of
+> capability.** Banner added 2026-09-13.
+>
+> This file titled "Validation Results" and asserts "**Method Successfully Validated**", with Atwood / Piedmont / Clendening marked "**CONTROL - PASS**" at "<0.01% AMD".
+>
+> **What is now known:** Those controls did not pass — they were **never measured**. The Ganau-tuned `AWEINSH > 0.20` water mask admitted **0 of 497** and **0 of 466** optically-water pixels at Piedmont and Atwood, so "clean" was a mask artifact. Piedmont in fact carries **462 mg/L sulfate** (25x Atwood), so scoring it clean was a false negative. The "expected ranges" yardstick used for the Rockwell sites was tuned to the **wrong** iron index and is disowned by this project's own validation protocol.
+>
+> Current state: [`validation/STATE.md`](validation/STATE.md) · how to run it and read it: [`docs/OPERATOR_GUIDE.md`](docs/OPERATOR_GUIDE.md) · every number with its sample size: [`validation/ACCURACY_ASSESSMENT.md`](validation/ACCURACY_ASSESSMENT.md)
+
+---
+
 # AMD Detection Tool - Validation Results
 **Date:** November 27, 2025  
 **Version:** 1.1.0  

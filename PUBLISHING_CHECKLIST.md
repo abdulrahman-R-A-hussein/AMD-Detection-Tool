@@ -1,3 +1,18 @@
+> # ⛔ SUPERSEDED — a record of the April 2026 release process
+>
+> **Banner added 2026-09-13.** This checklist certifies documents as complete
+> that have since been **retracted or superseded**: `CHANGELOG.md` (stops at
+> v1.5.4; science is now at v3.10.0), `PROJECT_OVERVIEW.md` (rewritten),
+> `docs/METHODOLOGY.md`, `earth-engine/USAGE_GUIDE.md`,
+> `earth-engine/water_quality_module_guide.md`, and
+> `earth-engine/validation_results_2025-11_SUPERSEDED.md` — which is listed
+> below as an "Accuracy assessment" and is **not one**. Its control lakes
+> "passed" because the water mask admitted zero water pixels at two of them.
+>
+> The actual accuracy assessment is
+> [`validation/ACCURACY_ASSESSMENT.md`](validation/ACCURACY_ASSESSMENT.md).
+> Current state: [`validation/STATE.md`](validation/STATE.md).
+
 # Publishing Checklist for Public Release
 
 ## ✅ Completed Items
@@ -14,7 +29,7 @@
 - [x] **docs/METHODOLOGY.md** - Scientific methods and algorithms
 - [x] **earth-engine/USAGE_GUIDE.md** - User instructions
 - [x] **earth-engine/water_quality_module_guide.md** - Water quality methods
-- [x] **earth-engine/validation_results.md** - Accuracy assessment
+- [x] ~~**earth-engine/validation_results_2025-11_SUPERSEDED.md** - Accuracy assessment~~ **— NOT an accuracy assessment; superseded, see the banner above**
 
 ### Code Quality
 - [x] **JavaScript header** - Professional authorship and citation information

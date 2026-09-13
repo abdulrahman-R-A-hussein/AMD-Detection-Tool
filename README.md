@@ -1,227 +1,175 @@
-# Acid Mine Drainage (AMD) and Coal Mine Drainage (CMD) Detection System
-### Advanced Remote Sensing for Environmental Monitoring
+# Acid Mine Drainage (AMD) / Coal Mine Drainage (CMD) Detection System
 
-[![Version](https://img.shields.io/badge/version-1.5.4-blue.svg)](https://github.com/coodawy/AMD-Detection-Tool)
+### An open reimplementation of USGS SIM 3466 — and a pre-registered measurement of what it can and cannot do
+
+[![Version](https://img.shields.io/badge/version-3.10.0-blue.svg)](https://github.com/abdulrahman-R-A-hussein/AMD-Detection-Tool)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Earth Engine](https://img.shields.io/badge/Google%20Earth%20Engine-Enabled-orange.svg)](https://earthengine.google.com/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19429983.svg)](https://doi.org/10.5281/zenodo.19429983)
 
-> **Advancing environmental monitoring through satellite-based detection of acid mine drainage (AMD), coal mine drainage (CMD), and water contamination worldwide**
+Rockwell & Gnesda (2021, USGS SIM 3466) published a method for automated
+iron-sulfate mineral mapping from Landsat 8, and a result raster — but no code.
+This repository reimplements that method in Google Earth Engine and Python, and
+then does the part that is usually left out: **measures, against real field
+chemistry and under pre-registered criteria, where it works and where it
+fails.**
+
+Author: **Abdulrahman Hussein**, Kent State University
+(Dr. Joseph D. Ortiz laboratory) · ORCID
+[0009-0003-0401-9219](https://orcid.org/0009-0003-0401-9219)
 
 ---
 
-## 🌍 Impact & Applications
+## ⚠️ Retraction notice — read before citing anything
 
-This research tool addresses a **critical global environmental challenge**: acid mine drainage (AMD) and coal mine drainage (CMD) contamination affects over **19,000 kilometers of waterways** in the United States alone, with millions more kilometers impacted worldwide. Traditional field surveys are costly, time-consuming, and limited in spatial coverage.
+**Versions up to and including 1.5.4 claimed a validated in-water
+contamination-detection capability. Those claims are retracted.** Specifically
+withdrawn:
 
-This automated detection system enables:
-- **Large-scale monitoring** of mining-impacted watersheds across continents
-- **Early warning detection** of emerging contamination in water bodies
-- **Cost-effective assessment** reducing field survey needs by up to 80%
-- **Temporal analysis** of contamination trends over decades using historical satellite data
-- **Environmental justice** applications in underserved communities lacking monitoring infrastructure
+- *"Validated against ground truth geochemical data from the Muskingum
+  Watershed, Ohio"* — the Ohio water column is a **measured null**. No
+  feature's 95% CI excludes zero for iron (n=17) or sulfate (n=23).
+- *"Successfully detected sulfate contamination (>700 mg/L) in Ganau Pond"* —
+  **circular.** The thresholds were tuned until that site scored contaminated.
+- The *"clean" control lakes* that appeared to pass — the water mask admitted
+  **zero** water pixels at two of them (0/497 and 0/466). "Clean" was a mask
+  artifact, and one of those lakes carries 462 mg/L sulfate.
+- *"Adaptive water masking via AWEINSH threshold optimization"*, listed as an
+  innovation — it is the project's canonical failure mode: an absolute cutoff
+  on a non-normalised index, which does not transfer between scenes.
+- *"Reducing field survey needs by up to 80%"* / *"cost reduction of 70–90%"* —
+  no analysis anywhere supports these numbers.
 
-**Real-world impact:**
-- Successfully detected sulfate contamination (>700 mg/L) in Ganau Pond, Kurdistan Region, Iraq
-- Validated against USGS reference sites in Colorado, Nevada, Utah, and Montana
-- Applied to coal mining regions in Ohio (Muskingum Watershed), Mediterranean lakes, and global study areas
-- Adaptable methodology extended to both terrestrial mineral mapping and aquatic contamination
-- **Presented at:** 40th Annual Graduate Research Symposium, Kent State University
-- **Publication:** [ResearchGate - Automating the Detection of Cryptic Sulfate Pollution](https://www.researchgate.net/publication/403521974_Automating_the_Detection_of_Cryptic_Sulfate_Pollution_Python_and_Machine_Learning_Implementation_for_Neutralized_Waters)
+**Sulfate has no VNIR absorption. No optical sulfate detection is claimed at
+any concentration**, and none is possible. Any apparent signal is iron,
+turbidity, or colour that co-varies with sulfate.
 
----
-
-## 🔬 Research Innovation
-
-This tool represents significant methodological advancement over existing approaches:
-
-### Novel Contributions
-1. **Dual-Domain Detection**: First implementation extending USGS terrestrial mineral detection (Rockwell et al., 2021) to contaminated water bodies
-2. **Multi-Criteria Water Quality Scoring**: 7-point contamination assessment combining spectral indices (NIR anomaly, turbidity, iron water index, yellow index)
-3. **Adaptive Water Masking**: Unified water detection using AWEINSH threshold optimization to separate true water bodies from wet soil
-4. **Multi-Sensor Integration**: Harmonized Landsat 8/9 and Sentinel-2 processing with automated sensor selection
-5. **Open Science Implementation**: Fully reproducible Google Earth Engine workflow accessible to researchers worldwide
-
-### Technical Achievements
-- **19-class Boolean classification** for terrestrial minerals following USGS methodology
-- **3-class water quality system** (clean, moderate, severe contamination)
-- **Contamination score model** validated against ground truth measurements
-- **Real-time interactive visualization** with diagnostic layers and pixel-level analysis
+The earlier ResearchGate item *"Automating the Detection of Cryptic Sulfate
+Pollution"* and Zenodo versions ≤ 1.5.4 carry the retracted claims and should
+be read with this notice attached.
 
 ---
 
-## 🚀 Quick Start
+## What is actually established
 
-### Google Earth Engine (Recommended)
-```javascript
-// 1. Open Google Earth Engine Code Editor
-// 2. Copy earth-engine/amd_detection_v1.0.0.js
-// 3. Paste and run - interactive map loads automatically
-// 4. Select study area from dropdown menu
-// 5. Click any pixel for detailed spectral analysis
+Every figure below is measured, with its sample size and its reference
+standard. **Full detail and provenance:
+[`validation/ACCURACY_ASSESSMENT.md`](validation/ACCURACY_ASSESSMENT.md).**
+
+| capability | result | measured against |
+|---|---|---|
+| **Land replica** | all six index formulas reproduce **exactly**; three of our own "improvements" were regressions, and fixing them took worst-case leave-one-site-out Youden J **0.107 → 0.440** | Rockwell's published map — **replica fidelity, not accuracy** |
+| **Detection of mine discharge** | **NULL.** All nine indices fail all three control tiers at n=86 confirmed source points; best case J **0.234** vs a pre-registered bar of **0.25** | measured USGS/EPA chemistry |
+| **Severity ranking** | `FerricIron1` vs dissolved Fe **rho +0.568** (n=75, within-region permutation p=0.0004), sign-consistent across four districts | measured chemistry ✅ |
+| — its bound | leave-one-region-out R² is **negative for every** index × analyte pair → **ranks within a district, does not predict across districts** | measured chemistry |
+| **Spatial resolution** | **flat** 10–100 m (+0.494 / +0.526 / +0.493 / +0.523 / +0.517) — resolution is *not* the binding constraint in that range | measured chemistry |
+| **Coal/CMD vegetation signal** | negative and sign-consistent in two basins, but at a **basin-specific scale** — Ohio strengthens to 1 km, Pennsylvania collapses to +0.003 there | measured chemistry |
+| **Catchment delineation** | **6/6 within ±33%** of published USGS drainage areas | official NWIS areas ✅ |
+
+### What may not be claimed
+
+- Finding **unknown** sources in blind scene-wide search — untested.
+- Optical **sulfate** detection, at any concentration, ever.
+- That resolution is the constraint — refuted for 10–100 m.
+- That agreement with Rockwell's map means **accuracy** — it is an automated
+  product, not ground truth.
+- That the shipped 19-class classifier detects mine discharge: measured against
+  bare ground it scores **AUC 0.456**, worst-case J **−0.304**. It is
+  substantially a bare-ground detector.
+
+---
+
+## Documentation — start here
+
+| document | what it is |
+|---|---|
+| [`validation/STATE.md`](validation/STATE.md) | **canonical current state** — proven / retracted / open / next. Read first. |
+| [`docs/OPERATOR_GUIDE.md`](docs/OPERATOR_GUIDE.md) | how to run both surfaces, what every layer means, what you may conclude |
+| [`validation/ACCURACY_ASSESSMENT.md`](validation/ACCURACY_ASSESSMENT.md) | every performance number, with n and reference standard |
+| [`validation/DECISION_LOG.md`](validation/DECISION_LOG.md) | the chronological journey, wrong turns included |
+| [`validation/`](validation/) | dated reports and the pre-registrations, each committed **before** its data |
+
+---
+
+## Quick start
+
+### Earth Engine (no install)
+
+1. Register for [Earth Engine](https://code.earthengine.google.com) (a Google
+   Cloud project with the Earth Engine API enabled is required).
+2. Paste [`earth-engine/amd_detection_v2.4.0.js`](earth-engine/amd_detection_v2.4.0.js)
+   into the Code Editor and Run. *(The filename says 2.4.0; the contents are
+   v3.1.0 — see `validation/STATE.md`.)*
+3. Pick a preset from **Study Area**, or type latitude / longitude / radius
+   under **Custom AOI** and press *Set Custom AOI*. It will point anywhere on
+   Earth.
+
+**Before interpreting the output, read `docs/OPERATOR_GUIDE.md` §5** — in
+adaptive mode (the default, and the calibrated one) the classification cutoff
+is computed from scene statistics, and the guide explains what that does and
+does not license.
+
+### Python pipeline
+
+See [`docs/OPERATOR_GUIDE.md`](docs/OPERATOR_GUIDE.md) §8 for setup,
+authentication, and the command sequence. It needs a Google Earth Engine
+service account and, for the Rockwell comparison arm, the published raster
+(USGS ScienceBase, DOI [10.5066/P9BYV5H4](https://doi.org/10.5066/P9BYV5H4)).
+
+---
+
+## Repository layout
+
 ```
-
-### Python Workflow (In Development)
-```bash
-pip install -r python/requirements.txt
-python python/amd_detection.py --region "Ganau Pond, Iraq" --sensor landsat8
+validation/      the log: dated reports, pre-registrations, STATE.md
+python/          analysis pipeline (extraction, statistics, delineation)
+earth-engine/    the interactive GEE tool
+docs/            OPERATOR_GUIDE.md, plans, memory
+data/            gitignored; regenerable from committed code
+paper.pdf        the full 47-page USGS SIM 3466 pamphlet (method source)
+paper2.pdf       Galaszkiewicz et al. 2024 (green:NIR — tested, failed here)
 ```
 
 ---
 
-## 📊 Methodology
+## How this project works
 
-### Spectral Indices (Rockwell et al., 2021)
-```
-Iron Sulfate Index = (B2/B1) - (B5/B4)  [Threshold: >1.15]
-Ferric Iron Index 1 = B4/B2  [Threshold: >1.40]
-Ferric Iron Index 2 = (B4/B2) × (B4+B6)/B5  [Threshold: >2.50]
-Clay-Sulfate-Mica = (B6/B7) - (B5/B4)  [Threshold: >0.12]
-```
+Four claims have been retracted after they failed a test this project ran on
+itself. That is the method, not an accident:
 
-### Water Quality Scoring System
-```
-Score = ƒ(NIR Anomaly, Turbidity Ratio, Iron Water Index, 
-          Yellow Index, NDWI, Iron Sulfate, Brightness)
-          
-Classification:
-  Score 0-2:  Clean Water (Blue)
-  Score 3-4:  Moderate Contamination (Orange)
-  Score 5-7:  Severe Contamination (Red)
-```
+- **Never judge a threshold by within-site performance.** Within-site AUCs of
+  0.99 collapsed to 0.63–0.67 pooled; one index fell to 0.437, below chance.
+- **Never put an absolute cutoff on a non-normalised index.** The same defect
+  broke the water mask and the land thresholds.
+- **Report the between/within variance split beside any pooled correlation.** A
+  pooled sulfate result *reversed sign* (−0.563 → +0.220) once region effects
+  were removed.
+- **Never test a hypothesis on the data that generated it.**
+- **A null or a collapse is a valid result** and is reported as prominently as
+  a positive.
 
-### Study Areas
-- **United States**: Ohio coal mining lakes, Colorado mining districts, Nevada, Utah, Montana
-- **Middle East**: Ganau Lake and Dukan Lake, Iraq
-- **Africa**: Lake Toshka and Lake Naser, Egypt
-- **Validation Sites**: USGS reference locations (Goldfield NV, Silverton CO, Iron Mountain CA)
+Every phase is pre-registered before its data exists, and the registration
+commit is verifiable in git history.
 
 ---
 
-## 📁 Project Structure
-
-```
-AMD-Detection-Tool/
-├── earth-engine/
-│   ├── amd_detection_v1.0.0.js       # Production GEE script (v1.5.4)
-│   ├── USAGE_GUIDE.md                # Detailed user documentation
-│   └── water_quality_module_guide.md # Water contamination methods
-│
-├── python/
-│   ├── amd_detection.py              # Core processing module
-│   ├── AMD_Detection_Tool.ipynb      # Jupyter notebook workflow
-│   └── requirements.txt              # Dependencies
-│
-├── docs/
-│   ├── METHODOLOGY.md                # Scientific methods
-│   ├── VALIDATION.md                 # Accuracy assessment
-│   └── API_REFERENCE.md              # Function documentation
-│
-├── CHANGELOG.md                      # Version history
-├── CITATION.cff                      # Citation metadata
-└── LICENSE                           # MIT License
-```
-
----
-
-## 🔗 Citation
-
-If you use this tool in your research, please cite:
+## Citation
 
 ```bibtex
-@software{hussein2024amd,
-  author = {Hussein, A.},
-  title = {Acid Mine Drainage (AMD) and Coal Mine Drainage (CMD) Detection System: Advanced Remote Sensing for Environmental Monitoring},
-  year = {2024},
-  version = {1.5.4},
-  doi = {10.5281/zenodo.19429983},
-  url = {https://github.com/coodawy/AMD-Detection-Tool},
-  note = {Based on Rockwell et al. (2021) USGS SIM 3466}
+@software{hussein_amd_2026,
+  author  = {Hussein, Abdulrahman},
+  title   = {Acid Mine Drainage (AMD) and Coal Mine Drainage (CMD) Detection System},
+  version = {3.10.0},
+  year    = {2026},
+  doi     = {10.5281/zenodo.19429983},
+  url     = {https://github.com/abdulrahman-R-A-hussein/AMD-Detection-Tool}
 }
 ```
 
-**Reference methodology:**
-Rockwell, B. W., McDougal, R. R., & Gent, C. A. (2021). Improved automated identification and mapping of iron sulfate minerals, other mineral groups, and vegetation using Landsat 8 Operational Land Imager data, San Juan Mountains, Colorado, and Four Corners Region. *U.S. Geological Survey Scientific Investigations Map 3466*.
+Please also cite the source method: Rockwell, B.W., and Gnesda, W.R., 2021,
+USGS Scientific Investigations Map 3466,
+[doi:10.3133/sim3466](https://doi.org/10.3133/sim3466).
 
----
+## License
 
-## 📈 Development Status
-
-**Current Version:** 1.5.4 (January 2025)
-
-### Recent Updates
-- ✅ Fixed wet bare soil misclassification using AWEINSH > 0.20 threshold
-- ✅ Resolved water quality layer masking issues
-- ✅ Validated against ground truth (Ganau Lake: 675 mg/L sulfate)
-- ✅ Multi-sensor harmonization (Landsat 8/9, Sentinel-2)
-
-### In Progress
-- 🔄 Python workflow automation
-- 🔄 Batch processing for large watersheds
-- 🔄 Temporal trend analysis
-- 🔄 Web application interface
-
-### Roadmap
-- ⏳ Machine learning classification enhancement
-- ⏳ Real-time alert system for contamination events
-- ⏳ Mobile app for field validation
-- ⏳ Integration with hydrological models
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! This is an active research project with opportunities for collaboration in:
-- Algorithm improvements and optimization
-- New study area validation
-- Python workflow development
-- Documentation and tutorials
-
-Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
----
-
-## 📧 Contact & Collaboration
-
-**Author:** Abdulrahman Hussein  
-**Affiliation:** Kent State University, Department of Earth Sciences  
-**Lab:** Environmental Remote Sensing Laboratory  
-**ORCID:** [0009-0003-0401-9219](https://orcid.org/0009-0003-0401-9219)  
-**DOI:** [10.5281/zenodo.19429983](https://doi.org/10.5281/zenodo.19429983)  
-**Research Focus:** Environmental remote sensing, hydrogeochemistry, agri-tech, climate adaptation
-
-**For collaboration inquiries, methodological questions, or data sharing, visit:**  
-🌐 **[www.climtawy.com](https://www.climtawy.com)** - Contact form and research portfolio
-
-**Connect with me:**
-- 📊 **Google Scholar:** [Abdulrahman Hussein](https://scholar.google.com)
-- 📄 **ResearchGate:** [Automating Cryptic Sulfate Pollution Detection](https://www.researchgate.net/publication/403521974_Automating_the_Detection_of_Cryptic_Sulfate_Pollution_Python_and_Machine_Learning_Implementation_for_Neutralized_Waters)
-- 💼 **LinkedIn:** [linkedin.com/in/climatawy](https://linkedin.com/in/climatawy)
-- 🐛 **GitHub Issues:** [Report bugs or request features](https://github.com/coodawy/AMD-Detection-Tool/issues)
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see [LICENSE](LICENSE) file for details.
-
-Open science principles: This tool is freely available to support environmental monitoring and research worldwide.
-
----
-
-## 🙏 Acknowledgments
-
-This research was conducted under the supervision of **Dr. Joseph D. Ortiz** at the Kent State University Environmental Remote Sensing Laboratory.
-
-**Supervisor:**
-- Dr. Joseph D. Ortiz, Professor, Department of Earth Sciences, Kent State University
-
-**Special Thanks:**
-- **U.S. Geological Survey** for the foundational Rockwell et al. (2021) methodology
-- **Google Earth Engine** team for cloud-based geospatial processing infrastructure
-- **Kent State University** for research support and facilities
-- **Global remote sensing community** for validation and feedback
-
----
-
-**⭐ If this tool supports your research or environmental monitoring work, please star this repository and cite our work!**
+MIT — see [LICENSE](LICENSE).

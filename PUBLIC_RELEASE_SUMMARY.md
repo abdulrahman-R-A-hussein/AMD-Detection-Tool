@@ -1,3 +1,38 @@
+> # ⛔ SUPERSEDED — DO NOT REUSE THE CLAIMS IN THIS FILE
+>
+> **Dated April 2026. Retained as a record of what was released, not as a
+> statement of capability.** Added 2026-09-13.
+>
+> Several claims below were **retracted** between July and September 2026 after
+> failing tests this project ran on itself:
+>
+> - *"Validated against ground truth (675 mg/L sulfate detection)"* — **circular.**
+>   The thresholds were tuned until that site scored contaminated.
+> - *"Novel multi-criteria contamination scoring (7-point system)"* — the whole
+>   in-water module is **retracted**; every ratio index ranked the *clean*
+>   control highest.
+> - *"Adaptive water masking innovation (AWEINSH > 0.20 optimization)"* — this
+>   is the project's canonical **failure** mode, not an innovation: an absolute
+>   cutoff on a non-normalised index, which admitted **zero** water pixels at
+>   two of the three control lakes.
+> - *"70-90% cost reduction versus traditional field monitoring"* — **no
+>   supporting analysis exists.** Withdrawn.
+> - *"Validated against ground truth measurements and applied across multiple
+>   continents"* — the validation half is withdrawn.
+>
+> **Sulfate has no VNIR absorption**, so no optical sulfate detection is
+> claimable at any concentration.
+>
+> Current state: [`validation/STATE.md`](validation/STATE.md). What is actually
+> established, with sample sizes:
+> [`validation/ACCURACY_ASSESSMENT.md`](validation/ACCURACY_ASSESSMENT.md).
+>
+> **Author-name note:** this file gave the author as "Abdulrahman Hussein" in six
+> places while the authoritative record (CITATION.cff, ORCID
+> 0009-0003-0401-9219, CLAUDE.md) is **Abdulrahman Hussein**. Corrected
+> 2026-09-13 for internal consistency — flagged here because the original
+> inconsistency may have propagated to documents outside this repository.
+
 # Public Release Preparation - Completion Summary
 
 ## 🎉 Project Successfully Prepared for Public Release
@@ -15,20 +50,20 @@ Your AMD Detection System repository is now ready for publication to support you
 - **Impact Statement**: Emphasizes 19,000+ km of affected U.S. waterways, global reach
 - **Research Innovation**: Highlights novel contributions (dual-domain detection, multi-criteria scoring)
 - **Technical Achievements**: 19-class land AMD + 3-class water quality system
-- **Author Branding**: Full attribution to Ahmad A. Hussein, Kent State University
+- **Author Branding**: Full attribution to Abdulrahman Hussein, Kent State University
 - **Website Integration**: www.climtawy.com prominently featured
 - **Citation Section**: Ready-to-use BibTeX format
 - Professional structure optimized for GitHub visibility
 
 #### **LICENSE** - MIT Open Source
 - Standard MIT license text
-- Copyright: Ahmad A. Hussein, 2025
+- Copyright: Abdulrahman Hussein, 2025
 - Supports open science principles
 - Compatible with research collaboration and commercial use
 
 #### **CITATION.cff** - Academic Citation Metadata
 - Standard format for GitHub citation button
-- Author: Ahmad A. Hussein, Kent State University
+- Author: Abdulrahman Hussein, Kent State University
 - Includes ORCID placeholder (update when available)
 - Email: contact@climtawy.com
 - Keywords: acid mine drainage, remote sensing, water quality, Google Earth Engine
@@ -78,7 +113,7 @@ Your AMD Detection System repository is now ready for publication to support you
  * Advanced Remote Sensing for Environmental Monitoring
  * 
  * Version: 1.5.4
- * Author: Ahmad A. Hussein
+ * Author: Abdulrahman Hussein
  * Affiliation: Kent State University
  * Website: www.climtawy.com
  * 
@@ -104,7 +139,7 @@ Your AMD Detection System repository is now ready for publication to support you
 - v1.5.1 (2025-01-05): Land/water module separation
 - v1.5.0 (2025-01-03): Water quality module introduction
 - v1.0.0 (2024-11-15): Initial release
-- Footer updated: Ahmad A. Hussein, MIT License, www.climtawy.com
+- Footer updated: Abdulrahman Hussein, MIT License, www.climtawy.com
 
 #### **.gitignore** - Production-Ready
 - Cleaned duplicates
@@ -240,7 +275,7 @@ docs/
 ## 💼 Professional Branding Integration
 
 **Author Attribution:**
-- Ahmad A. Hussein
+- Abdulrahman Hussein
 - Kent State University
 - www.climtawy.com
 - contact@climtawy.com

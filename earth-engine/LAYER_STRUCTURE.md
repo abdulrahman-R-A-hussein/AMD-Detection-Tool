@@ -1,3 +1,15 @@
+> # ⛔ SUPERSEDED
+> **Dated November 2025. Retained as a historical record, not as a statement of
+> capability.** Banner added 2026-09-13.
+>
+> This file describes the v2.x map layer set and class palette.
+>
+> **What is now known:** Water classes 20 and 21 were removed; classes 15 and 16 do not exist; classes 6 and 10 are unreachable in the cascade. The water raster now has a fourth state — **grey 3 = INDETERMINATE**, meaning *not measured* — which must never be pooled with clean.
+>
+> Current state: [`validation/STATE.md`](validation/STATE.md) · how to run it and read it: [`docs/OPERATOR_GUIDE.md`](docs/OPERATOR_GUIDE.md) · every number with its sample size: [`validation/ACCURACY_ASSESSMENT.md`](validation/ACCURACY_ASSESSMENT.md)
+
+---
+
 # Streamlined Layer Structure
 **After Code Review & Polishing**
 

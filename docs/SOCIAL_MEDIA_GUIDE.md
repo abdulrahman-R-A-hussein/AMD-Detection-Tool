@@ -1,3 +1,28 @@
+> # ⚠️ CLAIM RULES FOR ANYTHING POSTED FROM THIS FILE
+>
+> **Added 2026-09-13.** Two templates in this guide previously asserted
+> *"validated against ground truth measurements (675 mg/L sulfate detection)"*.
+> That claim is **retracted** — it was circular, the thresholds having been
+> tuned until that site scored contaminated. **The templates have been
+> rewritten.** If either was already posted, the post carries a retracted
+> claim.
+>
+> Before posting anything about this project:
+>
+> - **Never** claim optical **sulfate** detection. Sulfate has no VNIR
+>   absorption. Any apparent signal is iron, turbidity, or colour that
+>   co-varies with sulfate.
+> - **Never** claim scene-wide **detection** of mine drainage. It is a measured
+>   null: nine indices, three control tiers, n=86 confirmed source points.
+> - **Never** claim a cost-saving percentage. No analysis supports one.
+> - Agreement with Rockwell's published map is **replica fidelity, not
+>   accuracy.**
+> - What may be claimed: severity *ranking within a mineral district*
+>   (rho +0.568 vs measured dissolved iron, n=75), and a faithful replica of a
+>   published USGS method.
+>
+> Full boundaries: [`docs/OPERATOR_GUIDE.md`](OPERATOR_GUIDE.md) section 6.
+
 # Social Media & DOI Registration Guide
 
 ## 🎨 GitHub Social Preview Image (1280x640px)
@@ -109,7 +134,7 @@ Replace placeholder in README.md:
 ```
 🌍 Excited to share my open-source #AcidMineDrainage Detection System!
 
-This advanced remote sensing tool enables cost-effective monitoring of water contamination using satellite imagery. Based on USGS methodology and validated against ground truth measurements (675 mg/L sulfate detection).
+An open reimplementation of USGS SIM 3466 (Rockwell & Gnesda 2021) for mapping iron-sulfate minerals from Landsat, with a pre-registered assessment of where it works and where it does not. Severity ranking validated against measured USGS/EPA iron chemistry; scene-wide detection is a measured null and reported as one.
 
 🔬 Key Features:
 • 19-class land mineral classification
@@ -130,7 +155,7 @@ This advanced remote sensing tool enables cost-effective monitoring of water con
 ```
 🚀 Just published my open-source Acid Mine Drainage Detection System!
 
-Advanced remote sensing for water contamination monitoring using satellite imagery. Validated against ground truth (675 mg/L sulfate).
+Open reimplementation of USGS SIM 3466 for iron-sulfate mapping, plus a pre-registered measurement of its limits. Nulls reported as prominently as positives.
 
 🔗 https://github.com/coodawy/AMD-Detection-Tool
 

@@ -63,7 +63,7 @@ class 2/3/4. Real AMD is relabelled as ordinary ferric or ferrous iron.
 
 ### A4. The control-site validation is circular
 
-`earth-engine/validation_results.md` reports 0.00–0.01% AMD at Atwood,
+`earth-engine/validation_results_2025-11_SUPERSEDED.md` reports 0.00–0.01% AMD at Atwood,
 Piedmont and Clendening lakes and presents this as proof the method works. But
 the land module masks *all* water by construction (`amdLandMask` requires
 `unifiedWater.not()`). A clean lake scores ~0% because it is water, not because

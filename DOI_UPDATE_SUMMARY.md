@@ -1,3 +1,22 @@
+> # ⛔ SUPERSEDED — the paper trail for a now-corrected Zenodo abstract
+>
+> **Banner added 2026-09-13.** This file records that two claims were
+> deliberately written into the Zenodo abstract for DOI
+> `10.5281/zenodo.19429983`:
+>
+> - *"Ganau Pond validation (>700 mg/L sulfate)"* — **circular.** The
+>   thresholds were tuned until that site scored contaminated.
+> - *"Muskingum Watershed, Ohio validation"* — **the opposite of the measured
+>   result.** The Ohio water column is a clean null: no feature's 95% CI
+>   excludes zero for iron (n=17) or sulfate (n=23).
+>
+> `CITATION.cff` has been corrected in this repository (v3.10.0) and now
+> carries an explicit retraction. **A minted DOI cannot be changed by a local
+> edit — a new Zenodo version must be published for the correction to reach
+> anyone who cites it.** That action is outstanding.
+>
+> Current state: [`validation/STATE.md`](validation/STATE.md).
+
 # DOI and ResearchGate Integration - Update Summary
 
 ## ✅ **Completed Updates**

@@ -1,3 +1,15 @@
+> # ⛔ SUPERSEDED
+> **Dated November 2025. Retained as a historical record, not as a statement of
+> capability.** Banner added 2026-09-13.
+>
+> This file describes a v2.x masking correction.
+>
+> **What is now known:** Superseded by the v3.0.x departure fixes (per-scene standard deviation thresholding, the paper's May-July season, and the clay requirement) and by the v3.1.0 decoupling of the statistics region from the display AOI.
+>
+> Current state: [`validation/STATE.md`](validation/STATE.md) · how to run it and read it: [`docs/OPERATOR_GUIDE.md`](docs/OPERATOR_GUIDE.md) · every number with its sample size: [`validation/ACCURACY_ASSESSMENT.md`](validation/ACCURACY_ASSESSMENT.md)
+
+---
+
 # Critical Masking Logic Fix
 **Issue:** Conflicting water mask definitions causing pixel classification conflicts
 

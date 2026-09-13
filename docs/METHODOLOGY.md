@@ -1,3 +1,15 @@
+> # ⛔ SUPERSEDED
+> **Dated 2026-07-25. Retained as a historical record, not as a statement of
+> capability.** Banner added 2026-09-13.
+>
+> This file documents the method including the 7-point in-water scoring system and an absolute iron-sulfate threshold of 1.15.
+>
+> **What is now known:** **The in-water scoring system is retracted.** The absolute threshold was replaced by the paper's per-scene standard-deviation method (departure D1). This file already carries two accurate inline warnings, but it predates the entire B2 / CMD programme and knows nothing of the detection null, the resolution refutation, or the coal-drainage results.
+>
+> Current state: [`validation/STATE.md`](validation/STATE.md) · how to run it and read it: [`docs/OPERATOR_GUIDE.md`](docs/OPERATOR_GUIDE.md) · every number with its sample size: [`validation/ACCURACY_ASSESSMENT.md`](validation/ACCURACY_ASSESSMENT.md)
+
+---
+
 # Methodology
 
 ## Scientific Foundation

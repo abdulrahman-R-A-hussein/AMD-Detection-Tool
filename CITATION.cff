@@ -1,31 +1,45 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 type: software
-title: "Acid Mine Drainage (AMD) and Coal Mine Drainage (CMD) Detection System: Advanced Remote Sensing for Environmental Monitoring"
-version: 1.5.4
-date-released: 2024-08-01
+title: "Acid Mine Drainage (AMD) and Coal Mine Drainage (CMD) Detection System: a validated reimplementation of USGS SIM 3466, with its measured limits"
+version: 3.10.0
+date-released: 2026-09-13
 doi: 10.5281/zenodo.19429983
 authors:
   - family-names: "Hussein"
     given-names: "Abdulrahman"
     orcid: "https://orcid.org/0009-0003-0401-9219"
     affiliation: "Kent State University, Department of Earth Sciences, Environmental Remote Sensing Laboratory"
-repository-code: "https://github.com/coodawy/AMD-Detection-Tool"
+repository-code: "https://github.com/abdulrahman-R-A-hussein/AMD-Detection-Tool"
 url: "https://www.climtawy.com"
 abstract: >
-  The detection of cryptic pollution, particularly coal mine drainage (CMD) neutralized by carbonate
-  bedrock, remains a significant challenge in hydrogeology because these waters often retain toxic
-  sulfate loads despite exhibiting a neutral pH. This automated remote sensing workflow identifies
-  these anomalies without constant extensive ground sampling. We adapted the automated AMD detection
-  method originally proposed by Rockwell et al. (2021) for the USGS, translating the workflow into
-  custom Python algorithms for rapid processing of Landsat 8/9 and Sentinel-2 for higher resolution
-  results. The method was modified to detect spectral anomalies specifically within water bodies,
-  utilizing the iron sulfate index and new filtering equations to map potential pollution dispersion.
-  Preliminary application to Ganau Pond (Kurdistan Region, Iraq), a site with high sulfate (>700 mg/L),
-  revealed distinct spectral increases corresponding with suspected pollution inflows. Validated against
-  ground truth geochemical data from the Muskingum Watershed, Ohio. This research presents a cost-effective,
-  automated tool for preliminary water quality assessment in data-scarce regions. Presented at the 40th
-  Annual Graduate Research Symposium, Kent State University.
+  An open reimplementation of the automated iron-sulfate mineral mapping method published by Rockwell
+  and Gnesda (2021, USGS SIM 3466), which released a method and a result raster but no code, together
+  with a pre-registered programme measuring what that method can and cannot do. The land arm reproduces
+  all six published index formulas exactly; three departures this project had introduced as improvements
+  were measured as regressions, and correcting them raised worst-case leave-one-site-out Youden J from
+  0.107 to 0.440 against the published map. Agreement with that map is replica fidelity, not accuracy:
+  only measured field chemistry is treated as ground truth.
+  Against 86 chemically confirmed mine-discharge points across four Colorado districts, scored on
+  USGS and EPA water chemistry, detection is a measured NULL - all nine candidate indices fail all
+  three control tiers, the best case reaching Youden J 0.234 against a pre-registered bar of 0.25.
+  What does survive is severity ranking: a red-to-blue band ratio tracks measured dissolved iron at
+  Spearman rho +0.568 (n=75, within-region permutation p=0.0004), sign-consistent across all four
+  districts, but with negative leave-one-region-out R2 for every index-analyte pair - so it ranks
+  severity within a district and does not predict concentration across districts. Detection and
+  severity are both flat from 10 m to 100 m pixel size, so spatial resolution is not the binding
+  constraint in that range. In Appalachian coal watersheds a vegetation index tracks measured sulfate
+  and conductance negatively and sign-consistently, at a scale that differs between basins.
+  IMPORTANT - RETRACTIONS. Versions up to and including 1.5.4 claimed a validated in-water
+  contamination-detection capability, including validation against Muskingum Watershed (Ohio)
+  chemistry and detection of high-sulfate water at Ganau Pond, Iraq. Those claims are RETRACTED.
+  The Ohio water column is a measured null; the Ganau result was circular, because the thresholds
+  were tuned until that site scored as contaminated; and the water mask that produced the apparently
+  clean controls admitted zero water pixels at two of them. Sulfate has no VNIR absorption and no
+  optical sulfate detection is claimed at any concentration - any apparent signal is iron, turbidity,
+  or colour that co-varies with sulfate. The full record, including every retraction and the
+  pre-registrations that were committed before their data, is in the repository under validation/.
+  Earlier work presented at the 40th Annual Graduate Research Symposium, Kent State University.
 keywords:
   - "acid mine drainage"
   - "coal mine drainage"
@@ -37,19 +51,28 @@ keywords:
   - "Landsat"
   - "Sentinel-2"
   - "iron sulfate minerals"
-  - "contamination detection"
+  - "pre-registration"
+  - "reproducibility"
 license: MIT
 references:
-  - type: "article"
+  - type: "map"
     authors:
       - family-names: "Rockwell"
         given-names: "Barnaby W."
-      - family-names: "McDougal"
-        given-names: "Raymond R."
-      - family-names: "Gent"
-        given-names: "Carol A."
+      - family-names: "Gnesda"
+        given-names: "William R."
     title: "Improved automated identification and mapping of iron sulfate minerals, other mineral groups, and vegetation using Landsat 8 Operational Land Imager data, San Juan Mountains, Colorado, and Four Corners Region"
     year: 2021
     publisher: "U.S. Geological Survey"
-    genre: "map"
     number: "SIM 3466"
+    doi: "10.3133/sim3466"
+  - type: "data"
+    authors:
+      - family-names: "Rockwell"
+        given-names: "Barnaby W."
+      - family-names: "Gnesda"
+        given-names: "William R."
+    title: "Digital map of iron sulfate minerals, other mineral groups, and vegetation of the western United States derived from automated analysis of Landsat 8 satellite data"
+    year: 2021
+    publisher: "U.S. Geological Survey"
+    doi: "10.5066/P9BYV5H4"

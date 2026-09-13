@@ -1,3 +1,15 @@
+> # ⛔ SUPERSEDED
+> **Dated November 2025. Retained as a historical record, not as a statement of
+> capability.** Banner added 2026-09-13.
+>
+> This file titled "Zero Contradictions" and offers "Guarantees (Mathematical Proof)".
+>
+> **What is now known:** The proof covers only mutual exclusivity of the land and water masks — a set-theoretic fact, not correctness of the tool. Live contradictions remain and are tracked in `docs/OPERATOR_GUIDE.md` section 7: the click inspector is a **different classifier** from the map, and the statistics panel and accuracy masks use absolute thresholds while the map defaults to adaptive ones.
+>
+> Current state: [`validation/STATE.md`](validation/STATE.md) · how to run it and read it: [`docs/OPERATOR_GUIDE.md`](docs/OPERATOR_GUIDE.md) · every number with its sample size: [`validation/ACCURACY_ASSESSMENT.md`](validation/ACCURACY_ASSESSMENT.md)
+
+---
+
 # Final Logic Verification: Zero Contradictions
 **Comprehensive Detection with Complete Separation**
 

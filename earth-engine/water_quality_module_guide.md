@@ -1,3 +1,15 @@
+> # ⛔ SUPERSEDED
+> **Dated November 2025. Retained as a historical record, not as a statement of
+> capability.** Banner added 2026-09-13.
+>
+> This file documents the in-water contamination-scoring module and its physical mechanism, including "NIR Anomaly (MOST DIAGNOSTIC!)" and a "Validation Against Known Sites" table.
+>
+> **What is now known:** **The entire in-water module is retracted.** Every ratio index ranked the *clean* control highest. The Ohio water column is a measured null (no feature's 95% CI excludes zero for iron or sulfate); what the water arm actually detects is **turbidity**. The "Validation Against Known Sites" table lists *expected* results, not measured ones.
+>
+> Current state: [`validation/STATE.md`](validation/STATE.md) · how to run it and read it: [`docs/OPERATOR_GUIDE.md`](docs/OPERATOR_GUIDE.md) · every number with its sample size: [`validation/ACCURACY_ASSESSMENT.md`](validation/ACCURACY_ASSESSMENT.md)
+
+---
+
 # Water Quality Contamination Detection Module
 **Separate from Land AMD Detection**
 

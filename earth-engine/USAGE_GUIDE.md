@@ -1,3 +1,15 @@
+> # ⛔ SUPERSEDED
+> **Dated November 2025. Retained as a historical record, not as a statement of
+> capability.** Banner added 2026-09-13.
+>
+> This file describes v2.x operation, including a "Validate on Known Sites" workflow and slider-tuning advice.
+>
+> **What is now known:** **Do not follow the tuning workflow.** Adjusting thresholds until known sites produce the expected answer is the circularity this project retracted (findings W1 and C3). It also documents the **wrong** iron index — `(B2+B4)/B1`, since corrected to `(B2/B1)-(B5/B4)` — and v2.x threshold defaults that measured worst-case Youden J 0.107 against the published map.
+>
+> Current state: [`validation/STATE.md`](validation/STATE.md) · how to run it and read it: [`docs/OPERATOR_GUIDE.md`](docs/OPERATOR_GUIDE.md) · every number with its sample size: [`validation/ACCURACY_ASSESSMENT.md`](validation/ACCURACY_ASSESSMENT.md)
+
+---
+
 # AMD Detection Tool - Usage & Validation Guide
 **Version 1.1.0 - Streamlined Interface**
 

@@ -33,17 +33,9 @@ import json
 import sys
 import urllib.request
 
-KEY = r"D:\dev\VPCA+STEPWISE-REGRESSION\planty-gee-backend-b357c7b51077.json"
+from ee_auth import init_ee  # noqa: F401  shared auth - see python/ee_auth.py
 BASINS = "WWF/HydroSHEDS/v1/Basins/hybas_12"
 SQMI_PER_KM2 = 0.386102
-
-
-def init_ee():
-    import ee
-    info = json.load(open(KEY))
-    ee.Initialize(ee.ServiceAccountCredentials(info["client_email"], KEY),
-                  project=info["project_id"])
-    return ee
 
 
 def nwis_drainage_area_sqmi(site_no):

@@ -36,7 +36,7 @@ CHEM = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                     "data", "chemistry", "consolidated.csv")
 OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                    "data", "matched", "matched_spectra_chemistry.csv")
-KEY = r"D:\dev\VPCA+STEPWISE-REGRESSION\planty-gee-backend-b357c7b51077.json"
+from ee_auth import init_ee  # noqa: F401  shared auth - see python/ee_auth.py
 
 # Sentinel-2 SR -> the SR_B1..SR_B7 naming the rest of the toolchain uses.
 # B8A (865 nm) rather than B8 (842 nm) because it matches Landsat 8 B5.
@@ -46,17 +46,6 @@ S2_MAP = [("B1", "SR_B1"), ("B2", "SR_B2"), ("B3", "SR_B3"), ("B4", "SR_B4"),
 # Chemistry to carry through. Iron is handled separately (split by fraction).
 CHARS = ["Sulfate", "pH", "Turbidity", "Total suspended solids",
          "Specific conductance", "Chlorophyll a", "Manganese", "Aluminum"]
-
-
-def init_ee():
-    import json
-
-    import ee
-    with open(KEY) as fh:
-        info = json.load(fh)
-    ee.Initialize(ee.ServiceAccountCredentials(info["client_email"], KEY),
-                  project=info["project_id"])
-    return ee
 
 
 def screen_stream_width(ee, samples, min_width_m, sensor_scale):

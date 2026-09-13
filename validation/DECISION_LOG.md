@@ -50,10 +50,11 @@ terrain, and does not transfer to forested neutral-pH coal drainage.**
 | 2026-09-08 | **CMD2** confound | Is the Ohio vegetation–sulfate link just mining land cover? | **Confound REAL** (+0.519 / −0.283). Primary **PARTIAL by 0.004**. **T2 REFUTES the near-channel reading** — \|rho\| peaks at 1 km | v3.9.0 |
 | 2026-09-09 | **Tool v3.1.0** | Can the tool be pointed at any area of interest? | **It could not** — 30 hardcoded AOIs + 5 hand-synced dicts. Now free-form on both surfaces. **3 UI defects fixed**; the AOI extent was silently a classification parameter | tool `v3.1.0` |
 | 2026-09-09 | **CMD3** PA replication | Does CMD2's landscape-scale reading hold in another coal basin? | **FAILS TO REPLICATE** on the named falsifier. **Sign replicates** (−0.187, n=443, p=0.0002, **first sign-consistent CMD result**); **scale does not** — PA is monotone *declining*, the opposite of Ohio. CMD2 **bounded to Ohio**; radius shape **fails as a mechanism diagnostic** | v3.10.0 |
+| 2026-09-13 | **Record + grant readiness** | Does the outward-facing record match the measured one, and is there an honest grant case? | **It did not** — 9 documents incl. the DOI'd `CITATION.cff` asserted retracted water detection. Corrected; **0 live hazards**. Added ACCURACY_ASSESSMENT, GRANT_CASE, FIELD_CAMPAIGN. One load-bearing number (0.440) was **untraceable to raw output** — regenerated, reproduces exactly. Planned UAV prediction found **non-discriminating**. Python arm made runnable off this machine | v3.10.0 |
 
 ---
 
-## The eight corrections that shaped the method
+## The nine corrections that shaped the method
 
 Each was a case where **we** were wrong, not the data. They are the most
 transferable content in this project.
@@ -129,6 +130,24 @@ across sites unless the shape itself has been shown to transfer. If mechanism
 is the question, vary mechanism, not footprint. And CMD2's catchment-scale
 conclusion is **bounded to Ohio**, not withdrawn — the Ohio measurement stands;
 only its generality does not.
+
+### 9. A prediction must be one the baseline could fail (field campaign, 2026-09-13)
+The grant plan proposed a falsifiable drone test: low-altitude imaging would
+bring the canopy diagnostic (median buffer NDVI) below 0.6. Checked against
+existing results, **leaf-off satellite already does that** — 0.462 in Ohio,
+0.529 in Pennsylvania. The prediction could not fail for the drone *or* the
+satellite, so it could not tell them apart, and would have "confirmed" a drone
+on evidence the satellite already provides.
+
+**Consequence:** a test of added value is run against the baseline on the same
+units. H-UAV now compares UAV and leaf-off satellite at the same chemistry
+stations, with mutually exclusive rows: UAV meets the bar and satellite does
+not / both meet it / UAV does not.
+
+**A related near-miss the same day:** a load-bearing figure (0.440) was cited
+in five documents but existed only in prose reports, so every "verification" of
+it had compared one summary with another. **A number is verified only against
+raw output.** Regenerated and committed, it reproduced exactly.
 
 ### 8. A pre-registered verdict table must have MUTUALLY EXCLUSIVE rows (CMD3)
 CMD3's registration listed three outcomes: `(a) and (b) → REPLICATES`,

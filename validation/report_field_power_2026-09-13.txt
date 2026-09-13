@@ -1,0 +1,34 @@
+FIELD CAMPAIGN SAMPLE SIZES   alpha=0.05 two-sided, power=0.80, reps=4000, seed=20260913
+
+1. DOSE-RESPONSE - stations per district to detect Spearman rho
+   rho    closed-form n   simulated power at that n   anchor
+   0.300     89           0.820                        project bar |rho| >= 0.3
+   0.400     51           0.828                        
+   0.500     33           0.832                        
+   0.568     25           0.848                        measured pooled FerricIron1 vs dissolved Fe (L8)
+   0.640     20           0.869                        measured Central City / Silverton district rho
+
+2. SIGN CONSISTENCY - P(all k districts estimate a positive rho)
+   per-district probability simulated; all-k = product (districts independent)
+   true rho   n/district   P(one +)   P(all 3 +)   P(all 4 +)
+   0.20        10          0.704      0.348        0.245
+   0.20        20          0.797      0.507        0.405
+   0.20        30          0.842      0.596        0.502
+   0.20        50          0.916      0.769        0.704
+   0.30        10          0.800      0.513        0.411
+   0.30        20          0.908      0.750        0.681
+   0.30        30          0.954      0.867        0.827
+   0.30        50          0.982      0.946        0.929
+   0.50        10          0.934      0.814        0.760
+   0.50        20          0.987      0.962        0.949
+   0.50        30          0.998      0.993        0.990
+   0.50        50          1.000      1.000        1.000
+
+3. DISCOVERY - field visits to estimate precision or recall
+   95%% Wilson half-width at the least-favourable p = 0.5
+   +/- 0.20   ->   21 visits
+   +/- 0.15   ->   39 visits
+   +/- 0.10   ->   93 visits
+   at p = 0.2 (a plausible precision for a detector that failed its bar):
+   +/- 0.15   ->   26 visits
+   +/- 0.10   ->   60 visits

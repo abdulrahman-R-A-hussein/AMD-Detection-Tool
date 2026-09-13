@@ -41,7 +41,7 @@ import zipfile
 
 import numpy as np
 
-KEY = r"D:\dev\VPCA+STEPWISE-REGRESSION\planty-gee-backend-b357c7b51077.json"
+from ee_auth import init_ee  # noqa: F401  shared auth - see python/ee_auth.py
 SQMI_PER_KM2 = 0.386102
 MERIT = "MERIT/Hydro/v1_0_1"
 
@@ -51,14 +51,6 @@ D8 = {1: (0, 1), 2: (1, 1), 4: (1, 0), 8: (1, -1),
 # For neighbour at offset (dr, dc) from cell X, the neighbour flows INTO X iff
 # its dir code maps to (-dr, -dc).
 INFLOW_CODE = {(-dr, -dc): code for code, (dr, dc) in D8.items()}
-
-
-def init_ee():
-    import ee
-    info = json.load(open(KEY))
-    ee.Initialize(ee.ServiceAccountCredentials(info["client_email"], KEY),
-                  project=info["project_id"])
-    return ee
 
 
 def _fetch_band(ee, region, band, scale=92.77):

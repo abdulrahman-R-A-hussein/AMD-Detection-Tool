@@ -2,7 +2,7 @@
 
 **Applies to:** `earth-engine/amd_detection_v2.4.0.js` at **v3.1.0** (the
 filename still says 2.4.0; the contents do not — see `validation/STATE.md`) and
-the `python/` pipeline as of 2026-09-09.
+the `python/` pipeline as of 2026-09-13.
 
 > **Supersedes** `earth-engine/USAGE_GUIDE.md`, `earth-engine/LAYER_STRUCTURE.md`
 > and `earth-engine/FINAL_LOGIC_VERIFICATION.md`. Those are dated Nov 2025 and
@@ -19,6 +19,106 @@ There are **two surfaces** and they answer different questions.
 | **Needs chemistry** | no | yes |
 | **Output** | a map you read | numbers with n, p and a caveat |
 | **Validated?** | only in the terrain listed below | yes, within stated bounds |
+
+---
+
+## 0. Setup — from nothing to a first result
+
+**Added 2026-09-13.** This guide previously explained how to *read* the output
+but never how to get to it, and its section 8 told readers to run an
+interpreter path that exists only on the author's machine.
+
+### Earth Engine tool — about 10 minutes, nothing to install
+
+1. Sign in at [code.earthengine.google.com](https://code.earthengine.google.com)
+   and register a Google Cloud project for Earth Engine. Noncommercial research
+   use is available. The Code Editor's project selector supplies the project;
+   the script does not name one.
+2. New script → paste
+   [`earth-engine/amd_detection_v2.4.0.js`](../earth-engine/amd_detection_v2.4.0.js)
+   → **Run**.
+3. **Nothing else.** Every collection it reads is public — Landsat 8/9
+   Collection 2 Level 2, Sentinel-2 SR Harmonized, Cloud Score+. No assets, no
+   permissions to request.
+4. *Optional:* the **Export Threshold CSV** button needs two drawn geometry
+   layers named `amdPolygons` and `cleanPolygons`. If they are missing it prints
+   instructions rather than failing. Nothing else uses them.
+
+> **Sentinel-2 quietly shortens the record.** The collection window is
+> 2013–2020, but Sentinel-2 surface reflectance begins in 2017, so selecting it
+> analyses roughly 2017–2020 — a different basis from the Landsat presets.
+
+### Python pipeline
+
+1. **Python 3.11.**
+2. **One virtual environment, in the repository:**
+
+   ```bash
+   python -m venv .venv
+   ```
+
+   Activate it — PowerShell `.venv/Scripts/Activate.ps1`, bash
+   `source .venv/bin/activate` — then:
+
+   ```bash
+   pip install -r python/requirements.txt
+   ```
+
+3. **Earth Engine credentials — choose one.** Resolution lives in one place,
+   [`python/ee_auth.py`](../python/ee_auth.py).
+
+   | option | do this | when |
+   |---|---|---|
+   | **A. personal account** | `earthengine authenticate`, then set `GEE_PROJECT` to your Cloud project id | simplest; most people |
+   | **B. service account** | set `GEE_SERVICE_ACCOUNT_KEY` to the JSON key path. The service account must *also* be registered for Earth Engine — a separate step from creating it | unattended runs |
+
+   Check it before anything else:
+
+   ```bash
+   python python/ee_auth.py
+   ```
+
+   It prints `Earth Engine initialised OK`, or says exactly what is missing.
+
+4. **Smoke tests:**
+
+   | command | needs | expect |
+   |---|---|---|
+   | `python python/classify_v240.py` | nothing — runs from a bare clone | a self-test pass against the committed Silverton pixel export |
+   | `python python/catchment_dem.py --self-test` | Earth Engine | `6/6 within +/-33%` and `PASS` |
+
+5. **Data.** `data/` is gitignored and regenerable from committed code.
+   Chemistry needs only a network connection. **Rockwell's raster** is needed
+   only for the Rockwell-comparison arm:
+   - download from USGS ScienceBase, DOI
+     [10.5066/P9BYV5H4](https://doi.org/10.5066/P9BYV5H4) — a zip of about
+     **309 MB**;
+   - extract so this exact path exists, with its `.ige` (**~4.7 GB**) and
+     `.rrd` (**~1.6 GB**) sidecars beside it — **~6.3 GB** in total:
+
+     ```
+     data/rockwell/L8_US_Southwest/SouthWest/l8_aa13_southwest_mosaic11.img
+     ```
+
+     Four modules hard-code that path.
+
+6. **A first real result**, roughly 10–15 minutes:
+
+   ```bash
+   python python/fetch_wqp.py --region "Monday Creek, OH"
+   python python/cmd_detect.py --extract --season leafoff --radii 30,60,100 \
+       --bands NDVI_stress --regions monday_creek_oh --out data/matched/cmd_first.csv
+   python python/cmd_detect.py --analyse --inputs data/matched/cmd_first.csv
+   ```
+
+   Observed run times: a chemistry fetch takes **2–8 minutes** per region; an
+   extraction pass **1–5 minutes** per region, and up to ~19 minutes for a
+   large one.
+
+7. **Expect alarming-looking retry lines.** `memory limit - retrying at batch=N`
+   is normal Earth Engine behaviour, handled automatically. If a region still
+   fails, see *The GEE memory trap* in section 8 **before** changing anything —
+   two of the four ways to make it fit silently change the numbers.
 
 ---
 
@@ -261,14 +361,17 @@ map — that map is unvalidated.
 
 ## 8. Running the Python pipeline
 
-### Two virtualenvs — this has cost a wasted run
+### Environment
 
-| need | interpreter |
-|---|---|
-| Earth Engine (`ee`) — **and** `rasterio` | `D:/dev/VPCA+STEPWISE-REGRESSION/.venv/Scripts/python.exe` |
-| `rasterio`, pandas, no `ee` | `.venv/Scripts/python.exe` (repo-local) |
+Use the single virtual environment from section 0 — `python/requirements.txt`
+now lists every package the pipeline imports. It previously omitted `rasterio`,
+`requests` and `shapely`, so a fresh install failed at first use in seven
+modules.
 
-When in doubt use the VPCA venv; it has both.
+> **On the author's machine only**, there are two environments for historical
+> reasons: Earth Engine plus `rasterio` in
+> `D:/dev/VPCA+STEPWISE-REGRESSION/.venv`, and a repo-local `.venv` without
+> `ee`. That split is local, not part of the project; `CLAUDE.md` records it.
 
 > **After a machine reinstall both venvs break** with `No Python at '...'` while
 > `site-packages` is intact — `pyvenv.cfg` pins an absolute path under the old
@@ -305,19 +408,19 @@ memory problem into a methodology problem.
 ### End-to-end on a new region
 
 ```bash
-VPCA=D:/dev/VPCA+STEPWISE-REGRESSION/.venv/Scripts/python.exe
+PY=python    # the activated environment from section 0
 
 # 1. chemistry (once per region)
-$VPCA python/fetch_wqp.py --region "<Name>, <ST>" --bbox "lat_lo,lon_lo,lat_hi,lon_hi"
+$PY python/fetch_wqp.py --region "<Name>, <ST>" --bbox "lat_lo,lon_lo,lat_hi,lon_hi"
 
 # 2a. coal / neutral-pH dose-response
-$VPCA python/cmd_detect.py --extract --season leafoff --radii 30,60,100,500,1000 \
+$PY python/cmd_detect.py --extract --season leafoff --radii 30,60,100,500,1000 \
       --bands NDVI_stress --regions <slug> --out data/matched/cmd_<slug>.csv
-$VPCA python/cmd_detect.py --analyse --inputs data/matched/cmd_<slug>.csv
+$PY python/cmd_detect.py --analyse --inputs data/matched/cmd_<slug>.csv
 
 # 2b. acid metal-mine seep detection
-$VPCA python/seep_detect.py --extract --sensor L8 --regions <slug>
-$VPCA python/seep_detect.py --analyse
+$PY python/seep_detect.py --extract --sensor L8 --regions <slug>
+$PY python/seep_detect.py --analyse
 ```
 
 ### What stays region-locked no matter what

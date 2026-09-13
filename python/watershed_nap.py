@@ -59,7 +59,7 @@ from collections import Counter, defaultdict
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-KEY = r"D:\dev\VPCA+STEPWISE-REGRESSION\planty-gee-backend-b357c7b51077.json"
+from ee_auth import init_ee  # noqa: F401  shared auth - see python/ee_auth.py
 ROCKWELL_RASTER = os.path.join(ROOT, "data", "rockwell", "L8_US_Southwest",
                                "SouthWest", "l8_aa13_southwest_mosaic11.img")
 
@@ -72,14 +72,6 @@ ROCKWELL_COLLAPSE = {16: 12, 20: 17, 21: 18}
 
 CHEM_VARS = ["Iron_mgL_dissolved", "Iron_mgL_any", "Sulfate_mgL", "pH",
             "SpecificConductance"]
-
-
-def init_ee():
-    import ee
-    info = json.load(open(KEY))
-    ee.Initialize(ee.ServiceAccountCredentials(info["client_email"], KEY),
-                  project=info["project_id"])
-    return ee
 
 
 # ---------------------------------------------------------------- chemistry

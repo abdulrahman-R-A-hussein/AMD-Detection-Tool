@@ -1,23 +1,33 @@
-# AMD Detection Tool - Python Dependencies
-# ==========================================
-# Install with: pip install -r requirements.txt
+# AMD Detection Tool - Python dependencies
+# =========================================
+# Python 3.11 (tested on 3.11.16).
+# Install:   pip install -r python/requirements.txt
+# Then set up Earth Engine credentials - see docs/OPERATOR_GUIDE.md section 0,
+# or run `python python/ee_auth.py` for a guided check.
 
-# Google Earth Engine API
-earthengine-api>=0.1.370
-
-# Interactive mapping
-geemap>=0.30.0
-folium>=0.14.0
-
-# Data processing (optional but recommended)
-pandas>=2.0.0
+# --- core: the validated pipeline ------------------------------------------
+earthengine-api>=0.1.370   # every Earth Engine step; auth in python/ee_auth.py
 numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.11.0              # statistics; python/field_power.py
+rasterio                   # catchment_dem, compare_rockwell, watershed_nap,
+                           # cmd_confound, pool_labels, iron_index_transfer,
+                           # diagnose_veg_gate
+requests                   # catchment_dem (USGS NWIS), cmd_confound (ODNR ArcGIS)
+shapely                    # catchment_dem, cmd_confound
 
-# Jupyter notebook support
-ipywidgets>=8.0.0
-
-# Validation stack (vpca_validation.py, derive_thresholds.py)
-# VPCA spectral-library validation + ROC threshold derivation.
-scipy>=1.11.0
-scikit-learn>=1.3.0
+# --- validation stack --------------------------------------------------------
+scikit-learn>=1.3.0        # vpca_validation.py
 matplotlib>=3.7.0
+
+# --- optional ---------------------------------------------------------------
+# rasterio, requests and shapely were previously missing from this file even
+# though seven modules import them, so a fresh install failed at first use.
+#
+# The packages below are needed ONLY by python/amd_detection.py - a v1.5.1 port
+# that predates every v2.x correction and must not be used for comparisons -
+# and by notebooks. Uncomment if you need them.
+# geemap>=0.30.0
+# folium>=0.14.0
+# ipywidgets>=8.0.0
+# pypdf                    # to extract text from paper.pdf (SIM 3466)

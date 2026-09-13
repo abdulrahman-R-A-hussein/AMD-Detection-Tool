@@ -1,6 +1,6 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-09-09 · **Current tag:** `v3.9.0` (tool: `v3.1.0`)
+**Last updated:** 2026-09-13 · **Current tag:** `v3.10.0` (tool: `v3.1.0`)
 
 This file is the canonical "where are we right now". It is maintained under
 the logging rule in [`../CLAUDE.md`](../CLAUDE.md). It should be sufficient to
@@ -74,6 +74,79 @@ panel, click inspector and accuracy masks use absolute thresholds
 unconditionally and so disagree with the map; classes 6/10 unreachable; two
 legend swatches disagree with the palette; the legend omits water class 3
 (grey = INDETERMINATE, which must never be pooled with clean).
+
+---
+
+## RECORD AND GRANT READINESS (2026-09-13)
+
+**The externally-facing record now matches the measured one.** Before this,
+nine documents asserted a validated in-water detection capability that this
+file records as retracted — most seriously `CITATION.cff`, minted under DOI
+`10.5281/zenodo.19429983`, which claimed validation against Muskingum Watershed
+chemistry: the **opposite** of the measured null.
+- **Rewritten:** `CITATION.cff`, `README.md`, `PROJECT_OVERVIEW.md`,
+  `python/README.md` (its spectral-index formulas were wrong).
+- **Bannered, findings unedited:** the six Nov-2025 `earth-engine/*.md` guides,
+  `docs/METHODOLOGY.md`, `specs/amd-v2/*`, `PUBLIC_RELEASE_SUMMARY.md`,
+  `DOI_UPDATE_SUMMARY.md`, `PUBLISHING_CHECKLIST.md`.
+- **Renamed:** `earth-engine/validation_results.md` →
+  `validation_results_2025-11_SUPERSEDED.md` — its filename asserted a
+  validation it does not contain.
+- A sweep for every refuted-claim pattern finds **zero** unqualified hits.
+
+**New documents:**
+[`ACCURACY_ASSESSMENT.md`](ACCURACY_ASSESSMENT.md) (every number with n and
+reference standard) · [`../docs/GRANT_CASE.md`](../docs/GRANT_CASE.md) (the
+honest fundable argument) · [`../docs/FIELD_CAMPAIGN.md`](../docs/FIELD_CAMPAIGN.md)
+(sites, hypotheses, sample sizes from `python/field_power.py`).
+
+**Verified while writing them, and worth knowing:**
+- **A load-bearing number could not be traced.** The land-arm `0.107 → 0.440`
+  existed only in `.md` reports; those scripts print to stdout, so it had only
+  ever been checked against another summary. Regenerated — **reproduces
+  exactly** — and committed as `report_paper_faithful_2026-09-13.txt`. The
+  other load-bearing figures (0.234, +0.568, −0.354) verified against existing
+  raw output.
+- **All 7 pre-registrations were committed before their results**, checked by
+  commit ancestry, not filenames. Gaps run **11 min to 5 h 06 m**. Commit order
+  proves order; it does **not** prove analysis was not run locally in the gap.
+  The CMD1 files carry 2026-08-16 in their names but entered git on
+  **2026-08-24** (ordering still holds).
+- **The planned drone prediction did not discriminate.** It predicted UAV
+  imaging would bring the canopy diagnostic below 0.6 — **leaf-off satellite
+  already does** (0.462 Ohio, 0.529 Pennsylvania). Replaced by **H-UAV**: UAV
+  against leaf-off satellite on the same stations.
+- **Why archival data could not settle sign consistency:** at ~20 source points
+  per district, a true rho of 0.3 fails the four-district sign check about one
+  time in three — P(all 4 positive) = **0.681**. Leadville's +0.00 may be partly
+  sampling, not only heterogeneity.
+- **Archival iron tiers are uneven:** Ouray has **no** source point ≥10 mg/L
+  dissolved Fe on record; Silverton has one; Central City has 14.
+
+**Cold start fixed — the Python arm was unrunnable anywhere but this machine.**
+`python/ee_auth.py` replaces five copies of `init_ee()` that hard-coded a key
+path inside a sibling repository. Credentials now resolve
+`$GEE_SERVICE_ACCOUNT_KEY` → legacy path → `$GEE_PROJECT` (personal
+`earthengine authenticate`) → a clear setup error. `requirements.txt` gained
+`rasterio`, `requests`, `shapely`. `docs/OPERATOR_GUIDE.md` §0 is a real setup
+section. **Verified behaviour-neutral:** 27 modules compile; the old
+`from gee_classify import init_ee` path resolves to the shared function; a live
+Earth Engine call succeeds; the CMD1 baseline still reproduces (−0.354, n=137,
+p=0.0028); `catchment_dem --self-test` 6/6 PASS; `classify_v240` bare-clone
+smoke test PASS (94.95%, its documented ceiling).
+
+**Outstanding — only the author can do these:**
+1. **Publish a new Zenodo version.** `CITATION.cff` is corrected in-repo, but a
+   minted DOI is not changed by a local edit; until then anyone citing
+   `10.5281/zenodo.19429983` gets the retracted Muskingum claim.
+2. **`.private/EB2_DOCUMENTATION.md`** carries the same retracted claim and
+   lists the retracted water module as evidence of ability. Deliberately
+   untouched — gitignored, and may already be with an attorney.
+3. **Author name.** `PUBLIC_RELEASE_SUMMARY.md` gave "Ahmad A. Hussein" six
+   times; unified to Abdulrahman Hussein. Check it did not propagate elsewhere.
+4. **The earlier ResearchGate item** on "cryptic sulfate pollution" carries the
+   retracted claims.
+5. **Push** — commits are local.
 
 ---
 
@@ -495,6 +568,15 @@ Both from [`ARM_A_CROSS_REGION_RETEST_2026-08-13.md`](ARM_A_CROSS_REGION_RETEST_
 
 Ordered by value.
 
+**Author actions first (not analysis):** publish the corrected Zenodo version;
+review `.private/EB2_DOCUMENTATION.md`; push. See "RECORD AND GRANT READINESS".
+
+**Field campaign — pre-register before the first field day.** Design in
+`docs/FIELD_CAMPAIGN.md`: H-RANK, H-DET, H-LIMIT, H-PRECIP, H-DISC, H-UAV, each
+with mutually exclusive verdict rows. Recommended: **144** stations across 4
+Colorado districts (9 per iron tier), **~80** discovery visits, **90** stations
+across Huff Run / Clearfield / Moshannon for the UAV comparison.
+
 0. **Pursue the SIGN, not the scale — that is what replicated (post-CMD3).**
    A negative vegetation–sulfate/conductance association now holds in **two**
    independent coal basins and, in Pennsylvania, **across three disjoint
@@ -578,6 +660,15 @@ Ordered by value.
 
 ## KNOWN TRAPS
 
+- **Earth Engine credentials resolve in ONE place: `python/ee_auth.py`.**
+  Order: `$GEE_SERVICE_ACCOUNT_KEY` → the author's legacy key path →
+  `$GEE_PROJECT` with personal `earthengine authenticate` credentials → a
+  RuntimeError with setup steps. `python python/ee_auth.py` checks it.
+  **Never re-add a `KEY` constant to a module** — that is how five copies
+  pointing into a sibling repository accumulated.
+- **Verify a number against RAW output, never against another summary.** The
+  land-arm 0.440 was cited in five documents but existed only in prose; every
+  prior check had compared one summary with another.
 - **Two venvs.** GEE work needs `D:/dev/VPCA+STEPWISE-REGRESSION/.venv`
   (`ee` + `rasterio`); the repo `.venv` has no `ee`. Cost a wasted run already.
 - **⚠ BOTH VENVS BREAK ON A MACHINE REINSTALL, and the error does not say so.**

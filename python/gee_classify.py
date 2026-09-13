@@ -19,7 +19,7 @@ import csv
 import json
 import os
 
-KEY = r"D:\dev\VPCA+STEPWISE-REGRESSION\planty-gee-backend-b357c7b51077.json"
+from ee_auth import init_ee  # noqa: F401  shared auth - see python/ee_auth.py
 START, END = "2013-01-01", "2020-12-31"
 SUMMER = [7, 8, 9]                       # settings.seasonFilter default
 
@@ -36,14 +36,6 @@ T = dict(iron=0.10, ferric1=1.983, ferric2=3.758, ferrous=0.959, clay=0.021,
          green_veg=1.5, dense_veg=3.0, ndvi_max=0.25, bright_max=0.35,
          dark=0.2125, water=0.3, bu_bright=0.18, bu_ndvi_hi=0.15,
          bu_ndvi_lo=-0.10, bu_mndwi=-0.20)
-
-
-def init_ee():
-    import ee
-    info = json.load(open(KEY))
-    ee.Initialize(ee.ServiceAccountCredentials(info["client_email"], KEY),
-                  project=info["project_id"])
-    return ee
 
 
 def process_landsat(ee, img):

@@ -678,8 +678,25 @@ DISCOVERY SIGNAL / NOT BETTER THAN BARE GROUND / NO SIGNAL DETECTED.
 Checked against the registration on synthetic districts only. §9's
 link-distance sensitivity and §10's frame notice were missing; both are now
 implemented and tested. The snow-masked sensitivity still needs its own
-extraction once the primary extraction (3 of 7 districts done at 00:55 EDT)
-finishes.
+extraction once the primary extraction finishes.
+
+**Extraction status, 2026-09-15 11:35 EDT: 5 of 7 districts extracted** (Alma,
+Creede, Lake City, Central City, Leadville). The first run's process ended with
+its Claude session mid-Ouray. Ouray and Silverton were restarted at 09:34; the
+extraction code is behaviour-identical (`tests/test_source_parity.py`).
+**No blind-search analysis has been run.** If interrupted again:
+
+```
+python python/blind_search.py --extract --districts ouray_co,silverton_co
+```
+
+Finished districts are skipped.
+
+**Rule fixed now, before any result:** a district that stops on a transient
+Earth Engine service error (HTTP 502/503, seen intermittently during Ouray) is
+re-extracted, **not** declared FAILED. The registration reserves FAILED (§11)
+for a district that cannot be extracted after the safe memory levers (band
+subset, batch floor 1). The scene cap and composite stay unchanged.
 
 **Field campaign — pre-register before the first field day.** Design in
 `docs/FIELD_CAMPAIGN.md`: H-RANK, H-DET, H-LIMIT, H-PRECIP, H-DISC, H-UAV, each

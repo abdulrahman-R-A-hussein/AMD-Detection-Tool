@@ -1,0 +1,52 @@
+BLIND-SEARCH SAMPLE - fixed from station metadata only (no index values read)
+link distance 250 m; B2 targets n=86
+
+  hyp    district          source  dup  used  in-analysed-box  <250m-of-target  kept  SITES  PRIMARY(mine)
+  H-BS2  silverton_co          96    0    21                0                4    71     42             23
+  H-BS2  ouray_co              85    0    22                0               12    51     22              6
+  H-BS2  leadville_co          86    0    23                0               40    23     18             12
+  H-BS2  central_city_co       40    0    20                0                3    17     11              9
+  H-BS1  alma_co               12    2     0                0                0    10      7              6
+  H-BS1  creede_co             13    0     0                0                0    13      5              5
+  H-BS1  lake_city_co          50    0     0                0                0    50     21             21
+  T-86   silverton_co          21    0     0                0                0    21     12             12
+  T-86   ouray_co              22    0     0                0                0    22      9              8
+  T-86   leadville_co          23    0     0                0                0    23     13             12
+  T-86   central_city_co       20    0     0                0                0    20      7              5
+
+  PRIMARY sites (>=1 mine-type station): H-BS1=32   H-BS2=50   T-86=37
+  SENSITIVITY sites (incl. spring-only): H-BS1=33   H-BS2=93   T-86=41
+
+EXACT ONE-SIDED BINOMIAL POWER - is recall above the flagged-area budget?
+Holm over the two co-primary hypotheses: the smaller p is tested at 0.025, the other at 0.05.
+
+PRIMARY - sites with >= 1 mine-type station
+  H-BS1  n=32  budget=0.01 alpha=0.025  reject if >=3   sites flagged   r=0.10:0.63  r=0.15:0.88  r=0.20:0.97  r=0.30:1.00
+  H-BS1  n=32  budget=0.01 alpha=0.050  reject if >=2   sites flagged   r=0.10:0.84  r=0.15:0.96  r=0.20:0.99  r=0.30:1.00
+  H-BS1  n=32  budget=0.05 alpha=0.025  reject if >=5   sites flagged   r=0.10:0.21  r=0.15:0.54  r=0.20:0.80  r=0.30:0.98
+  H-BS1  n=32  budget=0.05 alpha=0.050  reject if >=5   sites flagged   r=0.10:0.21  r=0.15:0.54  r=0.20:0.80  r=0.30:0.98
+  H-BS1  n=32  budget=0.10 alpha=0.025  reject if >=8   sites flagged   r=0.10:0.01  r=0.15:0.10  r=0.20:0.30  r=0.30:0.79
+  H-BS1  n=32  budget=0.10 alpha=0.050  reject if >=7   sites flagged   r=0.10:0.04  r=0.15:0.19  r=0.20:0.46  r=0.30:0.89
+  H-BS2  n=50  budget=0.01 alpha=0.025  reject if >=3   sites flagged   r=0.10:0.89  r=0.15:0.99  r=0.20:1.00  r=0.30:1.00
+  H-BS2  n=50  budget=0.01 alpha=0.050  reject if >=3   sites flagged   r=0.10:0.89  r=0.15:0.99  r=0.20:1.00  r=0.30:1.00
+  H-BS2  n=50  budget=0.05 alpha=0.025  reject if >=7   sites flagged   r=0.10:0.23  r=0.15:0.64  r=0.20:0.90  r=0.30:1.00
+  H-BS2  n=50  budget=0.05 alpha=0.050  reject if >=6   sites flagged   r=0.10:0.38  r=0.15:0.78  r=0.20:0.95  r=0.30:1.00
+  H-BS2  n=50  budget=0.10 alpha=0.025  reject if >=10  sites flagged   r=0.10:0.02  r=0.15:0.21  r=0.20:0.56  r=0.30:0.96
+  H-BS2  n=50  budget=0.10 alpha=0.050  reject if >=10  sites flagged   r=0.10:0.02  r=0.15:0.21  r=0.20:0.56  r=0.30:0.96
+
+SENSITIVITY - all sites, including spring-only
+  H-BS1  n=33  budget=0.01 alpha=0.025  reject if >=3   sites flagged   r=0.10:0.65  r=0.15:0.89  r=0.20:0.97  r=0.30:1.00
+  H-BS1  n=33  budget=0.01 alpha=0.050  reject if >=2   sites flagged   r=0.10:0.86  r=0.15:0.97  r=0.20:0.99  r=0.30:1.00
+  H-BS1  n=33  budget=0.05 alpha=0.025  reject if >=5   sites flagged   r=0.10:0.23  r=0.15:0.56  r=0.20:0.82  r=0.30:0.99
+  H-BS1  n=33  budget=0.05 alpha=0.050  reject if >=5   sites flagged   r=0.10:0.23  r=0.15:0.56  r=0.20:0.82  r=0.30:0.99
+  H-BS1  n=33  budget=0.10 alpha=0.025  reject if >=8   sites flagged   r=0.10:0.01  r=0.15:0.11  r=0.20:0.33  r=0.30:0.82
+  H-BS1  n=33  budget=0.10 alpha=0.050  reject if >=7   sites flagged   r=0.10:0.04  r=0.15:0.22  r=0.20:0.50  r=0.30:0.91
+  H-BS2  n=93  budget=0.01 alpha=0.025  reject if >=4   sites flagged   r=0.10:0.99  r=0.15:1.00  r=0.20:1.00  r=0.30:1.00
+  H-BS2  n=93  budget=0.01 alpha=0.050  reject if >=4   sites flagged   r=0.10:0.99  r=0.15:1.00  r=0.20:1.00  r=0.30:1.00
+  H-BS2  n=93  budget=0.05 alpha=0.025  reject if >=10  sites flagged   r=0.10:0.45  r=0.15:0.91  r=0.20:0.99  r=0.30:1.00
+  H-BS2  n=93  budget=0.05 alpha=0.050  reject if >=9   sites flagged   r=0.10:0.59  r=0.15:0.95  r=0.20:1.00  r=0.30:1.00
+  H-BS2  n=93  budget=0.10 alpha=0.025  reject if >=16  sites flagged   r=0.10:0.02  r=0.15:0.32  r=0.20:0.79  r=0.30:1.00
+  H-BS2  n=93  budget=0.10 alpha=0.050  reject if >=15  sites flagged   r=0.10:0.04  r=0.15:0.42  r=0.20:0.86  r=0.30:1.00
+
+site list -> validation\blind_search_sites_2026-09-14.csv
+rows=321  sha256=6ee8aec0a6a25c09d04d906bc0b451b9f480fd57721679a0805ce8d8d6a93eb5

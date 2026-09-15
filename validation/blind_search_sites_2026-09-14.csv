@@ -1,0 +1,322 @@
+hypothesis,district,site_id,n_stations_in_site,site_has_mine_station,station_id,station_name,site_type,lat,lon
+H-BS1,alma_co,alma_co_S001,1,1,DRMS-L-S1,Seep upgradient of South Mosquito Creek,Mine/Mine Discharge,39.2706792,-106.1498072
+H-BS1,alma_co,alma_co_S002,2,1,DRMS-S-5,"Seep from Tailings Pile, West of Road",Mine/Mine Discharge Tailings Pile,39.272888,-106.148066
+H-BS1,alma_co,alma_co_S002,2,1,DRMS-S-6,"Seep from Tailing Pile, Down-gradient of Tailings Pond, West of Road",Mine/Mine Discharge Tailings Pile,39.272629,-106.148142
+H-BS1,alma_co,alma_co_S003,1,1,21COL001_WQX-LM001,LONDON MINE DISCHARGE FLUME,Mine/Mine Discharge,39.2730556,-106.1441667
+H-BS1,alma_co,alma_co_S004,2,1,DRMS-L-S4A,Mill Tailings Pond: South Discharge Pipe,Mine/Mine Discharge,39.2740611,-106.1409636
+H-BS1,alma_co,alma_co_S004,2,1,DRMS-L-S4B,Mill Tailings Pond: North Discharge Pipe,Mine/Mine Discharge,39.2740528,-106.1410108
+H-BS1,alma_co,alma_co_S005,1,0,USGS-391632106054201,SC00907810DCC,Spring,39.27575,-106.0950556
+H-BS1,alma_co,alma_co_S006,1,1,21COL001_WQX-MEAS-BG-16,"ADIT DRAINAGE FROM MIDDLE BUCKSKIN JOE MINE COMPLEX, SAMPLE TO BE COLLECTED WHERE EFFLUENT FLOWS OUT OF GATED ADIT BEFORE IT FLOWS INTO A PIPE THAT GOES UNDER WASTE ROCK AND EMERGES JUST ABOVE BUCKSKIN CREEK AND DISCHARGES INTO CREEK.",Mine/Mine Discharge,39.29102,-106.09435
+H-BS1,alma_co,alma_co_S007,2,1,21COL001_WQX-M4,TRIBUTARY FROM THE NORTH LONDON MINE,Mine/Mine Discharge,39.2922222,-106.1491667
+H-BS1,alma_co,alma_co_S007,2,1,21COL001_WQX-M5,DRAINAGE FROM NORTH LONDON TAILINGS.,Mine/Mine Discharge Waste Rock Pile,39.2927778,-106.1488889
+H-BS1,creede_co,creede_co_S001,1,1,CORIVWCH_WQX-3052,Mammoth Adit - MA,Mine/Mine Discharge Adit (Mine Entrance),37.86725333,-106.919464
+H-BS1,creede_co,creede_co_S002,3,1,21COL001_WQX-NELSON TUNNEL,NELSON TUNNEL DISCHARGE PT.,Mine/Mine Discharge,37.8708333,-106.9291667
+H-BS1,creede_co,creede_co_S002,3,1,CORIVWCH_WQX-3035,Nelson T - NT,Mine/Mine Discharge Adit (Mine Entrance),37.868196,-106.928916
+H-BS1,creede_co,creede_co_S002,3,1,CORIVWCH_WQX-3036,W Willow Cr - Commodore Tunnel,Mine/Mine Discharge Adit (Mine Entrance),37.8697,-106.9292
+H-BS1,creede_co,creede_co_S003,7,1,21COL001_WQX-MEAS-SOL-ADIT,SOLOMINE MINE INSIDE PORTAL AT FLUME BEHIND THE GATE,Mine/Mine Discharge Adit (Mine Entrance),37.880872,-106.917698
+H-BS1,creede_co,creede_co_S003,7,1,21COL001_WQX-MEAS-SOL-WET1,FIRST POND AFTER SOLOMON MINE ADIT INFLOW,Mine/Mine Discharge,37.881094,-106.917683
+H-BS1,creede_co,creede_co_S003,7,1,21COL001_WQX-MEAS-SOL-WET2,CURRENT OUTLET OF LAST WETLAND OF CURRENT SOLOMON MINE SYSTEM,Mine/Mine Discharge,37.881567,-106.917827
+H-BS1,creede_co,creede_co_S003,7,1,21COL001_WQX-SOLOMON ADIT,AT THE SOLOMON ADIT,Mine/Mine Discharge Adit (Mine Entrance),37.8805556,-106.9175
+H-BS1,creede_co,creede_co_S003,7,1,CORIVWCH_WQX-3055,Solomon Adit - Solomon Adit,Mine/Mine Discharge Adit (Mine Entrance),37.87943721,-106.9178134
+H-BS1,creede_co,creede_co_S003,7,1,CORIVWCH_WQX-3056,E Willow Cr - Paynes Culvert,Mine/Mine Discharge Adit (Mine Entrance),37.8805452,-106.9178421
+H-BS1,creede_co,creede_co_S003,7,1,CORIVWCH_WQX-3373,E Willow Cr - PMDTS Discharge,Mine/Mine Discharge Adit (Mine Entrance),37.87943061,-106.9176654
+H-BS1,creede_co,creede_co_S004,1,1,CORIVWCH_WQX-3059,Phoenix M Adit - PMA,Mine/Mine Discharge Adit (Mine Entrance),37.89648771,-106.9183582
+H-BS1,creede_co,creede_co_S005,1,1,CORIVWCH_WQX-3060,Gormex M Adit - GMA,Mine/Mine Discharge Adit (Mine Entrance),37.90173232,-106.9189265
+H-BS1,lake_city_co,lake_city_co_S001,1,1,LFWS-DM-9_LKFRK,Never Sweat Mine Drainage,Mine/Mine Discharge Adit (Mine Entrance),37.98,-107.3
+H-BS1,lake_city_co,lake_city_co_S002,8,1,LFWS-CONTENTION,Contention Draining Mine,Mine/Mine Discharge Adit (Mine Entrance),37.98,-107.29
+H-BS1,lake_city_co,lake_city_co_S002,8,1,LFWS-DM-10_LKFRK,Argus Mine Drainage,Mine/Mine Discharge Adit (Mine Entrance),37.98,-107.29
+H-BS1,lake_city_co,lake_city_co_S002,8,1,LFWS-DM-11_LKFRK,Contention Mine Drainage,Mine/Mine Discharge Adit (Mine Entrance),37.98,-107.29
+H-BS1,lake_city_co,lake_city_co_S002,8,1,LFWS-DM-2_LKFRK,Gladiator Draining Mine,Mine/Mine Discharge Adit (Mine Entrance),37.98,-107.29
+H-BS1,lake_city_co,lake_city_co_S002,8,1,LFWS-DM-3_LKFRK,Ilma-Hiwasee (Golden Fleece) Draining Mine,Mine/Mine Discharge Adit (Mine Entrance),37.98,-107.29
+H-BS1,lake_city_co,lake_city_co_S002,8,1,LFWS-DM-GLADIATOR,Gladiator Draining Mine,Mine/Mine Discharge Adit (Mine Entrance),37.98,-107.29
+H-BS1,lake_city_co,lake_city_co_S002,8,1,LFWS-DM10_SLVRCPR,Argus Draining Mine,Mine/Mine Discharge Adit (Mine Entrance),37.98,-107.29
+H-BS1,lake_city_co,lake_city_co_S002,8,1,LFWS-DMIW_SLVRCPR,Ilma-Hiwasee Draining Mine,Mine/Mine Discharge Adit (Mine Entrance),37.98,-107.29
+H-BS1,lake_city_co,lake_city_co_S003,4,1,LFVC-FI-1,Ilma-Hiwasee (Golden Fleece) Draining Mine,Mine/Mine Discharge,37.98343,-107.29385
+H-BS1,lake_city_co,lake_city_co_S003,4,1,LFVC-FI-2,Ilma-Hiwasee Draining Mine,Mine/Mine Discharge,37.98331,-107.29378
+H-BS1,lake_city_co,lake_city_co_S003,4,1,LFVC-FI-3,Fleece Ilma Mine Adit,Mine/Mine Discharge,37.983835,-107.293743
+H-BS1,lake_city_co,lake_city_co_S003,4,1,USGS-375900107174001,NB04300415CAC,"Subsurface: Tunnel, shaft, or mine",37.9833307,-107.2950551
+H-BS1,lake_city_co,lake_city_co_S004,2,1,LFVC-CDM-1,Contention Draining Mine,Mine/Mine Discharge,37.98542,-107.29853
+H-BS1,lake_city_co,lake_city_co_S004,2,1,LFVC-NS-1,Never Sweat Mine Drainage,Mine/Mine Discharge,37.9862,-107.30027
+H-BS1,lake_city_co,lake_city_co_S005,5,1,LFVC-AM-1,Argus Mine Drainage,Mine/Mine Discharge,37.98642,-107.29439
+H-BS1,lake_city_co,lake_city_co_S005,5,1,LFVC-AM-2,Argus Draining Mine,Mine/Mine Discharge,37.98656,-107.29453
+H-BS1,lake_city_co,lake_city_co_S005,5,1,LFVC-GM-1,Gladiator Draining Mine,Mine/Mine Discharge,37.98877,-107.29591
+H-BS1,lake_city_co,lake_city_co_S005,5,1,LFVC-GM-2,Gladiator Draining Mine,Mine/Mine Discharge,37.98858,-107.29514
+H-BS1,lake_city_co,lake_city_co_S005,5,1,USGS-375910107174001,NB04400415BDC,"Subsurface: Tunnel, shaft, or mine",37.98610847,-107.2950551
+H-BS1,lake_city_co,lake_city_co_S006,2,1,LFWS-DM-8_LKFRK,Jimmy Wells/Dawn of Hope Mine Drainage,Mine/Mine Discharge Adit (Mine Entrance),37.99,-107.29
+H-BS1,lake_city_co,lake_city_co_S006,2,1,LFWS-DM1_418502,Jimmy Well''s Draining Mine aka Dawn of Hope Draining Mine,Mine/Mine Discharge Adit (Mine Entrance),37.99,-107.29
+H-BS1,lake_city_co,lake_city_co_S007,1,1,LFVC-JW-1,Jimmy Well's Draining Mine aka Dawn of Hope Draining Mine,Mine/Mine Discharge,37.99849,-107.29125
+H-BS1,lake_city_co,lake_city_co_S008,5,1,LFWS-DM10_524,Seep near the outhouse at the Golden Wonder,Mine/Mine Discharge,38.0,-107.28
+H-BS1,lake_city_co,lake_city_co_S008,5,1,LFWS-DM2_418502,Redcloud Draining Mine,Mine/Mine Discharge Adit (Mine Entrance),38.0,-107.28
+H-BS1,lake_city_co,lake_city_co_S008,5,1,LFWS-DM2_524,Redcloud Draining Mine,Mine/Mine Discharge Adit (Mine Entrance),38.0,-107.28
+H-BS1,lake_city_co,lake_city_co_S008,5,1,LFWS-DM3_418502,Gold Quartz Draining Mine,Mine/Mine Discharge Adit (Mine Entrance),38.0,-107.28
+H-BS1,lake_city_co,lake_city_co_S008,5,1,LFWS-DM5_524,Seep from the Golden Wonder Mine Waste North,Mine/Mine Discharge,38.0,-107.28
+H-BS1,lake_city_co,lake_city_co_S009,2,1,LFVC-GQ-1,Gold Quartz Draining Mine,Mine/Mine Discharge,38.00146,-107.28627
+H-BS1,lake_city_co,lake_city_co_S009,2,1,LFVC-RC-2,Redcloud Draining Mine,Mine/Mine Discharge,38.00225,-107.28837
+H-BS1,lake_city_co,lake_city_co_S010,6,1,LFVC-DG-4N,Seep from the Golden Wonder Mine Waste North,Mine/Mine Discharge,38.00354,-107.28337
+H-BS1,lake_city_co,lake_city_co_S010,6,1,LFVC-DG-4O,Seep near the outhouse at the Golden Wonder,Mine/Mine Discharge,38.00319,-107.28249
+H-BS1,lake_city_co,lake_city_co_S010,6,1,LFVC-DG-4S,Seep from the Golden Wonder Mine Waste South,Mine/Mine Discharge,38.00337,-107.28327
+H-BS1,lake_city_co,lake_city_co_S010,6,1,LFVC-DG-6,Golden Wonder Level 6 Seep,Mine/Mine Discharge,38.00167,-107.28259
+H-BS1,lake_city_co,lake_city_co_S010,6,1,LFVC-DG4A,Seep at the toe of the Golden Wonder Waste Pile #1,Mine/Mine Discharge,38.00165,-107.28268
+H-BS1,lake_city_co,lake_city_co_S010,6,1,LFVC-DG4B,Seep at the toe of the Golden Wonder Waste Pile #2,Mine/Mine Discharge,38.0016,-107.28274
+H-BS1,lake_city_co,lake_city_co_S011,3,1,LFWS-DM-12,Four Aces Upper Adit,Mine/Mine Discharge Adit (Mine Entrance),38.01,-107.43
+H-BS1,lake_city_co,lake_city_co_S011,3,1,LFWS-DM-13,Four Aces Lower Adit,Mine/Mine Discharge Adit (Mine Entrance),38.01,-107.43
+H-BS1,lake_city_co,lake_city_co_S011,3,1,LFWS-DM-17,El Paso Creek Draining Mine,Mine/Mine Discharge Adit (Mine Entrance),38.01,-107.43
+H-BS1,lake_city_co,lake_city_co_S012,1,1,LFWS-DM-14,Pride of America Mine,Mine/Mine Discharge Adit (Mine Entrance),38.01,-107.42
+H-BS1,lake_city_co,lake_city_co_S013,1,1,LFWS-DM-15,Risorgimento Mine,Mine/Mine Discharge Adit (Mine Entrance),38.01,-107.35
+H-BS1,lake_city_co,lake_city_co_S014,1,1,LFVC-FA-1,Four Aces Upper Adit,Mine/Mine Discharge,38.01031,-107.43304
+H-BS1,lake_city_co,lake_city_co_S015,1,1,LFVC-EPC-3,El Paso Creek Draining Mine,Mine/Mine Discharge,38.0129,-107.4362
+H-BS1,lake_city_co,lake_city_co_S016,1,1,LFVC-PA-1,Pride of America Mine,Mine/Mine Discharge,38.0148,-107.42765
+H-BS1,lake_city_co,lake_city_co_S017,1,1,LFVC-RiM-1,Risorgimento Mine,Mine/Mine Discharge,38.01856,-107.35116
+H-BS1,lake_city_co,lake_city_co_S018,1,1,LFWS-DM-16,Pelican Mine,Mine/Mine Discharge Adit (Mine Entrance),38.02,-107.34
+H-BS1,lake_city_co,lake_city_co_S019,2,1,LFVC-DMBP,Draining Mine below Pelican,Mine/Mine Discharge,38.02026,-107.33244
+H-BS1,lake_city_co,lake_city_co_S019,2,1,LFWS-DM-18,Draining Mine below Pelican,Mine/Mine Discharge Adit (Mine Entrance),38.02,-107.33
+H-BS1,lake_city_co,lake_city_co_S020,1,1,LFVC-PeM-1,Pelican Mine,Mine/Mine Discharge,38.02479,-107.34
+H-BS1,lake_city_co,lake_city_co_S021,1,1,USGS-380435107175001,NB04400411CCB,"Subsurface: Tunnel, shaft, or mine",38.07638526,-107.2978337
+H-BS2,central_city_co,central_city_co_S001,1,0,USGS-393944105422500,SC00407432BCB1,Spring,39.6622095,-105.7075048
+H-BS2,central_city_co,central_city_co_S002,2,1,21COL001_WQX-MEAS-SMA-01,SYDNEY TUNNEL ADIT DISCHARGE,Mine/Mine Discharge Adit (Mine Entrance),39.662803,-105.741432
+H-BS2,central_city_co,central_city_co_S002,2,1,21COL001_WQX-SMA-01,SYDNEY TUNNEL ADIT DISCHARGE,Mine/Mine Discharge Adit (Mine Entrance),39.662803,-105.741432
+H-BS2,central_city_co,central_city_co_S003,1,1,CCWF-CC-SW-27,CDPHE-HMWMD Silver Plume/Georgetown - Burleigh Tunnel Discharge,Mine/Mine Discharge,39.69695,-105.7341
+H-BS2,central_city_co,central_city_co_S004,1,1,CCWF-BET,Trail Run Baby Edie Tunnel,Mine/Mine Discharge,39.736911,-105.59188
+H-BS2,central_city_co,central_city_co_S005,4,0,USGS-394419105304300,IDAHO HOT SPRING C,Spring,39.73859919,-105.512497
+H-BS2,central_city_co,central_city_co_S005,4,0,USGS-394420105304300,IDAHO HOT SPRING A,Spring,39.73887697,-105.512497
+H-BS2,central_city_co,central_city_co_S005,4,0,USGS-394421105304300,IDAHO HOT SPRING B,Spring,39.73915474,-105.512497
+H-BS2,central_city_co,central_city_co_S005,4,0,USGS-394422105304300,IDAHO LODGE HOT WATERWELL,Spring,39.7394325,-105.512497
+H-BS2,central_city_co,central_city_co_S006,1,1,CORIVWCH_WQX-3633,Argo Effluent - Argo Effluent,Mine/Mine Discharge Adit (Mine Entrance),39.7422,-105.5022
+H-BS2,central_city_co,central_city_co_S007,1,1,USGS-394433105302100,"ARGO TUNNEL AT IDAHO SPRINGS, CO.","Subsurface: Tunnel, shaft, or mine",39.74248809,-105.5063856
+H-BS2,central_city_co,central_city_co_S008,1,1,CORIVWCH_WQX-3632,Clear Cr - Above Idaho Sp @ Mine,Mine/Mine Discharge Tailings Pile,39.74331952,-105.5395624
+H-BS2,central_city_co,central_city_co_S009,2,1,CCWF-RT,Rockford Tunnel site to test water quality of mine drainage,Mine/Mine Discharge,39.75385,-105.5651
+H-BS2,central_city_co,central_city_co_S009,2,1,CCWF-TG-1B,Turkey Gulch spring below Rockford mine tailings pile to test water quality of Rockford Tunnel outflow below mine,Spring,39.75498,-105.56436
+H-BS2,central_city_co,central_city_co_S010,2,1,CCWF-SC-1,Silver Cycle Mine Adit,Mine/Mine Discharge Adit (Mine Entrance),39.75542,-105.50043
+H-BS2,central_city_co,central_city_co_S010,2,1,CCWF-SC-1A,Silver Cycle Mine Adit,Mine/Mine Discharge Adit (Mine Entrance),39.75553,-105.50076
+H-BS2,central_city_co,central_city_co_S011,1,1,CCWF-SHP,Ship Ahoy Mine Adit SHP/SHP-1,Mine/Mine Discharge Adit (Mine Entrance),39.76039,-105.50077
+H-BS2,leadville_co,leadville_co_S001,1,1,USGS-391341106103200,"SHERMAN TUNNEL NEAR LEADVILLE, CO.","Subsurface: Tunnel, shaft, or mine",39.2280458,-106.1761321
+H-BS2,leadville_co,leadville_co_S002,1,0,USGS-391351106232201,SC00908025DCD SODA SPRINGS,Spring,39.2308333,-106.3894444
+H-BS2,leadville_co,leadville_co_S003,1,1,USGS-391409106161300,"YAK TUNNEL NEAR LEADVILLE, CO.","Subsurface: Tunnel, shaft, or mine",39.23582329,-106.2708565
+H-BS2,leadville_co,leadville_co_S004,2,1,CORIVWCH_WQX-3386,California G - Outlet Apache Flume,Mine/Mine Discharge Tailings Pile,39.23761136,-106.2835266
+H-BS2,leadville_co,leadville_co_S004,2,1,CORIVWCH_WQX-3635,California G - Inlet Apache Flume,Mine/Mine Discharge Adit (Mine Entrance),39.23761136,-106.2835266
+H-BS2,leadville_co,leadville_co_S005,1,1,0801478-GAW-200,,Mine/Mine Discharge,39.2416209,-106.2864286
+H-BS2,leadville_co,leadville_co_S006,1,1,0801478-MAB-SHAFT,,Mine/Mine Discharge,39.2445296,-106.2741263
+H-BS2,leadville_co,leadville_co_S007,1,0,USGS-391446106224901,SC00908019CCD IRON-RICH SEEP,Spring,39.2461111,-106.3802778
+H-BS2,leadville_co,leadville_co_S008,1,1,USGS-391510106241001,SC00908124BCCB1 CG-05 CABIN SHAFT NR COLORADO GULC,"Subsurface: Tunnel, shaft, or mine",39.25277778,-106.4027778
+H-BS2,leadville_co,leadville_co_S009,2,0,USGS-391517106233601,SC00908124ACBB1 SLGS-03 SUGARLOAF GULCH SEEP 3,Spring,39.2547222,-106.3933333
+H-BS2,leadville_co,leadville_co_S009,2,0,USGS-391521106233801,SC00908124BAD SLGS-08,Spring,39.2558333,-106.3938889
+H-BS2,leadville_co,leadville_co_S010,1,0,USGS-391523106225201,SC00908019BBDA1 BPS-01 BUFFALO PK SEEP NR LEADVILL,Spring,39.25638889,-106.3811111
+H-BS2,leadville_co,leadville_co_S011,1,0,USGS-391524106232301,"LSGS-07A, SEEP FOUND NEAR LSGS-07",Spring,39.25666667,-106.3897222
+H-BS2,leadville_co,leadville_co_S012,2,1,USGS-391540106230501,SC00908113DDAD1 BGS-11 BARTLETT GULCH SEEP 11 NR L,"Subsurface: Tunnel, shaft, or mine",39.2611111,-106.3847222
+H-BS2,leadville_co,leadville_co_S012,2,1,USGS-391541106231501,SC00908113DDBD1 BGS-12 BARTLETT GULCH SEEP 12 NR L,Spring,39.26138889,-106.3875
+H-BS2,leadville_co,leadville_co_S013,1,1,USGS-391544106235401,SC00908113CDBB1 S-15 MINE SHAFT NR TURQUOISE LK NR,"Subsurface: Tunnel, shaft, or mine",39.2622222,-106.3983333
+H-BS2,leadville_co,leadville_co_S014,3,1,USGS-391556106235701,SC00908113CBAA1 TLS-01 TURQUOISE LAKE SOUTH SEEP 1,Spring,39.26555556,-106.3991667
+H-BS2,leadville_co,leadville_co_S014,3,1,USGS-391559106235801,SC00908113BCD  TLS-04,"Subsurface: Tunnel, shaft, or mine",39.26638889,-106.3994444
+H-BS2,leadville_co,leadville_co_S014,3,1,USGS-391603106235601,SC00908113BCDA1 TLSS-02 TURQUOISE LAKE SOUTH SEEP,"Subsurface: Tunnel, shaft, or mine",39.2675,-106.3988889
+H-BS2,leadville_co,leadville_co_S015,1,1,USGS-07079200,"LEADVILLE MINE DRAINAGE TUNNEL AT LEADVILLE, CO","Subsurface: Tunnel, shaft, or mine",39.2747115,-106.2880795
+H-BS2,leadville_co,leadville_co_S016,1,1,USGS-09077160,"CHARLES H. BOUSTEAD TUNNEL NEAR LEADVILLE, CO.","Subsurface: Tunnel, shaft, or mine",39.27777778,-106.4361111
+H-BS2,leadville_co,leadville_co_S017,1,0,USGS-391741106224400,SPRING ON SAINT KEVIN GULCH TAILINGS,Spring,39.29471076,-106.3794709
+H-BS2,leadville_co,leadville_co_S018,1,1,USGS-392038106092600,"HESS TUNNEL NEAR CLIMAX, CO.","Subsurface: Tunnel, shaft, or mine",39.3438775,-106.1577992
+H-BS2,ouray_co,ouray_co_S001,3,1,LFWS-DM-2_HSN,Wyoming Mine,Mine/Mine Discharge Adit (Mine Entrance),37.96,-107.57
+H-BS2,ouray_co,ouray_co_S001,3,1,LFWS-DM-4_HSN,Wyoming Mine,Mine/Mine Discharge Adit (Mine Entrance),37.96,-107.57
+H-BS2,ouray_co,ouray_co_S001,3,1,LFWS-DM-4_PALM,Wyoming Mine Drainage,Mine/Mine Discharge Adit (Mine Entrance),37.96,-107.57
+H-BS2,ouray_co,ouray_co_S002,1,0,USGS-375739107503601,NB04300927ADB1,Spring,37.9608268,-107.8439524
+H-BS2,ouray_co,ouray_co_S003,3,1,LFVC-WM-1,Wyoming Mine #1,Mine/Mine Discharge,37.96963,-107.57608
+H-BS2,ouray_co,ouray_co_S003,3,1,LFVC-WM-2,Wyoming Mine #2,Mine/Mine Discharge,37.96997,-107.57557
+H-BS2,ouray_co,ouray_co_S003,3,1,LFVC-WM-3,Wyoming Mine #3,Mine/Mine Discharge,37.969547,-107.576238
+H-BS2,ouray_co,ouray_co_S004,6,1,LFVC-SW-1,Sarah Woods Dump Drainage,Mine/Mine Discharge,37.97024,-107.58016
+H-BS2,ouray_co,ouray_co_S004,6,1,LFVC-SW-3,Sarah Woods Dump Drainage near Palmetto Gulch,Mine/Mine Discharge,37.970132,-107.580094
+H-BS2,ouray_co,ouray_co_S004,6,1,LFWS-DM-1_HSN,Hough Mine,Mine/Mine Discharge Adit (Mine Entrance),37.97,-107.58
+H-BS2,ouray_co,ouray_co_S004,6,1,LFWS-DM-1_PALM,Hough Mine Drainage,Mine/Mine Discharge Adit (Mine Entrance),37.97,-107.58
+H-BS2,ouray_co,ouray_co_S004,6,1,LFWS-PG-1A,Runoff from Hough Dump,Mine/Mine Discharge,37.97,-107.58
+H-BS2,ouray_co,ouray_co_S004,6,1,LFWS-SW_HSN,Sarah Woods Dump Drainage,Mine/Mine Discharge Waste Rock Pile,37.97,-107.58
+H-BS2,ouray_co,ouray_co_S005,8,1,LFWS-DM-2_PALM,Miner''s Bank Seepage,Spring,37.97,-107.57
+H-BS2,ouray_co,ouray_co_S005,8,1,LFWS-DM-3A_PALM,Spring near Roy Pray adit (upwelling near portal),Mine/Mine Discharge Adit (Mine Entrance),37.97,-107.57
+H-BS2,ouray_co,ouray_co_S005,8,1,LFWS-DM-3_HSN,Roy Pray Mine,Mine/Mine Discharge Adit (Mine Entrance),37.97,-107.57
+H-BS2,ouray_co,ouray_co_S005,8,1,LFWS-DM-3_PALM,Roy Pray Mine Drainage from Adit,Mine/Mine Discharge Adit (Mine Entrance),37.97,-107.57
+H-BS2,ouray_co,ouray_co_S005,8,1,LFWS-DM-5_HSN,Palmetto Mine,Mine/Mine Discharge Adit (Mine Entrance),37.97,-107.57
+H-BS2,ouray_co,ouray_co_S005,8,1,LFWS-DM-5_PALM,Palmetto Mine Drainage,Mine/Mine Discharge Adit (Mine Entrance),37.97,-107.57
+H-BS2,ouray_co,ouray_co_S005,8,1,LFWS-RPBH_PALM,Roy Pray Mine Pool - behind the bulkhead,Mine/Mine Discharge Adit (Mine Entrance),37.97,-107.57
+H-BS2,ouray_co,ouray_co_S005,8,1,LFWS-SW_PALM,Sara Woods Area Seep/Spring/AMD,Spring,37.97,-107.57
+H-BS2,ouray_co,ouray_co_S006,7,1,LFVC-HM-1,Hough Mine,Mine/Mine Discharge,37.97319,-107.58321
+H-BS2,ouray_co,ouray_co_S006,7,1,LFVC-HM-1-LOST,Hough Mine-Coordinates lost,Mine/Mine Discharge,37.97319,-107.58321
+H-BS2,ouray_co,ouray_co_S006,7,1,LFVC-HM-1A,Hough Mine Drainage,Mine/Mine Discharge,37.97306,-107.58336
+H-BS2,ouray_co,ouray_co_S006,7,1,LFVC-HM-2-LOST,Hough Mine-Coordinates lost,Mine/Mine Discharge,37.97319,-107.58321
+H-BS2,ouray_co,ouray_co_S006,7,1,LFVC-HM-3-LOST,Hough Mine-Coordinates lost,Mine/Mine Discharge,37.97319,-107.58321
+H-BS2,ouray_co,ouray_co_S006,7,1,LFVC-HM-5-LOST,Hough Mine-Coordinates lost,Mine/Mine Discharge,37.97319,-107.58321
+H-BS2,ouray_co,ouray_co_S006,7,1,LFVC-PG-1A,Runoff from Hough Dump,Mine/Mine Discharge,37.97342,-107.58261
+H-BS2,ouray_co,ouray_co_S007,2,1,LFVC-PM-1,Palmetto Mine Drainage,Mine/Mine Discharge,37.97761,-107.57504
+H-BS2,ouray_co,ouray_co_S007,2,1,LFVC-PM-2,Palmetto Mine,Mine/Mine Discharge,37.97774,-107.57482
+H-BS2,ouray_co,ouray_co_S008,1,0,USGS-380056107405901,NB04400836DDC,Spring,38.01554935,-107.683671
+H-BS2,ouray_co,ouray_co_S009,2,0,DEMOTEST_WQX-USGS-380100107404100,OURAY POOL HOT SPRING,Spring,38.01666049,-107.6786711
+H-BS2,ouray_co,ouray_co_S009,2,0,USGS-380100107404100,OURAY POOL HOT SPRING,Spring,38.01666049,-107.678671
+H-BS2,ouray_co,ouray_co_S010,1,0,USGS-380115107373302,NB04400731CAA1,Spring,38.02082715,-107.671171
+H-BS2,ouray_co,ouray_co_S011,4,0,USGS-380115107400300,OURAY WESBADEN MOTEL HOT SPRING 'A',Spring,38.02082718,-107.6681154
+H-BS2,ouray_co,ouray_co_S011,4,0,USGS-380115107400301,OURAY WESBADEN MOTEL HOT SPRING B,Spring,38.02082718,-107.6681154
+H-BS2,ouray_co,ouray_co_S011,4,0,USGS-380115107400302,OURAY WESBADEN MOTEL HOT SPRING C,Spring,38.02082718,-107.6681154
+H-BS2,ouray_co,ouray_co_S011,4,0,USGS-380119107400401,NB04400731ACD,Spring,38.02193827,-107.6683932
+H-BS2,ouray_co,ouray_co_S012,1,0,USGS-380332107390601,NB04400717CDA1,Spring,38.0588822,-107.6522819
+H-BS2,ouray_co,ouray_co_S013,1,0,USGS-380333107404001,NB04400718CCB1,Spring,38.05915975,-107.678393
+H-BS2,ouray_co,ouray_co_S014,1,0,USGS-380338107383801,NB04400718DAD1,Spring,38.06054894,-107.644504
+H-BS2,ouray_co,ouray_co_S015,1,0,USGS-380350107515701,NB04400916CBC1,Spring,38.06388078,-107.8664522
+H-BS2,ouray_co,ouray_co_S016,1,0,USGS-380514107515201,NB04400904CCD1,Spring,38.0872137,-107.8650631
+H-BS2,ouray_co,ouray_co_S017,1,0,USGS-380734107440100,NB04500827BDA1,Spring,38.12610249,-107.7342262
+H-BS2,ouray_co,ouray_co_S018,3,0,USGS-380759107440100,NB04500822CDB1 USGS 380759107440100,Spring,38.1330468,-107.7342261
+H-BS2,ouray_co,ouray_co_S018,3,0,USGS-380759107440101,NB04500822CDB1 USGS 380759107440101,Spring,38.1330468,-107.7342261
+H-BS2,ouray_co,ouray_co_S018,3,0,USGS-380800107440001,NB04500822C,Spring,38.13332458,-107.7339483
+H-BS2,ouray_co,ouray_co_S019,1,0,USGS-380834107381201,NB04500721ABC1,Spring,38.1427698,-107.6372816
+H-BS2,ouray_co,ouray_co_S020,1,0,USGS-381056107522401,NB04500905ADD1,Spring,38.18221217,-107.8739518
+H-BS2,ouray_co,ouray_co_S021,1,0,USGS-381104107444601,NB04500804ACB1,Spring,38.18443467,-107.7467257
+H-BS2,ouray_co,ouray_co_S022,1,0,USGS-381130107513201,NB04600933DCA1,Spring,38.19165649,-107.8595069
+H-BS2,silverton_co,silverton_co_S001,1,0,USGS-374701107402101,NB04100729,Spring,37.78360797,-107.6731171
+H-BS2,silverton_co,silverton_co_S002,2,1,CORIVWCH_WQX-375,Silver Lake - 100yrds from Royal Tiger,Mine/Mine Discharge Adit (Mine Entrance),37.7892166,-107.6073959
+H-BS2,silverton_co,silverton_co_S002,2,1,CORIVWCH_WQX-376,Silver Lake - 100 Yards from Royal Tiger 11F,Mine/Mine Discharge Adit (Mine Entrance),37.7892166,-107.6073959
+H-BS2,silverton_co,silverton_co_S003,2,1,CORIVWCH_WQX-3608,Arrastra G - Arrastra Above Quonset,Mine/Mine Discharge Tailings Pile,37.8119,-107.6165
+H-BS2,silverton_co,silverton_co_S003,2,1,CORIVWCH_WQX-3609,Arrastra G - Rock Flume,Mine/Mine Discharge Tailings Pile,37.8124,-107.6167
+H-BS2,silverton_co,silverton_co_S004,1,1,CORIVWCH_WQX-3607,Arrastra G - Arrastra Below Quonset,Mine/Mine Discharge Tailings Pile,37.8145,-107.6186
+H-BS2,silverton_co,silverton_co_S005,1,1,CORIVWCH_WQX-9004,Mineral Cr - Biochar Exp RC,Mine/Mine Discharge Tailings Pile,37.8171,-107.6987
+H-BS2,silverton_co,silverton_co_S006,1,1,CORIVWCH_WQX-3606,Arrastra G - Arrastra Below Flume,Mine/Mine Discharge Tailings Pile,37.8178,-107.6219
+H-BS2,silverton_co,silverton_co_S007,3,1,USGS-374925107350501,NATURAL FLOW INTO MINE DUP1,"Subsurface: Tunnel, shaft, or mine",37.8236081,-107.5853377
+H-BS2,silverton_co,silverton_co_S007,3,1,USGS-374925107350502,NATURAL FLOW INTO MINE DUP2,"Subsurface: Tunnel, shaft, or mine",37.8236081,-107.5853377
+H-BS2,silverton_co,silverton_co_S007,3,1,USGS-374925107350503,"MINE DISCHARGE AT PORTAL, SITE 1","Subsurface: Tunnel, shaft, or mine",37.8236081,-107.5853377
+H-BS2,silverton_co,silverton_co_S008,1,0,USGS-375003107453001,A10 FERRICRETE SPRING,Spring,37.83416226,-107.7589515
+H-BS2,silverton_co,silverton_co_S009,1,0,USGS-375009107451601,A16 SPRING,Spring,37.8358289,-107.7550625
+H-BS2,silverton_co,silverton_co_S010,3,0,USGS-375013107461401,PB2 SPRING UPPER PARADISE BOG,Spring,37.8369399,-107.771174
+H-BS2,silverton_co,silverton_co_S010,3,0,USGS-375014107461401,PB3 SULFIDE SPRING PARADISE BOG,Spring,37.83721769,-107.771174
+H-BS2,silverton_co,silverton_co_S010,3,0,USGS-375015107461601,PB1 MORAINE SPRING WEST PARADISE BOG,Spring,37.83749546,-107.7717296
+H-BS2,silverton_co,silverton_co_S011,2,1,USGS-375033107455001,PARADISE PORTAL (WHITE DEATH),"Subsurface: Tunnel, shaft, or mine",37.84249545,-107.7645071
+H-BS2,silverton_co,silverton_co_S011,2,1,USGS-375035107454201,A36 BLUE LAGOON SPRING BELOW PARADISE PORTAL,Spring,37.843051,-107.7622848
+H-BS2,silverton_co,silverton_co_S012,1,1,CORIVWCH_WQX-4214,Waterfall Cr - Gamebird Adit,Mine/Mine Discharge Adit (Mine Entrance),37.8432,-107.83
+H-BS2,silverton_co,silverton_co_S013,5,1,CORIVWCH_WQX-9001,Mineral Cr - Biochar Exp BON,Mine/Mine Discharge Tailings Pile,37.8437,-107.7375
+H-BS2,silverton_co,silverton_co_S013,5,1,USGS-375040107441201,W47 LOWER BONNER MINE,"Subsurface: Tunnel, shaft, or mine",37.84444006,-107.7372843
+H-BS2,silverton_co,silverton_co_S013,5,1,USGS-375040107442201,W48 INDEPENDENCE MINE,"Subsurface: Tunnel, shaft, or mine",37.84444,-107.7400621
+H-BS2,silverton_co,silverton_co_S013,5,1,USGS-375042107441001,W46 SPRING IN ALLUVIUM BELOW BONNER MINE,Spring,37.8449956,-107.7367287
+H-BS2,silverton_co,silverton_co_S013,5,1,USGS-375042107441501,W45 ALLUVIAL SPRING BELOW INDEPENDENCE MINE,Spring,37.8449956,-107.7381176
+H-BS2,silverton_co,silverton_co_S014,1,0,USGS-375040107445501,W11 FOREST CANOPY SPRING,Spring,37.84443997,-107.7492289
+H-BS2,silverton_co,silverton_co_S015,1,1,USGS-375045107450501,RUBY TRUST MINE,"Subsurface: Tunnel, shaft, or mine",37.8458288,-107.7520067
+H-BS2,silverton_co,silverton_co_S016,2,0,USGS-375049107411001,TOPEKA7,Spring,37.8469404,-107.686728
+H-BS2,silverton_co,silverton_co_S016,2,0,USGS-375050107411302,TOPEKA9,Spring,37.84721818,-107.6875613
+H-BS2,silverton_co,silverton_co_S017,1,0,USGS-375050107453201,W35 SPRING,Spring,37.84721764,-107.7595069
+H-BS2,silverton_co,silverton_co_S018,2,1,CORIVWCH_WQX-9000,Mineral Cr - Biochar Experiment AFB,Mine/Mine Discharge Tailings Pile,37.8475,-107.7362
+H-BS2,silverton_co,silverton_co_S018,2,1,USGS-375052107440701,W37 COLLAPSED MINE,"Subsurface: Tunnel, shaft, or mine",37.84777336,-107.7358954
+H-BS2,silverton_co,silverton_co_S019,2,0,USGS-375055107412401,TOPEKA3,Spring,37.848607,-107.6906169
+H-BS2,silverton_co,silverton_co_S019,2,0,USGS-375101107412801,TOPEKA1,Spring,37.85027366,-107.691728
+H-BS2,silverton_co,silverton_co_S020,2,0,DEMOTEST_WQX-USGS-375100107441601,W16 SPRING,Spring,37.84999553,-107.7383954
+H-BS2,silverton_co,silverton_co_S020,2,0,USGS-375100107441601,W16 SPRING,Spring,37.8499955,-107.7383954
+H-BS2,silverton_co,silverton_co_S021,1,0,USGS-375102107463901,OPHIR PASS SPRING,Spring,37.8505508,-107.7781185
+H-BS2,silverton_co,silverton_co_S022,1,0,USGS-375106107450601,W24 SPRING BELOW SHEEP BASIN,Spring,37.85166207,-107.7522845
+H-BS2,silverton_co,silverton_co_S023,1,0,USGS-375106107414501,TOPEKA5,Spring,37.8516625,-107.6964503
+H-BS2,silverton_co,silverton_co_S024,2,0,USGS-375124107492401,NB04200936ACC1,Spring,37.85666155,-107.823953
+H-BS2,silverton_co,silverton_co_S024,2,0,USGS-375128107491801,NB04200935DAA1,Spring,37.85777265,-107.8222864
+H-BS2,silverton_co,silverton_co_S025,1,0,USGS-375131107473801,NB04200936ADD1,Spring,37.85860615,-107.7945078
+H-BS2,silverton_co,silverton_co_S026,1,1,CORIVWCH_WQX-9002,Mineral Cr - Biochar Exp BRK,Mine/Mine Discharge Tailings Pile,37.8608,-107.7158
+H-BS2,silverton_co,silverton_co_S027,1,0,USGS-375149107503401,NB04200934ADB1,Spring,37.86360578,-107.843398
+H-BS2,silverton_co,silverton_co_S028,2,1,USGS-375236107383901,"NATALIE OCCIDENTAL MINE DRAINAGE NR GLADSTONE, CO","Subsurface: Tunnel, shaft, or mine",37.87666667,-107.6441667
+H-BS2,silverton_co,silverton_co_S028,2,1,USGS-375236107384801,"BIG COLORADO MINE DRAINAGE NEAR GLADSTONE, CO","Subsurface: Tunnel, shaft, or mine",37.87680278,-107.6466417
+H-BS2,silverton_co,silverton_co_S029,3,1,USGS-375322107385201,NATURAL FLOW INTO MINE DUP3,"Subsurface: Tunnel, shaft, or mine",37.88944018,-107.6483938
+H-BS2,silverton_co,silverton_co_S029,3,1,USGS-375322107385202,FLOW IN MINE,"Subsurface: Tunnel, shaft, or mine",37.88944018,-107.6483938
+H-BS2,silverton_co,silverton_co_S029,3,1,USGS-375322107385203,"MINE DISCHARGE AT PORTAL, SITE 2","Subsurface: Tunnel, shaft, or mine",37.88944018,-107.6483938
+H-BS2,silverton_co,silverton_co_S030,1,0,USGS-375332107385401,SS301 SPRING,Spring,37.8922222,-107.6483333
+H-BS2,silverton_co,silverton_co_S031,1,1,CORIVWCH_WQX-9003,Prospect G - Biochar Exp JJ,Mine/Mine Discharge Tailings Pile,37.8931,-107.6809
+H-BS2,silverton_co,silverton_co_S032,3,1,21COL001_WQX-MIN2,LONGFELLOW MINE DRAINAGE,Mine/Mine Discharge,37.8958333,-107.7125
+H-BS2,silverton_co,silverton_co_S032,3,1,USGS-375342107424101,LK1 KOEHLER MINE DRAINAGE,"Subsurface: Tunnel, shaft, or mine",37.89499515,-107.7120057
+H-BS2,silverton_co,silverton_co_S032,3,1,USGS-375344107424101,LK2 LONGFELLOW MINE DRAINAGE AT HEMATITE POOL,"Subsurface: Tunnel, shaft, or mine",37.8955507,-107.7120057
+H-BS2,silverton_co,silverton_co_S033,3,1,USGS-375357107323601,NATURAL FLOW INTO MINE DUP4,"Subsurface: Tunnel, shaft, or mine",37.89916314,-107.543948
+H-BS2,silverton_co,silverton_co_S033,3,1,USGS-375357107323602,NATURAL FLOW INTO MINE DUP5,"Subsurface: Tunnel, shaft, or mine",37.89916314,-107.543948
+H-BS2,silverton_co,silverton_co_S033,3,1,USGS-375357107323603,"MINE DISCHARGE AT PORTAL, SITE 3","Subsurface: Tunnel, shaft, or mine",37.89916314,-107.543948
+H-BS2,silverton_co,silverton_co_S034,1,0,USGS-375421107383701,"SS250 - SPRING DISCHARGE ABOVE CEMENT CREEK, CO",Spring,37.9058333,-107.6436111
+H-BS2,silverton_co,silverton_co_S035,4,1,USGS-375427107382401,"SS046 - MINE DRAINAGE NEAR GLADSTONE, CO","Subsurface: Tunnel, shaft, or mine",37.9075,-107.64
+H-BS2,silverton_co,silverton_co_S035,4,1,USGS-375430107381801,"MOGUL SOUTH MINE DRAINAGE NEAR GLADSTONE, CO","Subsurface: Tunnel, shaft, or mine",37.90833056,-107.638425
+H-BS2,silverton_co,silverton_co_S035,4,1,USGS-375431107382201,SS044 SPRING,Spring,37.9086111,-107.6394444
+H-BS2,silverton_co,silverton_co_S035,4,1,USGS-375436107381701,"MOGUL MINE ADIT DRAINAGE BELOW HURRICANE PASS, CO","Subsurface: Tunnel, shaft, or mine",37.91,-107.6380556
+H-BS2,silverton_co,silverton_co_S036,1,1,LFWS-DM-6_LKFRK,Gnome Draining Mine,Mine/Mine Discharge Adit (Mine Entrance),37.92,-107.51
+H-BS2,silverton_co,silverton_co_S037,1,1,LFVC-GN-1,Gnome Draining Mine,Mine/Mine Discharge,37.92015,-107.51768
+H-BS2,silverton_co,silverton_co_S038,1,1,CORIVWCH_WQX-4025,Ingram Cr - At Mine,Mine/Mine Discharge Tailings Pile,37.9238,-107.7698
+H-BS2,silverton_co,silverton_co_S039,4,1,21COL001_WQX-MEAS-SM-ADT-01,SILVER MOUNTAIN ADIT,Mine/Mine Discharge Adit (Mine Entrance),37.93308,-107.66071
+H-BS2,silverton_co,silverton_co_S039,4,1,21COL001_WQX-MEAS-SM-ADT-02,SILVER MOUNTAIN BLW WASTE ROCK PILE,Mine/Mine Discharge Waste Rock Pile,37.9327,-107.66133
+H-BS2,silverton_co,silverton_co_S039,4,1,21COL001_WQX-SM-ADT-01,SILVER MOUNTAIN ADIT,Mine/Mine Discharge Adit (Mine Entrance),37.93308,-107.66071
+H-BS2,silverton_co,silverton_co_S039,4,1,21COL001_WQX-SM-ADT-02,SILVER MOUNTAIN BLW WASTE ROCK PILE,Mine/Mine Discharge Adit (Mine Entrance),37.9327,-107.66133
+H-BS2,silverton_co,silverton_co_S040,1,0,USGS-375603107481000,SPRING DS FROM TAILS TEL-1,Spring,37.9341607,-107.803396
+H-BS2,silverton_co,silverton_co_S041,1,1,LFVC-BH-1,Bon Homme Draining Mine,Mine/Mine Discharge,37.93438,-107.50943
+H-BS2,silverton_co,silverton_co_S042,1,0,USGS-375630107483801,NB04300936DCB1,Spring,37.94166057,-107.811174
+T-86,central_city_co,central_city_co_T001,1,0,21COL001_WQX-MEAS-IDAHO-SP-1,SPRING RIGHT BANK OF CLEAR CREEK AT EFFLUENT OUTFALL,Spring,39.743711,-105.476019
+T-86,central_city_co,central_city_co_T002,1,0,USGS-394623105411201,MN-0995 LION CR  RT BNK INF AT 995  DS FR INJ SITE,Spring,39.77313056,-105.6866
+T-86,central_city_co,central_city_co_T003,14,1,USGS-394633105412002,MN-0550 LION CR  LFT BNK INF AT 550 DS FR INJ SITE,Spring,39.7759111,-105.6887389
+T-86,central_city_co,central_city_co_T003,14,1,USGS-394634105412101,MN-0507 LION CR  RT BNK INF AT 507M DS FR INJ SITE,Spring,39.77603889,-105.6891806
+T-86,central_city_co,central_city_co_T003,14,1,USGS-394636105412302,MN-0403 LION CR  RTBNK INF AT 403M  DS FR INJ SITE,Spring,39.77673889,-105.68975
+T-86,central_city_co,central_city_co_T003,14,1,USGS-394637105412402,MN-0387 LION CR  RT BNK INF AT 387M DS FR INJ SITE,Spring,39.77683889,-105.6898889
+T-86,central_city_co,central_city_co_T003,14,1,USGS-394638105412402,MN-0345 LION CR  RTBNK INF AT 345M  DS FR INJ SITE,Spring,39.77718056,-105.68995
+T-86,central_city_co,central_city_co_T003,14,1,USGS-394639105412402,MN-0317 LION CR LFT BNK INF AT 317M DS FR INJ SITE,Spring,39.77743056,-105.6900194
+T-86,central_city_co,central_city_co_T003,14,1,USGS-394639105412403,MN-0318 LION CR RT BNK INF AT 318M DS FR INJ SITE,Spring,39.77743056,-105.6900194
+T-86,central_city_co,central_city_co_T003,14,1,USGS-394639105412404,MN-0324 LION CR LFT BNK INF AT 324M DS FR INJ SITE,Spring,39.77738056,-105.69
+T-86,central_city_co,central_city_co_T003,14,1,USGS-394640105412501,MN-0258 LION CR LFT BNK INF AT 258M DS FR INJ SITE,Spring,39.7779,-105.6902694
+T-86,central_city_co,central_city_co_T003,14,1,USGS-394640105412502,MN-0270 LION CR LFT BNK INF AT 270M DS FR INJ SITE,Spring,39.7778,-105.69025
+T-86,central_city_co,central_city_co_T003,14,1,USGS-394640105412504,MN-0286 LION CR LFT BNK INF AT 286M DS FR INJ SITE,Spring,39.7776611,-105.6902111
+T-86,central_city_co,central_city_co_T003,14,1,USGS-394643105412602,MN-0181 LION CR LFT BNK INF AT 181M DS FR INJ SITE,Spring,39.77851944,-105.6904611
+T-86,central_city_co,central_city_co_T003,14,1,USGS-394646105412001,MN-ADIT MINNESOTA MINE ADIT,"Subsurface: Tunnel, shaft, or mine",39.77948889,-105.6889806
+T-86,central_city_co,central_city_co_T003,14,1,USGS-394646105412002,MN-POOL IN GRATED CHAMBER,"Subsurface: Tunnel, shaft, or mine",39.77949167,-105.6889833
+T-86,central_city_co,central_city_co_T004,1,1,CCWF-NE-4,North Empire Creek at point of emergence from reclaimed tailings subjacent to uppermost mine site,Mine/Mine Discharge Tailings Pile,39.78331,-105.68033
+T-86,central_city_co,central_city_co_T005,1,1,CCWF-NCC-SW-25,Quartz Hill adit discharge and Nevada Gulch flow. Location is on east side of Central City Parkway at culvert between parkway and Quartz Hill tailings impoundment.,Mine/Mine Discharge,39.796446,-105.516265
+T-86,central_city_co,central_city_co_T006,1,1,CCWF-NCC-SW-17,National Tunnel discharge - discharge is under bridge,Mine/Mine Discharge,39.798857,-105.484386
+T-86,central_city_co,central_city_co_T007,1,1,CCWF-NCC-SW-20,Gregory Incline discharge - discharge is under Black Hawk Street overpass,Mine/Mine Discharge,39.802144,-105.493944
+T-86,leadville_co,leadville_co_T001,1,1,USGS-391435106230801,SIWATCH MINE DRAINAGE TUNNEL BLW TURQ LAKE NR LEAD,"Subsurface: Tunnel, shaft, or mine",39.24305556,-106.3855556
+T-86,leadville_co,leadville_co_T002,1,1,USGS-391445106230701,SC00908124DDDA1 SBGS-01 STRAWBERRY GULCH SEEP 1,"Subsurface: Tunnel, shaft, or mine",39.2458333,-106.3852778
+T-86,leadville_co,leadville_co_T003,1,1,USGS-391449106232001,SC00908124DDBC1 SBGS-02 STRAWBERRY GULCH SEEP 2,"Subsurface: Tunnel, shaft, or mine",39.24694444,-106.3888889
+T-86,leadville_co,leadville_co_T004,4,1,USGS-391500106224901,UNNAMED MINE DRAINAGE TUNNEL BLW TURQ LK NR LEADVI,"Subsurface: Tunnel, shaft, or mine",39.25,-106.3802778
+T-86,leadville_co,leadville_co_T004,4,1,USGS-391501106224901,SC00908124CBAD2 SLGS-07 SUGARLOAF GULCH SEEP 7,Spring,39.25027778,-106.3802778
+T-86,leadville_co,leadville_co_T004,4,1,USGS-391501106225001,"SLGS-09 SUGARLOAF GULCH SEEP 9 PIPE NR DINERO, CO",Spring,39.25027778,-106.3805556
+T-86,leadville_co,leadville_co_T004,4,1,USGS-391504106225200,DINERO MINE DRAINAGE TUNNEL BLW TURQUOISE LK NR LE,"Subsurface: Tunnel, shaft, or mine",39.2511111,-106.3811111
+T-86,leadville_co,leadville_co_T005,1,1,USGS-391501106230601,NELSON MINE DRAINAGE TUN BLW TURQ LAKE NR LEADVILL,"Subsurface: Tunnel, shaft, or mine",39.25027778,-106.385
+T-86,leadville_co,leadville_co_T006,1,1,21COL001_WQX-MEAS-SEG-WRP-1,SOUTH EVANS G. WASTE ROCK PILE COMPOSITE,Mine/Mine Discharge Waste Rock Pile,39.251537,-106.230502
+T-86,leadville_co,leadville_co_T007,1,1,CMCNRMI_WQX-TT,Tiger Tunnel,Mine/Mine Discharge Adit (Mine Entrance),39.253274,-106.399227
+T-86,leadville_co,leadville_co_T008,7,1,USGS-391512106230001,SC00908019BCCA1 LSGS-03 LITTLE SUGARLOAF GL SEEP 3,Spring,39.2533333,-106.3833333
+T-86,leadville_co,leadville_co_T008,7,1,USGS-391512106230401,"DINERO STRUCTURE AT 1200 FT NEAR LEADVILLE, CO","Subsurface: Tunnel, shaft, or mine",39.25335556,-106.3843333
+T-86,leadville_co,leadville_co_T008,7,1,USGS-391513106230401,"DINERO BULKHEAD SPIGOT AT 1250 FT NR LEADVILLE, CO","Subsurface: Tunnel, shaft, or mine",39.25345556,-106.3844611
+T-86,leadville_co,leadville_co_T008,7,1,USGS-391517106230601,SC00908124ADAA1 LSGS-05 LITTLE SUGARLOAF GL SEEP 5,"Subsurface: Tunnel, shaft, or mine",39.2547222,-106.385
+T-86,leadville_co,leadville_co_T008,7,1,USGS-391517106230701,LSGS-12 SEEP BELOW SEEP 10 ON RIGHT BANK,Spring,39.2547222,-106.3852778
+T-86,leadville_co,leadville_co_T008,7,1,USGS-391518106230901,"LSGS-10, LITTLE SUGARLOAF GULCH SEEP 10",Spring,39.255,-106.3856944
+T-86,leadville_co,leadville_co_T008,7,1,USGS-391519106230901,"LSGS-11, LITTLE SUGARLOAF GULCH SEEP 11",Spring,39.25519444,-106.3858611
+T-86,leadville_co,leadville_co_T009,1,0,USGS-391513106232601,SC00908124ACAD1 SLGS-04 SUGARLOAF GULCH SEEP 4,Spring,39.2536111,-106.3905556
+T-86,leadville_co,leadville_co_T010,1,1,USGS-391517106223801,BARTLETT MINE DRAINAGE TUNNEL BLW TURQ LAKE NR LEA,"Subsurface: Tunnel, shaft, or mine",39.2547222,-106.3772222
+T-86,leadville_co,leadville_co_T011,2,1,21COL001_WQX-MEAS-STRSD-WRP-1,EVANS G. STREAMSIDE WASTE ROCK PILE,Mine/Mine Discharge Waste Rock Pile,39.258034,-106.230639
+T-86,leadville_co,leadville_co_T011,2,1,21COL001_WQX-MEAS-VAL-WRP,VALLEY MINE WASTE ROCK PILE COMPOSITE,Mine/Mine Discharge Waste Rock Pile,39.257376,-106.230289
+T-86,leadville_co,leadville_co_T012,1,1,USGS-391559106230901,SC00908113ADDD1 TLSS-03 TURQUOISE LAKE SOUTH SEEP,"Subsurface: Tunnel, shaft, or mine",39.26638889,-106.3858333
+T-86,leadville_co,leadville_co_T013,1,1,USGS-391606106241601,SC00908113ADB TL-ADIT,"Subsurface: Tunnel, shaft, or mine",39.2683333,-106.4044444
+T-86,ouray_co,ouray_co_T001,3,1,21COL001_WQX-MEAS-HDT-ADT-01,HIDDEN TREASURE MINE ADIT,Mine/Mine Discharge Adit (Mine Entrance),37.95006,-107.73319
+T-86,ouray_co,ouray_co_T001,3,1,21COL001_WQX-MEAS-HDT-P-01,HIDDEN TREASURE MINE ADIT BELOW WASTE ROCK PILE NORTH,Mine/Mine Discharge Adit (Mine Entrance),37.95028,-107.7324
+T-86,ouray_co,ouray_co_T001,3,1,21COL001_WQX-MEAS-HT-ADT-01,HIDDEN TREASURE MINE ADIT,Mine/Mine Discharge Adit (Mine Entrance),37.950023,-107.732428
+T-86,ouray_co,ouray_co_T002,1,1,21COL001_WQX-MEAS-OL-ADT-01,OLD LOUT DRAINING ADIT #1,Mine/Mine Discharge Adit (Mine Entrance),37.953384,-107.625643
+T-86,ouray_co,ouray_co_T003,1,1,UWP-GB-ADT-01,Grey Burro Mine Adit,Mine/Mine Discharge Adit (Mine Entrance),37.96484,-107.74536
+T-86,ouray_co,ouray_co_T004,1,1,UWP-EUR-ADT-01,Eurades Adit,Mine/Mine Discharge Adit (Mine Entrance),37.96607,-107.60923
+T-86,ouray_co,ouray_co_T005,1,1,UWP-SB-ADT-01,Sidney Basin Adit,Mine/Mine Discharge Adit (Mine Entrance),37.96732,-107.76038
+T-86,ouray_co,ouray_co_T006,5,1,21COL001_WQX-MEAS-AM-02,SEEP BELOW WRP,Mine/Mine Discharge Adit (Mine Entrance),37.971407,-107.754327
+T-86,ouray_co,ouray_co_T006,5,1,21COL001_WQX-MEAS-AM-03,POND ABOVE ATLAS MINE SEEP,Mine/Mine Discharge Waste Rock Pile,37.971522,-107.75527
+T-86,ouray_co,ouray_co_T006,5,1,21COL001_WQX-MEAS-AM-ADT-01,ATLAS MINE ADIT,Mine/Mine Discharge Adit (Mine Entrance),37.971115,-107.75528
+T-86,ouray_co,ouray_co_T006,5,1,UWP-AM-01,Atlas Mine Adit,Mine/Mine Discharge Adit (Mine Entrance),37.97102833,-107.755325
+T-86,ouray_co,ouray_co_T006,5,1,UWP-AM-02,Atlas Mine Seep,Mine/Mine Discharge,37.97140667,-107.7543267
+T-86,ouray_co,ouray_co_T007,2,1,21COL001_WQX-MEAS-RP-4,ROY PRAY AMD AT THE PORTAL (2FT FROM TIMBERS),Mine/Mine Discharge,37.97354156,-107.57593
+T-86,ouray_co,ouray_co_T007,2,1,21COL001_WQX-MEAS-RP-5,"ROY PRAY AMD INSIDE THE PORTAL BY 43.5FT, FLOW COMING FROM ROOF 8.5FT HIGH",Mine/Mine Discharge,37.97359273,-107.5760147
+T-86,ouray_co,ouray_co_T008,6,1,21COL001_WQX-MEAS-MB-ADT-01,MICHEAL BREEN ADIT,Mine/Mine Discharge Adit (Mine Entrance),37.97519,-107.63503
+T-86,ouray_co,ouray_co_T008,6,1,21COL001_WQX-MEAS-MB-ADT-02,MICHAEL BREEN MINE ADIT BELOW WASTE ROCK,Mine/Mine Discharge Waste Rock Pile,37.97521,-107.63569
+T-86,ouray_co,ouray_co_T008,6,1,UWP-MB-ADT-01,Michael Breen adit,Mine/Mine Discharge Adit (Mine Entrance),37.97512167,-107.6350567
+T-86,ouray_co,ouray_co_T008,6,1,UWP-MB-ADT-01D,Michael Breen adit; Duplicate,Mine/Mine Discharge Adit (Mine Entrance),37.97512167,-107.6350567
+T-86,ouray_co,ouray_co_T008,6,1,UWP-MB-ADT-02,Michael Breen adit below waste rock,Mine/Mine Discharge Waste Rock Pile,37.9748,-107.635676
+T-86,ouray_co,ouray_co_T008,6,1,UWP-MB-ADT-03,Michael Breen seep below mine,Mine/Mine Discharge,37.9748,-107.635676
+T-86,ouray_co,ouray_co_T009,2,0,USGS-380110107403401,"UNCOMPAGHRE RIVER BRIDGE HOT SPRING AT OURAY, CO",Spring,38.01935,-107.6761861
+T-86,ouray_co,ouray_co_T009,2,0,USGS-380110107403801,"FIESTA POOL HOT SPRING AT OURAY, CO",Spring,38.01945556,-107.6771139
+T-86,silverton_co,silverton_co_T001,1,1,ARSG-BANDORA,BANDORA ADIT,Mine/Mine Discharge Adit (Mine Entrance),37.78678,-107.80135
+T-86,silverton_co,silverton_co_T002,1,1,ARSG-ROYAL TIGER,ROYAL TIGER,Mine/Mine Discharge Adit (Mine Entrance),37.78775,-107.60415
+T-86,silverton_co,silverton_co_T003,1,1,CORIVWCH_WQX-4224,Howards Fk - Carribeau Adit,Mine/Mine Discharge Adit (Mine Entrance),37.8579,-107.8464
+T-86,silverton_co,silverton_co_T004,1,1,SMWC-SMWC_CG100,Chapman Gulch Adit 100,Mine/Mine Discharge Adit (Mine Entrance),37.859187,-107.802304
+T-86,silverton_co,silverton_co_T005,2,1,SMWC-SMWC_CG101_01,Chapman Gulch Adit 101,Mine/Mine Discharge Adit (Mine Entrance),37.860744,-107.798738
+T-86,silverton_co,silverton_co_T005,2,1,SMWC-SMWC_CG101_02,Chapman Gulch Adit 101,Mine/Mine Discharge Waste Rock Pile,37.860715,-107.798834
+T-86,silverton_co,silverton_co_T006,1,1,NNEPA-32GOLDKING01,Gold King Mine adit,Mine/Mine Discharge,37.8946387,-107.6384095
+T-86,silverton_co,silverton_co_T007,3,1,21COL001_WQX-9457A,GOLD KING MINE EFFLUENT,Mine/Mine Discharge Adit (Mine Entrance),37.8952,-107.6468
+T-86,silverton_co,silverton_co_T007,3,1,21COL001_WQX-9457B,GOLD KING MINE INFLUENT PRIOR TO TREATMENT,Mine/Mine Discharge Adit (Mine Entrance),37.8952,-107.647
+T-86,silverton_co,silverton_co_T007,3,1,21COL001_WQX-9457C,GOLD KING MINE TREATMENT EFFLUENT,Mine/Mine Discharge Adit (Mine Entrance),37.89572,-107.64714
+T-86,silverton_co,silverton_co_T008,3,1,21COL001_WQX-MEAS-VRN-ADT-01,VERNON DRAINING ADIT #1,Mine/Mine Discharge Adit (Mine Entrance),37.91727,-107.65569
+T-86,silverton_co,silverton_co_T008,3,1,UWP-VRN-ADT-01,Vernon draining adit #1,Mine/Mine Discharge Adit (Mine Entrance),37.91723,-107.6555667
+T-86,silverton_co,silverton_co_T008,3,1,UWP-VRN-ADT-01-WR,Vernon draining adit #1 waste rock seep,Mine/Mine Discharge Waste Rock Pile,37.91782,-107.65602
+T-86,silverton_co,silverton_co_T009,1,1,21COL001_WQX-MEAS-AKB-02,AMADOR MINE DRAINING ADIT,Mine/Mine Discharge Adit (Mine Entrance),37.936858,-107.626533
+T-86,silverton_co,silverton_co_T010,1,1,UWP-LARBRO-Adt-01,Larson Brothers draining adit near Ironton Park,Mine/Mine Discharge Adit (Mine Entrance),37.938226,-107.675449
+T-86,silverton_co,silverton_co_T011,5,1,21COL001_WQX-MEAS-CB-ADT-01,CAMP BIRD MINE #3 ADIT,Mine/Mine Discharge Adit (Mine Entrance),37.94796,-107.7309
+T-86,silverton_co,silverton_co_T011,5,1,21COL001_WQX-MEAS-CB-P-01,CAMP BIRD MINE #3 ABOVE WASTE ROCK,Mine/Mine Discharge Waste Rock Pile,37.94839,-107.72935
+T-86,silverton_co,silverton_co_T011,5,1,21COL001_WQX-MEAS-CB-P-02,CAMP BIRD MINE #3 BELOW WASTE ROCK E,Mine/Mine Discharge Waste Rock Pile,37.94894,-107.7296
+T-86,silverton_co,silverton_co_T011,5,1,21COL001_WQX-MEAS-CB-P-03,CAMP BIRD MINE #3 BELOW WASTE ROCK W,Mine/Mine Discharge Waste Rock Pile,37.949457,-107.728542
+T-86,silverton_co,silverton_co_T011,5,1,21COL001_WQX-MEAS-CB-P-04,CAMP BIRD MINE #3 BELOW WASTE ROCK SOUTH,Mine/Mine Discharge Waste Rock Pile,37.94864,-107.72901
+T-86,silverton_co,silverton_co_T012,1,1,21COL001_WQX-MEAS-HDT-P-02,HIDDEN TREASURE MINE ADIT BELOW WASTE ROCK PILE SOUTH,Mine/Mine Discharge Adit (Mine Entrance),37.94999,-107.73217

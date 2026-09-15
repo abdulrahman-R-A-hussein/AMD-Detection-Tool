@@ -1,6 +1,6 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-09-13 · **Current tag:** `v3.10.0` (tool: `v3.1.0`)
+**Last updated:** 2026-09-14 · **Current tag:** `v3.10.0` (tool: `v3.1.0`)
 
 This file is the canonical "where are we right now". It is maintained under
 the logging rule in [`../CLAUDE.md`](../CLAUDE.md). It should be sufficient to
@@ -147,6 +147,32 @@ smoke test PASS (94.95%, its documented ceiling).
 4. **The earlier ResearchGate item** on "cryptic sulfate pollution" carries the
    retracted claims.
 5. **Push** — commits are local.
+
+---
+
+## AUDIT 2026-09-14 — found while scoping the next test
+
+→ [`AUDIT_2026-09-14_ARMA_AND_TOOLING.md`](AUDIT_2026-09-14_ARMA_AND_TOOLING.md).
+All six verified directly. **None rescues a retracted claim.**
+
+1. **Arm A computed σ thresholds per catchment** (`watershed_nap.py:165`) — the
+   AOI-extent defect fixed in the Earth Engine tool at v3.1.0, so catchment size
+   acted as a classification parameter.
+2. **Arm A's "31 catchments" are 28 distinct polygons.** `7121080490`
+   (Alma/Leadville), `7121092570` (Ouray/Silverton) and `7120588780` (Lake
+   City/Ouray) each appear under two regions, so identical loadings sit on both
+   sides of leave-one-region-out splits. The curated Alma and Leadville boxes
+   overlap. **Quote n as 28.**
+3. **Creede and Lake City were mislabelled as non-caldera** — see the corrected
+   OPEN QUESTION below.
+4. **`vpca_validation.convolve_splib07` crashes on NumPy 2.x** (`np.trapz`
+   removed). Nothing calls it, so no number is affected.
+5. **CMD2's absolute bars (0.25 / 0.15) cannot be reused for Pennsylvania**,
+   whose raw values (−0.143 / −0.187) already sit below them. A PA confound
+   test must measure attenuation from PA's own raw value.
+6. **A `seep_detect` comment claims Creede and Alma were extracted; they never
+   were.** That confirms those districts are independent of the index choice,
+   which the blind-search test relies on.
 
 ---
 
@@ -516,7 +542,14 @@ Both from [`ARM_A_CROSS_REGION_RETEST_2026-08-13.md`](ARM_A_CROSS_REGION_RETEST_
   multiple-comparison correction** (20 tests; BH/Bonferroni threshold 0.0025).
   A lead to test on new data. Note it runs *opposite* to the retracted claim —
   if it replicates it favours Rockwell's map, not ours.
-- **Does the Arm A sign-flip track geology?** Silverton +0.714 and Ouray +0.667
+- **Does the Arm A sign-flip track geology?** ⚠ **Corrected 2026-09-14 — the
+  grouping below is geologically wrong.** Creede lies in the central San Juan
+  caldera cluster (USGS I-2799) and Lake City in the western San Juan caldera
+  complex (USGS I-962), so Creede belongs with Silverton and Ouray — and at
+  −0.800 it runs *against* the idea. Labels must be defined on one explicit
+  axis (volcanic setting vs deposit style) from a citable source before any new
+  region's sign is seen. → `AUDIT_2026-09-14_ARMA_AND_TOOLING.md` §3.
+  *Original text, unedited:* Silverton +0.714 and Ouray +0.667
   (both San Juan volcanic-field calderas) vs Central City −0.700, Creede
   −0.800, Leadville −0.800. **Deliberately untested and given no p-value** —
   the hypothesis was generated from these same signs, so testing it here would
@@ -571,6 +604,18 @@ Ordered by value.
 **Author actions first (not analysis):** publish the corrected Zenodo version;
 review `.private/EB2_DOCUMENTATION.md`; push. See "RECORD AND GRANT READINESS".
 
+**Blind-search test — REGISTERED 2026-09-14; landscape extraction not yet
+run.** → [`BLIND_SEARCH_PREREGISTRATION_2026-09-14.md`](BLIND_SEARCH_PREREGISTRATION_2026-09-14.md),
+with a site list fixed from station metadata only (321 rows, SHA-256
+`6ee8aec0…eb5`). Two co-primary hypotheses, Holm-corrected: **H-BS1** — 32 mine
+sites in never-analysed Alma, Creede and Lake City (power at a threefold lift
+**0.54**, at recall 0.20 **0.80**); **H-BS2** — 50 mine sites from unused
+stations in the four analysed districts (**0.64** / **0.90**). **Spring-only
+sites were moved out of the primary set before any score existed:** 43 of
+H-BS2's 93 sites were springs, which would have made half of that test a
+spring-finder. Scored against a −NDVI bare-ground baseline; verdict rows are
+DISCOVERY SIGNAL / NOT BETTER THAN BARE GROUND / NO SIGNAL DETECTED.
+
 **Field campaign — pre-register before the first field day.** Design in
 `docs/FIELD_CAMPAIGN.md`: H-RANK, H-DET, H-LIMIT, H-PRECIP, H-DISC, H-UAV, each
 with mutually exclusive verdict rows. Recommended: **144** stations across 4
@@ -601,10 +646,14 @@ across Huff Run / Clearfield / Moshannon for the UAV comparison.
       it.** Still circular — the same data suggested it and scored it.
    Also: **more Ohio sulfate coverage.** Two of five watersheds run at n=12,
    and n=12 is what decides sign consistency there.
-1. **Test whether Arm A's sign-flip tracks geology** (see "OPEN QUESTION"
-   above). Silverton+Ouray (San Juan calderas) vs Central
-   City+Creede+Leadville — no new fetching needed, the 31-catchment dataset
-   already exists at `data/matched/watershed_nap_*.csv`.
+1. ~~**Test whether Arm A's sign-flip tracks geology** on the existing
+   31-catchment dataset.~~ **Withdrawn as written, 2026-09-14.** That dataset
+   *generated* the idea, so it cannot test it; its grouping mislabels Creede
+   (central San Juan caldera cluster); and its 31 rows are 28 distinct polygons,
+   three shared across regions. A real test needs **new regions labelled on
+   one explicit axis from a citable source before their signs are seen**, plus
+   an Arm A re-run with global de-duplication and per-district σ thresholds.
+   → `AUDIT_2026-09-14_ARMA_AND_TOOLING.md`
 2. ~~Fix the `hybas_12` dilution problem~~ **TOOL BUILT AND VALIDATED
    2026-08-13** (`python/catchment_dem.py`), **not yet wired into Arm A.**
    True MERIT D8 delineation scores **6/6 within ±33%** of published USGS

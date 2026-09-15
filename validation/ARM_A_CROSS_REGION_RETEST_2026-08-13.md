@@ -1,3 +1,21 @@
+> ## ⚠ ERRATUM 2026-09-14 — read with [`AUDIT_2026-09-14_ARMA_AND_TOOLING.md`](AUDIT_2026-09-14_ARMA_AND_TOOLING.md)
+>
+> Three problems were found in the Arm A material below. **The retraction this
+> report records stands; none of them rescues the claim.** Findings below are
+> unedited.
+>
+> 1. **σ thresholds were computed over each catchment polygon**, so catchment
+>    size acted as a classification parameter (the defect fixed in the Earth
+>    Engine tool at v3.1.0).
+> 2. **The 31 rows are 28 distinct `hybas_12` polygons.** Three appear under two
+>    regions (`7121080490` Alma/Leadville, `7121092570` Ouray/Silverton,
+>    `7120588780` Lake City/Ouray), so identical loadings sit on both sides of
+>    leave-one-region-out splits. Quote n as **28 distinct catchments**.
+> 3. **The geology grouping mislabels Creede.** It is placed with Central City and
+>    Leadville, but the Creede caldera lies in the central San Juan caldera
+>    cluster (USGS I-2799), as does Lake City in the western San Juans (USGS
+>    I-962). The grouping must not be carried into any future test.
+
 # Arm A cross-region re-test: the n=6 finding does not replicate
 
 **Date:** 2026-08-13 · **Status: the headline result from 2026-08-10 is

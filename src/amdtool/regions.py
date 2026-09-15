@@ -22,10 +22,17 @@ OVERLAY_FILENAME = "regions.json"
 
 
 def region_slug(name):
-    """Canonical slug for a region name: "Silverton, CO" -> "silverton_co"."""
+    """Canonical slug for a region name: "Silverton, CO" -> "silverton_co".
+
+    This lived as an inline expression in four modules, kept in sync by hand -
+    watershed_nap.py said so in a comment. One copy, imported everywhere.
+    """
     return name.lower().replace(", ", "_").replace(" ", "_")
 
 
+# Regions pulled by BBOX rather than a named point - used for Colorado, where
+# the target is the whole Animas River watershed (streams + a few lakes), not
+# one named waterbody. (lat_lo, lon_lo, lat_hi, lon_hi, siteTypes, note)
 REGIONS = {
     "Silverton, CO": (
         37.70, -107.85, 37.95, -107.50, None,
@@ -158,7 +165,10 @@ def load_overlay(data_dir):
 
 
 def all_regions(data_dir=None):
-    """Curated REGIONS plus the overlay in data_dir. Curated entries win."""
+    """Curated REGIONS plus the overlay. Curated entries win on conflict.
+
+    Curated REGIONS plus the overlay in data_dir.
+    """
     merged = dict(load_overlay(data_dir))
     merged.update(REGIONS)
     return merged

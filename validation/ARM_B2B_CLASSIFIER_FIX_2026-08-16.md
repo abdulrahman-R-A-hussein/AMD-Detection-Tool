@@ -1,3 +1,11 @@
+> ## ⚠ ERRATUM 2026-09-15 — read with [`AUDIT_2026-09-15_B2_REPRODUCTION.md`](AUDIT_2026-09-15_B2_REPRODUCTION.md)
+>
+> Findings below are unedited. **The FAILURE verdict stands.** Worst-case J was
+> computed inside runs of tied scores. Corrected, the eight grid points score
+> **−0.452, −0.443, 0.000, 0.000, 0.000, 0.000, −0.087, −0.087** (printed as 0.000
+> for all eight), and the v3 baseline is **−0.252**, not 0.000. No grid point
+> beats zero, so the fix failed more clearly than this report shows.
+
 # Phase B2b — the bare-ground fix FAILED. The mechanism was right; the fix was not.
 
 **Date:** 2026-08-16 · **Pre-registration:** [`B2B_PREREGISTRATION_2026-08-16.md`](B2B_PREREGISTRATION_2026-08-16.md)

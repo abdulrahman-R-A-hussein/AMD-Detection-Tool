@@ -1,3 +1,12 @@
+> ## ⚠ ERRATUM 2026-09-15 — read with [`AUDIT_2026-09-15_B2_REPRODUCTION.md`](AUDIT_2026-09-15_B2_REPRODUCTION.md)
+>
+> Findings below are unedited. B2c's own numbers are unaffected: its detector
+> only evaluated thresholds at distinct scores, and it excluded the
+> cloud-unfiltered files. What changes is a baseline it quotes: corrected for
+> tied scores, the shipped classifier (`AMDclassFrac`) scores **−0.252** against
+> bare ground, not 0.000, so the continuous model's gain there is from −0.252
+> to +0.617.
+
 # Phase B2c — going continuous solves the bare-ground problem. It does not solve detection.
 
 **Date:** 2026-08-16 · **Pre-registration:** [`B2C_PREREGISTRATION_2026-08-16.md`](B2C_PREREGISTRATION_2026-08-16.md)

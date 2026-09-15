@@ -96,11 +96,19 @@ def _worst_j_fast(scores, labels, regs, folds):
             continue
         tp = fp = 0
         best_j, cut = -2.0, None
-        for i in tr:                       # fit threshold on the OTHER regions
+        for k, i in enumerate(tr):         # fit threshold on the OTHER regions
             if labels[i]:
                 tp += 1
             else:
                 fp += 1
+            # DELIBERATE CHANGE from the committed sweep (audit 2026-09-15, item 9).
+            # A `>=` cut cannot fall between two equal scores, so J is evaluated
+            # only after the LAST member of a run of tied scores. Evaluating it
+            # part-way through a tie made the chosen cut - and the held-out J -
+            # depend on the order rows arrived in. Only tied scores are affected:
+            # AMDclassFrac (18-95% tied) moved; the continuous indices did not.
+            if k + 1 < len(tr) and scores[tr[k + 1]] == scores[i]:
+                continue
             j = tp / p_tr - fp / n_tr
             if j > best_j:
                 best_j, cut = j, scores[i]

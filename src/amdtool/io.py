@@ -12,12 +12,15 @@ _TEXT_COLUMNS = ("region", "sensor", "tier", "pid", "name", "site_type", "season
 
 
 def load_extracted(paths):
-    """Load extracted CSVs, DEDUPED on (sensor, radius, tier, region, pid, k_bare, clay_bare).
+    """Load extracted CSVs, DEDUPED on (sensor, radius, tier, pid).
 
     The C3b amendment was extracted in a separate pass that also re-extracted
     the targets (a control tier is meaningless without something to compare it
     to), so target rows appear in two files. Without deduping they would be
     counted twice, inflating n+ and every statistic built on it.
+
+    Load extracted CSVs, DEDUPED on (sensor, radius, tier, region, pid,
+    k_bare, clay_bare).
     """
     rows = []
     seen = set()

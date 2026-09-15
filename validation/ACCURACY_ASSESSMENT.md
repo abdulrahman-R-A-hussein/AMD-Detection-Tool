@@ -103,9 +103,12 @@ fixed in advance and was not moved.
 | `AMDclassFrac` vs | AUC | worst-case J |
 |---|---|---|
 | C1 in-stream | 0.586 | 0.004 |
-| C2 terrain-matched | 0.743 | **0.000** |
-| **C3b NLCD barren** | **0.442** | **0.000** |
+| C2 terrain-matched | 0.743 | **+0.049** |
+| **C3b NLCD barren** | **0.442** | **−0.252** |
 | C3 | 0.471 | **−0.304** |
+
+Worst-case J corrected for tied scores (audit 2026-09-15, item 9). The raw
+report prints 0.000 for C2 and C3b; the other two rows were already right.
 
 At Leadville, median `AMDclassFrac` is **0.376 on bare ground vs 0.049 at
 targets — 7.7× the wrong way.** This is the single most important limitation
@@ -119,7 +122,9 @@ of the shipped 19-class product.
 | C2 | 0.319 | 0.291 |
 | C3b | **0.617** | 0.318 |
 
-Thresholding *was* part of the problem — J 0.000 → +0.617 against bare ground.
+Thresholding *was* part of the problem: J went from −0.252 to +0.617 against bare
+ground. The −0.252 is the shipped classifier's value corrected for tied scores;
+the B2c report compared against a printed 0.000.
 But the model beats the single index only on C2 and C3b, and **loses on the
 primary tier**. Verdict: PARTIAL.
 
@@ -140,8 +145,9 @@ look similar (C1 0.228 vs −0.019) but BH q = **0.2558** on all three tiers.
 ### 2d. A mechanism can be right and the fix still fail
 
 The bare-relative threshold diagnosis passed its falsifiable pre-check
-**16/16**. The fix then changed **nothing** — all eight grid points scored
-J = **0.000**, AUC 0.34–0.50. Mechanism supported, fix refuted. Not shipped.
+**16/16**. The fix then changed **nothing** — no grid point scored above zero
+(worst-case J **−0.452 to 0.000** corrected for tied scores; the raw report
+printed 0.000 for all eight), AUC 0.34–0.50. Mechanism supported, fix refuted. Not shipped.
 
 ---
 

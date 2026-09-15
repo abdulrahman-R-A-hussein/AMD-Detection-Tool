@@ -81,7 +81,7 @@ def _same(a, b):
     return a == b
 
 
-def test_cmd2_t1_table_reproduces_and_the_partial_guard_changes_nothing():
+def test_cmd2_t1_table_reproduces_and_the_partial_guard_changes_nothing(legacy):
     """CMD2 T1, assembled exactly as python/cmd_confound.run_analyse does.
 
     Two claims checked at once: the library reproduces every committed T1 line
@@ -89,13 +89,17 @@ def test_cmd2_t1_table_reproduces_and_the_partial_guard_changes_nothing():
     the 2026-09-14 tolerance guard in partial_spearman returns the identical
     value to the legacy guard at every covariate and every watershed - including
     near-collinear Monday Creek, the one place a tolerance could bite.
+
+    The legacy side is cmd_confound AS COMMITTED at LEGACY_REV: the working copy
+    re-exports amdtool's partial_spearman, so comparing against it would compare
+    the library with itself.
     """
     import csv
     import random
 
     from amdtool import stats as S
     from amdtool.io import load_extracted
-    cmd_confound = pytest.importorskip("cmd_confound")
+    cmd_confound = legacy("cmd_confound")
 
     geo = _need("cmdgeo_l8_*.csv")
     conf_csv = os.path.join(MATCHED, "cmdconf.csv")

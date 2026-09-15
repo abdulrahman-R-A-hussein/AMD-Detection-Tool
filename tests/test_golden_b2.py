@@ -116,15 +116,16 @@ def test_l8_dose_response_is_positive_in_all_four_districts_and_fails_loro():
                                 "FerricIron1     Iron_mgL_dissolved")
 
 
-def test_within_region_permutation_p_is_rng_identical_to_legacy(legacy):
+def test_l8_ferriciron1_vs_c1_committed_and_tie_corrected(legacy):
+    """36% of these scores are tied (co-located in-stream stations share a buffer).
+    The committed sweep reproduces the report's -0.018; the tie-corrected sweep
+    gives -0.019 (audit 2026-09-15, item 9). Permutation p stays RNG-identical on
+    tie-free scores - proven in tests/test_worst_j_ties.py."""
     seep = legacy("seep_detect")
-    _, _, sc, lb, rg = _detection(_rows("l8"), "C1")    # worst J -0.018, p 0.197
-    wj_new, per_new = stats.loro_worst_j(sc, lb, rg)
-    wj_old, per_old = seep.loro_worst_j(sc, lb, rg)
-    assert (wj_new, per_new) == (wj_old, per_old)
-    r_new, r_old = random.Random(SEED), random.Random(SEED)
-    p_new = stats.perm_p_within_region(sc, lb, rg, wj_new, 300, r_new)
-    p_old = seep.perm_p_within_region(sc, lb, rg, wj_old, 300, r_old)
-    assert p_new == p_old
-    assert 0.02 < p_new < 0.9                      # a p that actually exercises the null
-    assert r_new.random() == r_old.random()        # identical RNG consumption
+    _, _, sc, lb, rg = _detection(_rows("l8"), "C1")
+    fields = _report_line("report_seep_b2_l8_2026-08-14.txt", "L8      FerricIron1     C1").split()
+    assert fields[4] == "%.3f" % seep.loro_worst_j(sc, lb, rg)[0] == "-0.018"
+    assert "%.3f" % stats.loro_worst_j(sc, lb, rg)[0] == "-0.019"
+    r = random.Random(SEED)
+    p = stats.perm_p_within_region(sc, lb, rg, stats.loro_worst_j(sc, lb, rg)[0], 300, r)
+    assert 0.02 < p < 0.9                            # still nowhere near significant

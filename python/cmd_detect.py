@@ -31,6 +31,15 @@ import random
 import statistics
 import sys
 
+# --- Since 2026-09-14 the definitions below live in the amdtool package and are
+# imported here, so every name this script ever exported still resolves. Each was
+# proven identical to this file as committed at ad05971 by
+# tests/test_source_parity.py; see validation/AMDTOOL_REFACTOR_GATE_2026-09-14.md.
+import _amdtool_path  # noqa: E402,F401  (src/amdtool importable from a bare clone)
+from amdtool.imagery import (  # noqa: E402,F401
+    l8_composite_season,
+)
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from seep_detect import (OUTDIR, SEED, PRIMARY_RADIUS, INDEX_BANDS,
@@ -86,37 +95,6 @@ ANALYTES = ["Sulfate_mgL", "SpecificConductance", "Iron_mgL_any", "pH"]
 # graph directly. This is the fix that finally made Silverton S2 complete after
 # four failures; applied here to Landsat for the same reason.
 L8_MAX_SCENES = 120
-
-
-def l8_composite_season(ee, region, season="leafoff", max_scenes=L8_MAX_SCENES):
-    """Landsat composite for a named season, with snow masked and scenes capped.
-
-    season="leafoff" -> Nov-Mar. That range WRAPS the year boundary, so it needs
-    an Or of two calendarRange filters; calendarRange(11, 3) is empty, not
-    inclusive, and would silently return nothing.
-
-    SNOW MASKING is required for winter imagery and is not in the standard
-    process_landsat() path: QA_PIXEL bit 5 is snow/ice. Snow is bright and
-    seasonal, so leaving it in would create a season-dependent artifact that
-    could masquerade as either signal or canopy relief - registered in
-    CMD1 amendment 1 before this was run.
-    """
-    from gee_classify import process_landsat, add_indices, START, END
-
-    if season == "leafoff":
-        mfilter = ee.Filter.Or(ee.Filter.calendarRange(11, 12, "month"),
-                               ee.Filter.calendarRange(1, 3, "month"))
-    else:
-        mfilter = ee.Filter.calendarRange(5, 7, "month")
-
-    def prep(img):
-        snow = img.select("QA_PIXEL").bitwiseAnd(1 << 5).eq(0)
-        return add_indices(ee, process_landsat(ee, img).updateMask(snow))
-
-    col = (ee.ImageCollection("LANDSAT/LC08/C02/T1_L2")
-           .filterBounds(region).filterDate(START, END).filter(mfilter)
-           .sort("CLOUD_COVER").limit(max_scenes).map(prep))
-    return col.median().clip(region), int(col.size().getInfo())
 
 
 def load_cmd_stations(slug):

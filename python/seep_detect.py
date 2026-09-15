@@ -35,6 +35,34 @@ import random
 import statistics
 import sys
 
+# --- Since 2026-09-14 the definitions below live in the amdtool package and are
+# imported here, so every name this script ever exported still resolves. Each was
+# proven identical to this file as committed at ad05971 by
+# tests/test_source_parity.py; see validation/AMDTOOL_REFACTOR_GATE_2026-09-14.md.
+import _amdtool_path  # noqa: E402,F401  (src/amdtool importable from a bare clone)
+from amdtool.imagery import (  # noqa: E402,F401
+    l8_composite,
+    s2_composite,
+    index_image,
+    _chunks,
+    extract_buffers,
+)
+from amdtool.stats import (  # noqa: E402,F401
+    auc,
+    best_threshold,
+    j_at,
+    _prep_folds,
+    _worst_j_fast,
+    loro_worst_j,
+    perm_p_within_region,
+    benjamini_hochberg,
+    variance_split,
+    spearman,
+)
+from amdtool.io import (  # noqa: E402,F401
+    load_extracted,
+)
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -174,70 +202,6 @@ def region_geometry(ee, region_key):
     return ee.Geometry.Rectangle([lon_lo, lat_lo, lon_hi, lat_hi])
 
 
-def l8_composite(ee, region):
-    from gee_classify import composite_for_region
-    col, size = composite_for_region(ee, region)
-    return col.median().clip(region), int(size.getInfo())
-
-
-def s2_composite(ee, region):
-    """Sentinel-2 SR mapped onto the SR_B1..SR_B7 naming the rest of the
-    toolchain uses (match_scenes.S2_MAP), so add_indices() and classify_v3()
-    work unchanged. B8A not B8 for SR_B5, matching Landsat 8 B5's 865 nm -
-    the same choice match_scenes.py already made and validated.
-
-    B8 (842 nm, 10 m) is carried separately as SR_B8_10 purely for the
-    resolution ladder's genuine-10 m green:NIR; it is NOT substituted into the
-    SIM 3466 indices, which would silently change their definition.
-    """
-    from gee_classify import add_indices, START, END, V3_MONTHS
-    from match_scenes import S2_MAP
-
-    def prep(img):
-        scl = img.select("SCL")
-        clear = (scl.neq(1).And(scl.neq(3)).And(scl.neq(8))
-                 .And(scl.neq(9)).And(scl.neq(10)))
-        b = img.updateMask(clear)
-        scaled = (b.select([s for s, _ in S2_MAP])
-                  .divide(10000).clamp(0.0, 1.0)
-                  .rename([d for _, d in S2_MAP]))
-        nir10 = b.select("B8").divide(10000).clamp(0.0, 1.0).rename("SR_B8_10")
-        return add_indices(ee, scaled.addBands(nir10))
-
-    # CLOUD FILTER IS LOAD-BEARING, not cosmetic. Silverton returns 554 S2
-    # scenes in the May-Jul window (Ouray 276) against Landsat's handful, and a
-    # median over 554 images with add_indices mapped onto each exceeds the EE
-    # memory limit before any tiling or batching downstream can help - retries
-    # cannot fix a graph that is too large to build. Capping cloud cover cuts
-    # the collection several-fold AND improves the composite, since >60% cloudy
-    # scenes contribute almost nothing after SCL masking anyway.
-    col = (ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
-           .filterBounds(region).filterDate(START, END)
-           .filter(ee.Filter.calendarRange(V3_MONTHS[0], V3_MONTHS[-1], "month"))
-           .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", S2_MAX_CLOUD))
-           .sort("CLOUDY_PIXEL_PERCENTAGE").limit(S2_MAX_SCENES)
-           .map(prep))
-    return col.median().clip(region), int(col.size().getInfo())
-
-
-def index_image(ee, comp):
-    """Add the paper2 indices and drop water pixels.
-
-    Water exclusion is the whole point of the B1/B2 split: Green:NIR is
-    degenerate on open water (all water absorbs NIR), so applied to a lake it
-    detects water, not sulfur. Uses the classifier's OWN water term
-    (gee_classify.water_term) rather than a second definition, and deliberately
-    NOT the full `land` mask, which would also drop bright/dark/built/vegetated
-    pixels and remove legitimate precipitate targets.
-    """
-    from gee_classify import water_term
-    from water_indices import green_nir_ee, ndvi_stress_ee
-
-    img = green_nir_ee(comp, "SR_B3", "SR_B5")
-    img = img.addBands(ndvi_stress_ee(img, "SR_B5", "SR_B4"))
-    return img.updateMask(water_term(ee, comp).Not())
-
-
 NLCD_BARREN = 31          # NLCD "Barren Land (Rock/Sand/Clay)"
 
 
@@ -309,81 +273,6 @@ def amd_binary(ee, comp, region, scale, n_tiles=4):
     cls = classify_v3(ee, comp, region, scale=scale, n_tiles=n_tiles)
     amd = cls.remap(list(AMD_CLASSES), [1] * len(AMD_CLASSES), 0)
     return amd.updateMask(comp.select("SR_B4").mask()).rename("AMDclassFrac")
-
-
-def _chunks(seq, n):
-    for i in range(0, len(seq), n):
-        yield seq[i:i + n]
-
-
-def extract_buffers(ee, img, points, radius_m, scale, bands, batch=25):
-    """p90 + mean + valid-pixel count per buffer, one reduceRegions per batch.
-
-    Batch size is small and halves on failure because "User memory limit
-    exceeded" here is about SERVER COMPUTE-GRAPH SIZE, not pixel count - the
-    recurring trap in this project. Each buffer in the collection re-evaluates
-    the whole median-composite-plus-indices graph, so cost scales with batch
-    size, and bestEffort does not help because it only mitigates pixel count.
-    150 fails; 25 succeeds.
-    """
-    red = (ee.Reducer.percentile([90])
-           .combine(ee.Reducer.mean(), "", True)
-           .combine(ee.Reducer.count(), "", True))
-    sel = img.select(bands)
-    out = {}
-    for grp in _chunks(points, batch):
-        size = len(grp)
-        while True:
-            try:
-                for sub in _chunks(grp, size):
-                    fc = ee.FeatureCollection([
-                        ee.Feature(ee.Geometry.Point([p["lon"], p["lat"]])
-                                   .buffer(radius_m), {"pid": p["pid"]})
-                        for p in sub])
-                    got = sel.reduceRegions(collection=fc, reducer=red,
-                                            scale=scale).getInfo()["features"]
-                    for f in got:
-                        pr = f["properties"]
-                        # EE DROPS THE BAND PREFIX when the image has exactly
-                        # one band: properties come back as "mean"/"p90"/
-                        # "count", not "<band>_mean". Silently produced an
-                        # all-NaN AMDclassFrac column on the first Silverton
-                        # run. Normalise so callers see one naming scheme.
-                        if len(bands) == 1 and "mean" in pr:
-                            for s in ("p90", "mean", "count"):
-                                if s in pr:
-                                    pr["%s_%s" % (bands[0], s)] = pr.pop(s)
-                        out[pr["pid"]] = pr
-                break
-            except Exception as exc:                       # noqa: BLE001
-                # 2026-09-09: floor lowered 2 -> 1. Moshannon Creek, PA (162
-                # stations, 120 scenes) failed the 500/1000 m ladder at
-                # batch=2 with the band subset ALREADY applied, so the two
-                # known request-size levers were exhausted.
-                #
-                # batch=1 is a request-size change, not a method change: each
-                # buffer's p90/mean/count is computed independently, so how
-                # many buffers share one reduceRegions call cannot affect any
-                # of their values. Only the HTTP request count changes.
-                #
-                # MEASURED, not assumed: batch=1 vs batch=25 over 20 Chest
-                # Creek stations at 500 m gives max abs difference 1.11e-16 -
-                # one double-precision ULP, i.e. float representation noise.
-                # Note this is NOT bit-identical the way the band subset is
-                # (that one measures exactly 0.000 over 27 stations). The
-                # difference is ~1e-16 relative and cannot move a Spearman
-                # rank, but say "identical to within float epsilon", never
-                # "identical".
-                #
-                # Contrast the SCENE CAP, which is the tempting next lever and
-                # is NOT safe: a shallower stack is a different median
-                # composite and different numbers. Never reduce it for one
-                # region and pool the result with regions that kept 120.
-                if "memory" not in str(exc).lower() or size <= 1:
-                    raise
-                size = max(1, size // 2)
-                print("      memory limit - retrying at batch=%d" % size)
-    return out
 
 
 # ------------------------------------------------------------------ controls
@@ -548,235 +437,8 @@ def run_extract(sensor, slugs, out_csv, tiers=None, radii=None):
 
 # ------------------------------------------------------------------ stats
 
-def auc(pos, neg):
-    """Mann-Whitney U / (n1*n2), ties at 0.5."""
-    if not pos or not neg:
-        return float("nan")
-    allv = sorted(pos + neg)
-    n = len(allv)
-    ranks, i = {}, 0
-    while i < n:
-        j = i
-        while j + 1 < n and allv[j + 1] == allv[i]:
-            j += 1
-        r = (i + j) / 2.0 + 1
-        ranks[allv[i]] = r
-        i = j + 1
-    rp = sum(ranks[v] for v in pos)
-    u = rp - len(pos) * (len(pos) + 1) / 2.0
-    return u / (len(pos) * len(neg))
-
-
-def best_threshold(pos, neg):
-    """Threshold maximising Youden J (TPR - FPR) on the given sample."""
-    if not pos or not neg:
-        return float("nan"), float("nan")
-    cuts = sorted(set(pos + neg))
-    bj, bt = -2.0, float("nan")
-    for c in cuts:
-        tpr = sum(1 for v in pos if v >= c) / len(pos)
-        fpr = sum(1 for v in neg if v >= c) / len(neg)
-        if tpr - fpr > bj:
-            bj, bt = tpr - fpr, c
-    return bt, bj
-
-
-def j_at(pos, neg, cut):
-    if not pos or not neg or cut != cut:
-        return float("nan")
-    tpr = sum(1 for v in pos if v >= cut) / len(pos)
-    fpr = sum(1 for v in neg if v >= cut) / len(neg)
-    return tpr - fpr
-
-
-def _prep_folds(scores, regions):
-    """Precompute each LORO fold's score-descending index order ONCE.
-
-    Scores never change under label permutation - only labels do - so the sort
-    is loop-invariant. Hoisting it turns the O(n^2)-per-draw threshold search
-    into a single O(n) sweep, which is what makes 10,000 permutations x 27
-    tests finish in minutes instead of hours.
-    """
-    regs = sorted(set(regions))
-    folds = {}
-    for held in regs:
-        tr = [i for i, r in enumerate(regions) if r != held]
-        te = [i for i, r in enumerate(regions) if r == held]
-        tr.sort(key=lambda i: -scores[i])
-        te.sort(key=lambda i: -scores[i])
-        folds[held] = (tr, te)
-    return regs, folds
-
-
-def _worst_j_fast(scores, labels, regs, folds):
-    """Worst-case LORO Youden J via one descending sweep per fold."""
-    worst, per = None, {}
-    for held in regs:
-        tr, te = folds[held]
-        p_tr = sum(labels[i] for i in tr)
-        n_tr = len(tr) - p_tr
-        p_te = sum(labels[i] for i in te)
-        n_te = len(te) - p_te
-        if not (p_tr and n_tr and p_te and n_te):
-            continue
-        tp = fp = 0
-        best_j, cut = -2.0, None
-        for i in tr:                       # fit threshold on the OTHER regions
-            if labels[i]:
-                tp += 1
-            else:
-                fp += 1
-            j = tp / p_tr - fp / n_tr
-            if j > best_j:
-                best_j, cut = j, scores[i]
-        tp = fp = 0
-        for i in te:                       # apply it to the held-out region
-            if scores[i] >= cut:
-                if labels[i]:
-                    tp += 1
-                else:
-                    fp += 1
-        jt = tp / p_te - fp / n_te
-        per[held] = jt
-        worst = jt if worst is None else min(worst, jt)
-    return (worst if worst is not None else float("nan")), per
-
-
-def loro_worst_j(scores, labels, regions):
-    """Worst-case leave-one-REGION-out Youden J.
-
-    THE criterion, per the pre-registration. Fit the threshold on every region
-    except one, apply it to the held-out region, keep the worst fold. Pooled
-    or within-region J is reported alongside but is NOT the criterion - Test C
-    scored 0.99 within-site and 0.63 across sites, which is exactly the failure
-    mode this guards against.
-    """
-    if len(set(regions)) < 2:
-        return float("nan"), {}
-    regs, folds = _prep_folds(scores, regions)
-    return _worst_j_fast(scores, labels, regs, folds)
-
-
-def perm_p_within_region(scores, labels, regions, observed, n_perm, rng):
-    """One-sided p from shuffling labels WITHIN region only.
-
-    Never across regions: source points cluster spatially and regions differ in
-    geology, illumination and scene availability, so a global shuffle destroys
-    the blocking and inflates significance.
-    """
-    if observed != observed:
-        return float("nan")
-    by = {}
-    for i, r in enumerate(regions):
-        by.setdefault(r, []).append(i)
-    regs, folds = _prep_folds(scores, regions)
-    lab = list(labels)
-    perm = list(lab)
-    hits = 0
-    for _ in range(n_perm):
-        for idx in by.values():
-            sub = [lab[i] for i in idx]
-            rng.shuffle(sub)
-            for i, v in zip(idx, sub):
-                perm[i] = v
-        j, _ = _worst_j_fast(scores, perm, regs, folds)
-        if j == j and j >= observed:
-            hits += 1
-    return (hits + 1) / (n_perm + 1)
-
-
-def benjamini_hochberg(pvals):
-    """Return the BH-adjusted p-values, order preserved."""
-    idx = sorted(range(len(pvals)), key=lambda i: pvals[i])
-    m = len(pvals)
-    adj = [1.0] * m
-    prev = 1.0
-    for rank, i in enumerate(reversed(idx), 1):
-        k = m - rank + 1
-        prev = min(prev, pvals[i] * m / k)
-        adj[i] = prev
-    return adj
-
-
-def variance_split(values, regions):
-    """Fraction of total variance that is BETWEEN regions.
-
-    Mandatory next to any pooled correlation here: the pooled sulfate result
-    reversed sign once 67.5%-between-region structure was removed.
-    """
-    vals = [(v, r) for v, r in zip(values, regions) if v == v]
-    if len(vals) < 3:
-        return float("nan")
-    grand = statistics.mean(v for v, _ in vals)
-    by = {}
-    for v, r in vals:
-        by.setdefault(r, []).append(v)
-    ss_b = sum(len(g) * (statistics.mean(g) - grand) ** 2 for g in by.values())
-    ss_t = sum((v - grand) ** 2 for v, _ in vals)
-    return ss_b / ss_t if ss_t else float("nan")
-
-
-def spearman(x, y):
-    pairs = [(a, b) for a, b in zip(x, y) if a == a and b == b]
-    if len(pairs) < 4:
-        return float("nan"), len(pairs)
-    def rank(a):
-        order = sorted(range(len(a)), key=lambda i: a[i])
-        r = [0.0] * len(a)
-        i = 0
-        while i < len(order):
-            j = i
-            while j + 1 < len(order) and a[order[j + 1]] == a[order[i]]:
-                j += 1
-            avg = (i + j) / 2.0 + 1
-            for k in range(i, j + 1):
-                r[order[k]] = avg
-            i = j + 1
-        return r
-    rx, ry = rank([p[0] for p in pairs]), rank([p[1] for p in pairs])
-    n = len(pairs)
-    mx, my = statistics.mean(rx), statistics.mean(ry)
-    num = sum((a - mx) * (b - my) for a, b in zip(rx, ry))
-    den = (sum((a - mx) ** 2 for a in rx) * sum((b - my) ** 2 for b in ry)) ** 0.5
-    return (num / den if den else float("nan")), n
-
 
 # ------------------------------------------------------------------ analyse
-
-def load_extracted(paths):
-    """Load extracted CSVs, DEDUPED on (sensor, radius, tier, pid).
-
-    The C3b amendment was extracted in a separate pass that also re-extracted
-    the targets (a control tier is meaningless without something to compare it
-    to), so target rows appear in two files. Without deduping they would be
-    counted twice, inflating n+ and every statistic built on it.
-    """
-    rows = []
-    seen = set()
-    for p in paths:
-        if not os.path.isfile(p):
-            continue
-        with open(p, encoding="utf-8") as fh:
-            for r in csv.DictReader(fh):
-                # k_bare/clay_bare MUST be in the key. Without them the B2b
-                # sweep's 8 grid points - same pid, same tier, same radius,
-                # different thresholds - collapse onto the first one, and the
-                # verdict gets computed from 1/8 of the data. Observed
-                # 2026-08-16: reported FAILURE off a single grid point before
-                # the CSV was checked against the analysis output.
-                key = (r.get("sensor"), r.get("radius"), r.get("tier"),
-                       r.get("region"), r.get("pid"),
-                       r.get("k_bare"), r.get("clay_bare"))
-                if key in seen:
-                    continue
-                seen.add(key)
-                for k, v in list(r.items()):
-                    if k in ("region", "sensor", "tier", "pid", "name",
-                             "site_type", "season"):
-                        continue
-                    r[k] = float(v) if v not in ("", None, "None") else float("nan")
-                rows.append(r)
-    return rows
 
 
 def _score_key(index, stat):

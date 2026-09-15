@@ -1,3 +1,14 @@
+> ## ⚠ ERRATUM 2026-09-15 — read with [`AUDIT_2026-09-15_B2_REPRODUCTION.md`](AUDIT_2026-09-15_B2_REPRODUCTION.md)
+>
+> Findings below are unedited. **No verdict changes.** (1) The C3b amendment
+> report (`report_seep_b2_s2_c3b_2026-08-15.txt`) pooled control rows from a
+> cloud-unfiltered composite (161 and 138 scenes, Central City and Leadville)
+> into its C2 and C3 tiers. Its targets, C1 and C3b rows are clean, so
+> `FerricIron1` vs C3b +0.318 stands, but that report's C2/C3 rows must not be
+> cited. (2) Corrected for tied scores, `AMDclassFrac` vs C3b is **−0.252**, not
+> 0.000, and vs C2 is **+0.049**, not 0.000 (recomputed q = 0.031; J far below
+> 0.25): [`report_seep_b2_s2_tiefix_2026-09-15.txt`](report_seep_b2_s2_tiefix_2026-09-15.txt).
+
 # Arm B2 on Sentinel-2 — the resolution effect
 
 **Date:** 2026-08-15 · **Pre-registration:** [`B2_PREREGISTRATION_2026-08-14.md`](B2_PREREGISTRATION_2026-08-14.md) (committed `4bb3b63` before any extraction)

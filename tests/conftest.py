@@ -36,6 +36,9 @@ def legacy(tmp_path):
         path.write_bytes(src)
         spec = importlib.util.spec_from_file_location("legacy_%s" % name, str(path))
         mod = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(mod)
+        try:
+            spec.loader.exec_module(mod)
+        except ImportError as exc:          # e.g. no earthengine-api on this machine
+            pytest.skip("legacy python/%s.py cannot be imported here: %s" % (name, exc))
         return mod
     return load

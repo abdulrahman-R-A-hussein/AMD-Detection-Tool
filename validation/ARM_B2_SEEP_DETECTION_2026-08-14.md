@@ -1,3 +1,15 @@
+> ## ⚠ ERRATUM 2026-09-15 — read with [`AUDIT_2026-09-15_B2_REPRODUCTION.md`](AUDIT_2026-09-15_B2_REPRODUCTION.md)
+>
+> Findings below are unedited. **No verdict changes.** Worst-case J was computed
+> inside runs of tied scores, so some printed values are wrong: `AMDclassFrac`
+> vs C1 and vs C2 are **+0.032** and **+0.235**, not 0.000 (vs C3, −0.304, is
+> right); `ClaySulfateMica` vs C1 is **+0.030**, not +0.044; `FerricIron1` vs C1
+> is −0.019, not −0.018. The report regenerates byte for byte only with the
+> district CSVs in the order Silverton, Leadville, Ouray, Central City.
+> Recomputed with the corrected statistic, `AMDclassFrac` vs C2 is significant
+> (p 0.0001, q 0.0004), but its J stays below 0.25 and it still fails C1 and C3:
+> [`report_seep_b2_l8_tiefix_2026-09-15.txt`](report_seep_b2_l8_tiefix_2026-09-15.txt).
+
 # Arm B2 — seep/precipitate detection at 86 AMD source points
 
 **Date:** 2026-08-14 · **Pre-registration:** [`B2_PREREGISTRATION_2026-08-14.md`](B2_PREREGISTRATION_2026-08-14.md),

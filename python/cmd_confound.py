@@ -45,6 +45,17 @@ import time
 
 import numpy as np
 
+# --- Since 2026-09-14 the definitions below live in the amdtool package and are
+# imported here, so every name this script ever exported still resolves. Each was
+# proven identical to this file as committed at ad05971 by
+# tests/test_source_parity.py; see validation/AMDTOOL_REFACTOR_GATE_2026-09-14.md.
+import _amdtool_path  # noqa: E402,F401  (src/amdtool importable from a bare clone)
+from amdtool.stats import (  # noqa: E402,F401
+    _rank,
+    partial_spearman,
+    perm_p_within,
+)
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from seep_detect import OUTDIR, SEED, load_extracted, spearman, variance_split
@@ -305,62 +316,6 @@ def run_catchments(slugs, out_csv):
 
 
 # ------------------------------------------------------------------ statistics
-
-def _rank(v):
-    order = sorted(range(len(v)), key=lambda i: v[i])
-    out = [0.0] * len(v)
-    i = 0
-    while i < len(order):
-        j = i
-        while j + 1 < len(order) and v[order[j + 1]] == v[order[i]]:
-            j += 1
-        avg = (i + j) / 2.0 + 1.0
-        for k in range(i, j + 1):
-            out[order[k]] = avg
-        i = j + 1
-    return np.asarray(out)
-
-
-def partial_spearman(x, y, z):
-    """Spearman rho of x vs y with z removed, on ranks.
-
-    Residualise rank(x) and rank(y) on rank(z) by least squares, then correlate
-    the residuals. This is the rank analogue of a partial correlation and is
-    what the pre-registration fixed as the primary statistic.
-    """
-    rx, ry, rz = _rank(x), _rank(y), _rank(z)
-    A = np.column_stack([rz, np.ones(len(rz))])
-    ex = rx - A @ np.linalg.lstsq(A, rx, rcond=None)[0]
-    ey = ry - A @ np.linalg.lstsq(A, ry, rcond=None)[0]
-    sx, sy = ex.std(), ey.std()
-    if sx == 0 or sy == 0:
-        return float("nan")
-    return float((ex * ey).mean() / (sx * sy))
-
-
-def perm_p_within(x, y, z, regions, observed, n_perm, rng):
-    """Shuffle y WITHIN watershed; z travels with the station, not with y.
-
-    This is the null that destroyed the pooled Colorado sulfate claim and that
-    Arm B2 passed. Keeping z attached to the station is the point: it asks
-    whether the x-y link survives at equal mining extent, not whether the
-    triple is jointly random.
-    """
-    by = {}
-    for i, g in enumerate(regions):
-        by.setdefault(g, []).append(i)
-    hits = 0
-    for _ in range(n_perm):
-        yp = list(y)
-        for ix in by.values():
-            sub = [y[i] for i in ix]
-            rng.shuffle(sub)
-            for i, v in zip(ix, sub):
-                yp[i] = v
-        r = partial_spearman(x, yp, z)
-        if r == r and abs(r) >= abs(observed):
-            hits += 1
-    return (hits + 1) / (n_perm + 1)
 
 
 def _per_region(x, y, regions, z=None, minn=5):

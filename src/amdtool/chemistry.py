@@ -35,9 +35,21 @@ from amdtool.errors import AmdToolError, InsufficientDataError
 WQP = "https://www.waterqualitydata.us/data"
 USER_AGENT = "AMD-Detection-Tool/2.5 (research)"
 
-# Site types that are not surface water. Filtered locally in consolidate():
-# WQP's siteType FILTER parameter uses a narrower vocabulary than
-# MonitoringLocationTypeName and rejects (HTTP 400) many real type strings.
+# WQP's siteType FILTER parameter is a small fixed domain (Stream, Lake,
+# Reservoir, Impoundment, Spring, Well, Facility, Land, Atmosphere, ...) that
+# is DIFFERENT from and narrower than the values a station's
+# MonitoringLocationTypeName can actually hold. Verified 2026-08-10: passing
+# "River/Stream", "Reservoir", "Lake", "Canal *", "Ditch", or any
+# "Mine/Mine Discharge *" / "Subsurface: Tunnel..." value as siteType causes an
+# HTTP 400 (not a silent empty result) - the filter parameter simply does not
+# accept those strings, even though real stations carry them.
+#
+# The robust fix: fetch_region() sends NO siteType filter (bbox + date +
+# characteristics only, so every type comes back), and filtering happens
+# locally against MonitoringLocationTypeName via EXCLUDE_SITE_TYPES. That
+# recovered 11,410 Iron rows (vs 3,844 under the old "Stream"-only filter),
+# including the mine-discharge/adit/spring source points that are the highest-
+# concentration, most AMD-diagnostic samples in the record.
 EXCLUDE_SITE_TYPES = {
     "CERCLA Superfund Site",   # verified: unnamed stations, IDs like -AS-/-SE-
                                # (air/sediment sample codes) - not water
@@ -48,6 +60,10 @@ EXCLUDE_SITE_TYPES = {
     "Facility: Laboratory or sample-preparation area",
 }
 
+# For downstream regression: source points (mine discharge) carry the highest
+# concentrations and are point sources; in-stream sites are diluted and
+# integrate upstream area. Arm A should NOT pool these two categories without
+# recording which is which - a station's category is a first-class covariate.
 SOURCE_POINT_TYPES = {
     "Mine/Mine Discharge Adit (Mine Entrance)", "Mine/Mine Discharge",
     "Mine/Mine Discharge Tailings Pile", "Mine/Mine Discharge Waste Rock Pile",

@@ -1,6 +1,6 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-09-14 · **Current tag:** `v3.10.0` (tool: `v3.1.0`)
+**Last updated:** 2026-09-15 · **Current tag:** `v3.10.0` (tool: `v3.1.0`)
 
 This file is the canonical "where are we right now". It is maintained under
 the logging rule in [`../CLAUDE.md`](../CLAUDE.md). It should be sufficient to
@@ -48,8 +48,11 @@ pipeline needed edits to five hand-synced dicts.
   prints, exits or authenticates on a host's behalf: a host passes in `ee`.
   **Behaviour-neutral so far, proven:** 68 tests, including exact golden rebuilds
   of CMD1, CMD2 T1, the CMD3 ladder, B2's J 0.234 and its ρ +0.568 / LORO lines.
-  `ee_auth.py` is now a wrapper; `seep_detect`, `cmd_detect`, `cmd_confound` and
-  `fetch_wqp` **still carry their own copies**. Gate:
+  **Since 2026-09-15** `seep_detect`, `cmd_detect`, `cmd_confound`, `fetch_wqp`
+  and `ee_auth` are thin wrappers over it. CMD1, CMD2, CMD3 and B2 dose-LORO
+  regenerate identically through them, and a live Monday Creek re-extraction
+  matches the committed file exactly (max abs diff 0.000). B2's detection
+  tables now carry the tied-score correction (audit 2026-09-15, item 9). Gate:
   `AMDTOOL_REFACTOR_GATE_2026-09-14.md`.
 - **SpectraLab "AMD severity report" module** — branch
   `feature/amd-severity-module` of VPCA+STEPWISE-REGRESSION, **not released**.
@@ -204,6 +207,27 @@ All eight verified directly. **None rescues a retracted claim.**
 
 ---
 
+## AUDIT 2026-09-15 — Arm B2 regenerated from committed code and data
+
+→ [`AUDIT_2026-09-15_B2_REPRODUCTION.md`](AUDIT_2026-09-15_B2_REPRODUCTION.md) ·
+raw: [`report_b2_reproduction_2026-09-15.txt`](report_b2_reproduction_2026-09-15.txt)
+
+**No pre-registered verdict changes. No headline number changes.**
+
+9. **Worst-case J was evaluated inside runs of tied scores**, making it depend
+   on row order. Six printed values change. Most notable: L8 `AMDclassFrac` vs
+   C2 goes 0.000 → +0.235, the shipped classifier vs C3b 0.000 → **−0.252**, and
+   the B2b grid goes from 0.000 everywhere to −0.452…0.000. No row crosses 0.25.
+   With p recomputed, `AMDclassFrac` vs C2 becomes significant (L8 q 0.0004,
+   S2 q 0.031) but stays below the J bar and still fails C1 and C3, so no verdict
+   moves. The claims that leaned on the zeros get stronger. Fixed in `amdtool` and
+   tested against brute force.
+10. **The C3b report pooled a cloud-unfiltered composite** (161 and 138 scenes
+    vs 61 and 59) into its C2/C3 tiers. Its C3b, C1 and target rows are clean.
+11. **The B2 reports regenerate byte for byte, but only in an input order
+    nobody recorded** (Silverton, Leadville, Ouray, Central City). From now on a
+    regeneration command lists its inputs in order.
+
 ## PROVEN (with numbers)
 
 ### Land arm
@@ -285,9 +309,11 @@ All eight verified directly. **None rescues a retracted claim.**
   ground redefined from NLCD class 31 (independent of our imagery, fixing C3's
   NDVI circularity): `FerricIron1` vs C3b J = **+0.318**, identical to its
   circular-C3 value — so that separation was **not** an artifact. And
-  `AMDclassFrac` vs C3b = **0.000, AUC 0.442**, confirming with a non-circular
+  `AMDclassFrac` vs C3b = **−0.252, AUC 0.442**, confirming with a non-circular
   control that the shipped classifier cannot tell mine discharge from bare
-  ground.
+  ground. The −0.252 is corrected for tied scores; the report printed 0.000
+  (audit 2026-09-15, item 9). That report's C2/C3 rows pooled a
+  cloud-unfiltered composite and must not be cited (item 10).
 - **RESOLUTION IS THE BINDING CONSTRAINT — as originally claimed, now corrected
   above (2026-08-15).**
   Same 86 points, same controls, same pre-registered test; only pixel size
@@ -541,7 +567,9 @@ All eight verified directly. **None rescues a retracted claim.**
   gate. → [`ARM_B2B_CLASSIFIER_FIX_2026-08-16.md`](ARM_B2B_CLASSIFIER_FIX_2026-08-16.md)
 - **⭐ THE SHARPEST OPEN LEAD: continuous beats binarised.** Same 86 points,
   same control: `FerricIron1` **continuous** (p90) = **J +0.318**;
-  `AMDclassFrac` **binarised** = 0.000, at two different threshold references.
+  `AMDclassFrac` **binarised** ≤ 0 at two different threshold references: v3
+  −0.252, v4 best 0.000. Both are corrected for tied scores; the reports printed
+  0.000 for both (audit 2026-09-15, item 9).
   The information is in the imagery; thresholding discards it. Two post-hoc
   explanations, both UNTESTED and neither citable as a finding: (a)
   binarisation destroys the magnitude carrying the signal; (b) in a mineralised

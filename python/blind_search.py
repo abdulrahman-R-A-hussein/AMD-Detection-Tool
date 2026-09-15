@@ -193,18 +193,18 @@ def run_analyse(reg_path, out_txt):
 
     say("")
     say("--- LANDSCAPE SAMPLE AND CUTOFFS ---")
-    say("  %-16s %6s  %-26s  %-26s" % ("district", "valid", "FerricIron1 cut 1/5/10%", "-NDVI cut 1/5/10%"))
+    say("  %-16s %6s %7s  %-26s  %-26s" % ("district", "valid", "dropped", "FerricIron1 cut 1/5/10%", "-NDVI cut 1/5/10%"))
     for d in sorted(rows):
         land = rows[d]["landscape"]
         nv = bs.landscape_cutoff(land, bs.primary_score, 0.05)[1]
         pc = [bs.landscape_cutoff(land, bs.primary_score, b)[0] for b in (0.01, 0.05, 0.10)]
         bc = [bs.landscape_cutoff(land, bs.baseline_score, b)[0] for b in (0.01, 0.05, 0.10)]
         flag = "  <- below %d valid" % bs.MIN_VALID_LANDSCAPE if nv < bs.MIN_VALID_LANDSCAPE else ""
-        say("  %-16s %6d  %7.4f %7.4f %7.4f   %7.4f %7.4f %7.4f%s"
-            % (d, nv, pc[0], pc[1], pc[2], bc[0], bc[1], bc[2], flag))
+        say("  %-16s %6d %7d  %7.4f %7.4f %7.4f   %7.4f %7.4f %7.4f%s"
+            % (d, nv, len(land) - nv, pc[0], pc[1], pc[2], bc[0], bc[1], bc[2], flag))
 
     def block(title, **kw):
-        res = {h: bs.evaluate(sites, rows, kw.get("budget", bs.PRIMARY_BUDGET), h,
+        res = {h: bs.evaluate(kw.get("sites", sites), rows, kw.get("budget", bs.PRIMARY_BUDGET), h,
                               site_set=kw.get("site_set", "primary"),
                               how=kw.get("how", "max"),
                               unscoreable=kw.get("unscoreable", "not_flagged"))
@@ -242,6 +242,9 @@ def run_analyse(reg_path, out_txt):
     block("all sites including spring-only", site_set="all")
     block("median site score", how="median")
     block("unscoreable sites excluded", unscoreable="exclude")
+    for link in (100.0, 500.0):
+        block("link distance %.0f m - the same registered stations, re-clustered" % link,
+              sites=bs.relink_sites(sites, link))
     say("")
     say("--- station-level recall (5%) ---")
     for h in bs.HYPOTHESES:
@@ -297,13 +300,18 @@ def run_frame(reg_path, out_csv):
         with io.open(path, encoding="utf-8") as fh:
             wqp[d] = [{"lat": float(r["lat"]), "lon": float(r["lon"])}
                       for r in csv.DictReader(fh) if r.get("lat") and r.get("lon")]
+    primary = {h: bs.evaluate(sites, rows, bs.PRIMARY_BUDGET, h) for h in bs.HYPOTHESES}
+    bs.apply_verdicts(primary)
+    notice = bs.frame_notice(primary)
     drawn, counts = bs.sampling_frame(rows, wqp)
+    print(notice)
     print("cluster counts per district: %s" % counts)
     if failed:
         print("FAILED districts, excluded from the frame: %s" % ", ".join(failed))
     keys = ["district", "frame_id", "n_points", "lat", "lon", "max_score"]
     with open(out_csv, "w", newline="", encoding="utf-8") as fh:
         fh.write("# A SAMPLING FRAME, NOT A LIST OF DETECTIONS - see the blind-search report verdicts.\n")
+        fh.write("# %s\n" % notice)
         w = csv.DictWriter(fh, fieldnames=keys)
         w.writeheader()
         w.writerows(drawn)

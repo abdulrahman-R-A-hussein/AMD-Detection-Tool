@@ -102,6 +102,10 @@ class Site:
     has_mine: bool
     station_ids: List[str] = field(default_factory=list)
     station_types: List[str] = field(default_factory=list)
+    station_coords: List[tuple] = field(default_factory=list)
+
+
+SPRING = "Spring"                   # the one source type that is not a mine type
 
 
 def load_sites(path):
@@ -115,7 +119,43 @@ def load_sites(path):
                                   r["site_has_mine_station"] == "1")
             sites[key].station_ids.append(r["station_id"])
             sites[key].station_types.append(r["site_type"])
+            sites[key].station_coords.append((float(r["lat"]), float(r["lon"])))
     return list(sites.values())
+
+
+def relink_sites(sites, link_m):
+    """Sensitivity (registration section 9): the SAME registered stations,
+    re-clustered at another link distance.
+
+    Only the clustering distance changes. Which stations are in the sample -
+    including the 250 m exclusion around the 86 B2 targets - stays the
+    registered one, so a change in recall can only come from how stations group
+    into sites. At link_m=250 this reproduces the registered sites exactly
+    (tests/test_blind_search.py).
+    """
+    by = {}
+    for s in sites:
+        group = by.setdefault((s.hypothesis, s.district), {})
+        for sid, typ, (lat, lon) in zip(s.station_ids, s.station_types, s.station_coords):
+            group[sid] = {"pid": sid, "lat": lat, "lon": lon, "type": typ}
+    out = []
+    for hyp, d in sorted(by):
+        for i, cl in enumerate(single_linkage(list(by[(hyp, d)].values()), link_m)):
+            out.append(Site(hyp, d, "%s_L%d_%03d" % (d, int(link_m), i + 1),
+                            any(p["type"] != SPRING for p in cl),
+                            [p["pid"] for p in cl], [p["type"] for p in cl],
+                            [(p["lat"], p["lon"]) for p in cl]))
+    return out
+
+
+def frame_notice(primary_results):
+    """Registration section 10: the sampling frame must say when the verdicts do
+    not support visiting it."""
+    verdicts = {h: primary_results[h].verdict for h in HYPOTHESES}
+    if all(v == VERDICT_NONE for v in verdicts.values()):
+        return ("Both co-primary hypotheses: NO SIGNAL DETECTED. Visiting these "
+                "clusters is NOT supported by this test (registration section 10).")
+    return "Verdicts: " + "; ".join("%s %s" % (h, verdicts[h]) for h in HYPOTHESES) + "."
 
 
 def site_score(site, station_rows, score_fn, how="max"):

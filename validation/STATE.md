@@ -673,6 +673,13 @@ H-BS2's 93 sites were springs, which would have made half of that test a
 spring-finder. Scored against a −NDVI bare-ground baseline; verdict rows are
 DISCOVERY SIGNAL / NOT BETTER THAN BARE GROUND / NO SIGNAL DETECTED.
 
+**Blind-search analysis code — completed 2026-09-15, before any analysis ran.**
+Checked against the registration on synthetic districts only. §9's
+link-distance sensitivity and §10's frame notice were missing; both are now
+implemented and tested. The snow-masked sensitivity still needs its own
+extraction once the primary extraction (3 of 7 districts done at 00:55 EDT)
+finishes.
+
 **Field campaign — pre-register before the first field day.** Design in
 `docs/FIELD_CAMPAIGN.md`: H-RANK, H-DET, H-LIMIT, H-PRECIP, H-DISC, H-UAV, each
 with mutually exclusive verdict rows. Recommended: **144** stations across 4

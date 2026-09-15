@@ -26,8 +26,8 @@ under criteria written down before each test, what it can and cannot do. It
 **ranks** mine-drainage severity within a mineral district
 (rho +0.568 against measured dissolved iron, n=75); it does **not** detect
 mine drainage against clean ground (a measured null at 86 confirmed discharge
-points), does not predict concentration across districts, and has never been
-tested at finding unknown sites. Detection and severity are both flat from
+points), does not predict concentration across districts, and in a pre-registered
+blind search it did not find unknown sites. Detection and severity are both flat from
 10 m to 100 m pixel size, so the limit is **spectral and radiometric, not
 spatial**. The proposed campaign pairs synchronous field spectroscopy with
 water and sediment chemistry to measure the quantities the satellite cannot —
@@ -59,7 +59,7 @@ value** — Sentinel-2 gives +0.549.
 | null | figure |
 |---|---|
 | **Detection** of mine discharge vs clean ground | all 9 indices fail all 3 control tiers at **n=86**; best case J **0.234** vs a pre-registered bar of **0.25** |
-| The shipped 19-class classifier | vs non-circular bare ground: AUC **0.442**, J **0.000**; at Leadville its median is **7.7× higher on bare ground** than at mine targets |
+| The shipped 19-class classifier | vs non-circular bare ground: AUC **0.442**, J **−0.252** (corrected for tied scores; the raw report printed 0.000); at Leadville its median is **7.7× higher on bare ground** than at mine targets |
 | **Dissolved iron in the Ohio water column** | no feature's 95% CI excludes zero (iron n=17, sulfate n=23); turbidity *is* detected (rho up to 0.499) |
 | **Spatial resolution** as the constraint | flat at 10 / 20 / 30 / 60 / 100 m: +0.494 / +0.526 / +0.493 / +0.523 / +0.517 |
 | A **transferable scale** for the coal signal | Ohio strengthens to 1 km (−0.438); Pennsylvania collapses there (+0.003) |
@@ -108,7 +108,9 @@ Each of these was a claim the author believed, tested, and withdrew:
 ### 5.2 Pre-registration — verifiable, with an honest limit
 
 Seven phases were registered in writing and committed to git **before** their
-results were committed. Verified 2026-09-13 by commit ancestry, not by filename:
+results were committed. An eighth, the blind search, followed: registered in
+`ad05971` on 2026-09-14, result on 2026-09-15. The seven were verified
+2026-09-13 by commit ancestry, not by filename:
 
 | phase | registration | results | gap |
 |---|---|---|---|

@@ -46,7 +46,7 @@ pipeline needed edits to five hand-synced dicts.
   It holds statistics, dose-response, imagery, WQP chemistry, the severity
   report, the score raster, the blind search, auth and claim text. It never
   prints, exits or authenticates on a host's behalf: a host passes in `ee`.
-  **Behaviour-neutral so far, proven:** 68 tests, including exact golden rebuilds
+  **Behaviour-neutral, proven:** 207 tests, including exact golden rebuilds
   of CMD1, CMD2 T1, the CMD3 ladder, B2's J 0.234 and its ρ +0.568 / LORO lines.
   **Since 2026-09-15** `seep_detect`, `cmd_detect`, `cmd_confound`, `fetch_wqp`
   and `ee_auth` are thin wrappers over it. CMD1, CMD2, CMD3 and B2 dose-LORO
@@ -563,7 +563,8 @@ raw: [`report_b2_reproduction_2026-09-15.txt`](report_b2_reproduction_2026-09-15
   **16/16** — v3's thresholds really were mis-referenced (whole-region
   `mean+0.5σ` sat far below typical bare ground; `IronSulfate` at Ouray −2.334
   vs −0.399). **But correcting it changed nothing:** all 8 grid points give
-  worst-case LORO J = **0.000** vs NLCD bare ground, AUC **0.34–0.50**,
+  worst-case LORO J **−0.452 to 0.000** vs NLCD bare ground (corrected for tied
+  scores; printed as 0.000), AUC **0.34–0.50**,
   identical to v3. **H-mech supported, H-fix refuted** — a confirmed mechanism
   is not a sufficient cause. **v4 was NOT shipped**, per the pre-registered
   gate. → [`ARM_B2B_CLASSIFIER_FIX_2026-08-16.md`](ARM_B2B_CLASSIFIER_FIX_2026-08-16.md)

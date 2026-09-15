@@ -68,7 +68,10 @@ standard. **Full detail and provenance:
 
 ### What may not be claimed
 
-- Finding **unknown** sources in blind scene-wide search — untested.
+- Finding **unknown** sources in blind scene-wide search — **tested and not
+  supported**. A pre-registered blind search (2026-09-15) found no signal in
+  districts never used to choose the index (4 of 32 sites, p = 0.074), and no
+  advantage over bare ground where it was chosen.
 - Optical **sulfate** detection, at any concentration, ever.
 - That resolution is the constraint — refuted for 10–100 m.
 - That agreement with Rockwell's map means **accuracy** — it is an automated

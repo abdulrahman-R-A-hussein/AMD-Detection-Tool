@@ -535,7 +535,8 @@ raw: [`report_b2_reproduction_2026-09-15.txt`](report_b2_reproduction_2026-09-15
   the rule — but the single index is the simpler, more transferable headline.
   **MAY claim:** separates AMD-affected from chemically-verified clean water at
   monitored locations, out-of-region, monotone in contamination.
-  **MAY NOT claim:** finds unknown sources in blind search — untested.
+  **MAY NOT claim:** finds unknown sources in blind search — tested 2026-09-15, not
+  supported ([`ARM_BLIND_SEARCH_2026-09-15.md`](ARM_BLIND_SEARCH_2026-09-15.md)).
   → [`ARM_B2D_CHEM_CONTROLS_2026-08-16.md`](ARM_B2D_CHEM_CONTROLS_2026-08-16.md)
 - **⭐ GOING CONTINUOUS SOLVES THE BARE-GROUND PROBLEM (2026-08-16, B2c).**
   Pre-registered `6af0b5b` before any fitting. Against NLCD bare ground, an
@@ -662,8 +663,7 @@ Ordered by value.
 **Author actions first (not analysis):** publish the corrected Zenodo version;
 review `.private/EB2_DOCUMENTATION.md`; push. See "RECORD AND GRANT READINESS".
 
-**Blind-search test — REGISTERED 2026-09-14; landscape extraction not yet
-run.** → [`BLIND_SEARCH_PREREGISTRATION_2026-09-14.md`](BLIND_SEARCH_PREREGISTRATION_2026-09-14.md),
+**Blind-search test — REGISTERED 2026-09-14; RESULT 2026-09-15 (below).** → [`BLIND_SEARCH_PREREGISTRATION_2026-09-14.md`](BLIND_SEARCH_PREREGISTRATION_2026-09-14.md),
 with a site list fixed from station metadata only (321 rows, SHA-256
 `6ee8aec0…eb5`). Two co-primary hypotheses, Holm-corrected: **H-BS1** — 32 mine
 sites in never-analysed Alma, Creede and Lake City (power at a threefold lift
@@ -680,17 +680,21 @@ link-distance sensitivity and §10's frame notice were missing; both are now
 implemented and tested. The snow-masked sensitivity still needs its own
 extraction once the primary extraction finishes.
 
-**Extraction status, 2026-09-15 11:35 EDT: 5 of 7 districts extracted** (Alma,
-Creede, Lake City, Central City, Leadville). The first run's process ended with
-its Claude session mid-Ouray. Ouray and Silverton were restarted at 09:34; the
-extraction code is behaviour-identical (`tests/test_source_parity.py`).
-**No blind-search analysis has been run.** If interrupted again:
+**Blind-search RESULT, 2026-09-15 — no evidence the tool finds mine sources it
+was not told about.** → [`ARM_BLIND_SEARCH_2026-09-15.md`](ARM_BLIND_SEARCH_2026-09-15.md)
 
-```
-python python/blind_search.py --extract --districts ouray_co,silverton_co
-```
-
-Finished districts are skipped.
+- **H-BS1: NO SIGNAL DETECTED.** 4 of 32 sites flagged at a 5% budget, recall
+  0.125 [0.050, 0.281], p = 0.074; one site short of the registered bar. Power
+  was 0.54 at a threefold lift, so a modest lift is not excluded.
+- **H-BS2: NOT BETTER THAN BARE GROUND.** Recall 0.280 (p = 1e-7), but McNemar
+  p = 0.038 against its Holm level of 0.025 (12 vs 4 discordant sites).
+- Flagged ground is 1.2–4.4× enriched for NLCD barren land.
+- All seven districts extracted; none FAILED. The run spanned two sessions (Ouray
+  and Silverton re-extracted with behaviour-identical code) and survived
+  intermittent Earth Engine 5xx errors and two local DNS outages.
+- **Not run:** the snow-masked sensitivity.
+- The 40-cluster field frame is a sampling frame, not detections; visiting it
+  as candidate sources is not supported.
 
 **Rule fixed now, before any result:** a district that stops on a transient
 Earth Engine service error (HTTP 502/503, seen intermittently during Ouray) is

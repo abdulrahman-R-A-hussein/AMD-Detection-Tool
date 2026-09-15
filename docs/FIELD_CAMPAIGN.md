@@ -79,8 +79,16 @@ interval, per sensor. Reported whatever it turns out to be.
 ### H-DISC — can the tool find sites it was not told about?
 
 **Estimation, with confidence intervals:** precision at flagged sites that have
-no record, and recall at known sources. This is the discovery test the project
-has never run.
+no record, and recall at known sources.
+
+**The archive half of this test has now run**, pre-registered
+(`validation/ARM_BLIND_SEARCH_2026-09-15.md`). Recall at known sources was not
+above a 5% flagged-area budget in districts never used to choose the index (4 of
+32 sites). Where the index was chosen, it was not better than a bare-ground
+baseline. Flagged ground without a record is therefore **not** expected to be a
+source. The field half is now a test of that negative expectation, sampled from
+the registered 40-cluster frame (`validation/blind_search_field_frame_2026-09-15.csv`);
+it is not a search for new sites.
 
 ### H-UAV — does a drone add anything over leaf-off satellite?
 

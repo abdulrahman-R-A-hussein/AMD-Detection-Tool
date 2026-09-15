@@ -294,8 +294,10 @@ method, plus a within-district severity ranker validated against real chemistry,
 plus externally validated catchment delineation.
 
 **What it is not:** a detector. It does not find mine drainage — that is a
-measured null at n=86 — and it has never been tested in blind scene-wide search,
-which is a different and harder problem.
+measured null at n=86 — and a pre-registered blind scene-wide search (2026-09-15)
+found no evidence that it finds unrecorded sources: no signal in districts never
+used to choose the index, and no advantage over bare ground where it was chosen
+([`ARM_BLIND_SEARCH_2026-09-15.md`](ARM_BLIND_SEARCH_2026-09-15.md)).
 
 **The single sentence that survives every test run so far:**
 

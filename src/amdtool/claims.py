@@ -53,8 +53,9 @@ MAY_NOT_CLAIM = (
     "confirmed source points (best worst-case J 0.234 against a bar of 0.25).",
     "Prediction of concentration across districts - leave-one-region-out R2 is "
     "negative for every index and analyte.",
-    "Finding unknown sources in scene-wide search, unless a pre-registered "
-    "blind-search test has measured it.",
+    "Finding unknown sources in scene-wide search - a pre-registered blind search "
+    "(2026-09-15) found no signal in districts never used to choose the index, and "
+    "no advantage over bare ground where it was chosen.",
     "Optical sulfate detection, at any concentration.",
     "That spatial resolution is the constraint - refuted for 10-100 m.",
     "That the coal-drainage signal is near-channel or seep-scale, or "

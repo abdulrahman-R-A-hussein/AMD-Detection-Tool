@@ -317,8 +317,11 @@ preferences; each was learned by getting it wrong.**
 
 ### MAY NOT claim
 
-- Finding unknown sources in **blind scene-wide search** — untested. Every
-  validated result scored a *known* monitoring station.
+- Finding unknown sources in **blind scene-wide search**. Tested, pre-registered,
+  on 2026-09-15: no signal in districts never used to choose the index, and no
+  advantage over bare ground where it was chosen
+  (`validation/ARM_BLIND_SEARCH_2026-09-15.md`). A flag on ground with no record
+  is not evidence of a mine source.
 - **Optical sulfate detection at any concentration.** Sulfate has no VNIR
   absorption. Ever. Any apparent signal is iron, turbidity, or colour that
   co-varies with sulfate — word it that way.

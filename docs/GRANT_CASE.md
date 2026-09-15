@@ -63,7 +63,7 @@ value** — Sentinel-2 gives +0.549.
 | **Dissolved iron in the Ohio water column** | no feature's 95% CI excludes zero (iron n=17, sulfate n=23); turbidity *is* detected (rho up to 0.499) |
 | **Spatial resolution** as the constraint | flat at 10 / 20 / 30 / 60 / 100 m: +0.494 / +0.526 / +0.493 / +0.523 / +0.517 |
 | A **transferable scale** for the coal signal | Ohio strengthens to 1 km (−0.438); Pennsylvania collapses there (+0.003) |
-| **Blind search** for unknown sites | **never tested** — every validated result scored a known monitoring station |
+| **Blind search** for unknown sites | **tested 2026-09-15, not supported** (pre-registered): no signal in never-analysed districts (4 of 32 sites flagged at a 5% budget, p = 0.074); not better than bare ground where the index was chosen (McNemar p = 0.038 against α 0.025) |
 
 ---
 
@@ -79,7 +79,7 @@ This is the section that does the work. Each null names a measurement that
 | Water column is a null while turbidity is detected | co-measured **TSS, turbidity, DOC/CDOM** at every station | these confounds are absent or unmatched in public records, so iron cannot be separated from sediment and colour |
 | The detectable target is plausibly the **precipitate**, not the water | **bed-sediment and shoreline-precipitate** sampling with field spectra of the precipitate itself | no public dataset measures precipitate composition at mine outflows |
 | Resolution is flat, so the limit is spectral | an **ASD-class field spectrometer** and a **≥10-band** sensor | the index panel is built from 7 broad Landsat-equivalent bands (Sentinel-2 is mapped onto the same set), at which the iron minerals collapse into one ferric group; what narrower bands resolve cannot be learned from those 7 |
-| Blind search is untested | **field visits** to sites the tool flags that have no record, and to known sources it misses | precision and recall on *unknown* sites have no ground truth until someone goes there |
+| The archival blind search found no discovery signal | **field visits** to a registered sample of flagged ground with no record, and to known sources it misses | whether flagged unrecorded ground is ever a source has no ground truth until someone goes there; the archive predicts mostly spoil and outcrop |
 
 **A tool that already detected mine drainage would need no campaign.** The
 preliminary data are valuable precisely because they locate the boundary.
@@ -192,7 +192,7 @@ monitoring of mine drainage — and it must be reported as prominently as a pass
   conductance **negatively**, replicating across two independent basins.
 
 **MAY NOT claim**
-- Finding unknown sources in blind scene-wide search — **untested**.
+- Finding unknown sources in blind scene-wide search — **tested 2026-09-15, not supported**.
 - Optical **sulfate** detection at any concentration — sulfate has no VNIR
   absorption. **Ever.**
 - That resolution is the constraint — **refuted** for 10–100 m.

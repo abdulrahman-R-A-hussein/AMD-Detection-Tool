@@ -54,7 +54,9 @@ application.
 
 **The gap that defines the remaining work:** the difference between *scoring
 known points correctly* and *finding unknown sites* — a severity tool versus a
-discovery tool. This project owns the first. The second is untested.
+discovery tool. This project owns the first. The second was tested on
+2026-09-15, pre-registered, and is not supported on the archive
+(`validation/ARM_BLIND_SEARCH_2026-09-15.md`).
 
 ## What may not be claimed
 

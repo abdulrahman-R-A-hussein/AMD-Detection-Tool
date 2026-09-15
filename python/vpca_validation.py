@@ -148,8 +148,8 @@ def convolve_splib07(wavelengths_um, reflectance, rsr_table):
         if good.sum() == 0:
             out[band] = np.nan
         else:
-            out[band] = np.trapz(r_interp[good] * resp[good], wl_rsr[good]) / \
-                        np.trapz(resp[good], wl_rsr[good])
+            out[band] = np.trapezoid(r_interp[good] * resp[good], wl_rsr[good]) / \
+                        np.trapezoid(resp[good], wl_rsr[good])
     return out
 
 

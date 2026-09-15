@@ -24,8 +24,8 @@ abstract: >
   USGS and EPA water chemistry, detection is a measured NULL - all nine candidate indices fail all
   three control tiers, the best case reaching Youden J 0.234 against a pre-registered bar of 0.25.
   What does survive is severity ranking: a red-to-blue band ratio tracks measured dissolved iron at
-  Spearman rho +0.568 (n=75, within-region permutation p=0.0004), sign-consistent across all four
-  districts, but with negative leave-one-region-out R2 for every index-analyte pair - so it ranks
+  Spearman rho +0.568 (n=75, within-region permutation p=0.0004), positive in three of four
+  districts (Leadville rho +0.004, n=23), but with negative leave-one-region-out R2 for every index-analyte pair - so it ranks
   severity within a district and does not predict concentration across districts. Detection and
   severity are both flat from 10 m to 100 m pixel size, so spatial resolution is not the binding
   constraint in that range. In Appalachian coal watersheds a vegetation index tracks measured sulfate

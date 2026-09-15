@@ -62,7 +62,15 @@ interpreter path that exists only on the author's machine.
 
    ```bash
    pip install -r python/requirements.txt
+   pip install -e .
    ```
+
+   The second line installs **`amdtool`**, the importable package the
+   validated pipeline now lives in (`src/amdtool`, added 2026-09-14). Every
+   `python/*.py` command below keeps working without it; it is what lets
+   another program — SpectraLab's *AMD severity report* — call the same code.
+   Check it with `python -m pytest tests/` (tests that need the gitignored
+   `data/` skip when it is absent).
 
 3. **Earth Engine credentials — choose one.** Resolution lives in one place,
    [`python/ee_auth.py`](../python/ee_auth.py).

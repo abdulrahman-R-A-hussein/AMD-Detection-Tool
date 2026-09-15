@@ -42,8 +42,8 @@ left room for choosing the kinder reading after the fact (correction #8,
 
 ### H-RANK — does severity ranking hold with synchronous data?
 
-Archival chemistry gave `FerricIron1` vs dissolved Fe rho +0.568, sign-positive
-in all four districts, but LORO R² negative for every pair. Synchronous sampling
+Archival chemistry gave `FerricIron1` vs dissolved Fe rho +0.568: +0.64, +0.68
+and +0.64 in three districts but +0.004 in Leadville (n=23), and LORO R² negative for every pair. Synchronous sampling
 removes the date mismatch that sits inside every archival number.
 
 | outcome | verdict |
@@ -166,7 +166,7 @@ two-sided, power 0.80:
 | 0.40 | 51 | 0.828 | |
 | **0.50** | **33** | 0.832 | **design target** |
 | 0.568 | 25 | 0.848 | measured pooled value |
-| 0.64 | 20 | 0.869 | measured best-district value |
+| 0.64 | 20 | 0.869 | measured Central City / Silverton value (Ouray +0.68; Leadville +0.004) |
 
 **Why the design targets rho 0.5 within district rather than 0.3:** detecting
 0.3 in *every* district needs 89 × 4 = **356** stations, which is not a

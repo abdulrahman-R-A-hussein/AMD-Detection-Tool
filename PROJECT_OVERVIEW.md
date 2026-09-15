@@ -32,7 +32,8 @@ application.
   that map is replica fidelity, not accuracy.*
 - **Severity ranking works within a mineral district.** `FerricIron1` tracks
   measured dissolved iron at **rho +0.568** (n=75, within-region permutation
-  p=0.0004), sign-consistent across four Colorado districts — but
+  p=0.0004), positive in three of four Colorado districts and ≈0 in
+  Leadville (+0.004, n=23) — but
   leave-one-region-out R² is negative for every index × analyte pair, so it
   **ranks within a district and does not predict across districts**.
 - **Catchment delineation is externally validated**: 6/6 within ±33% of

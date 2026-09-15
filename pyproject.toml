@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "amdtool"
+version = "0.1.0"
+description = "Acid/coal mine drainage analysis from satellite imagery and public water chemistry: an importable library behind the AMD Detection Tool"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Abdulrahman Hussein" }]
+dependencies = [
+    "numpy>=1.24",
+]
+
+[project.optional-dependencies]
+# Earth Engine steps (composites, extraction, rasters). Authentication is the
+# host's job: amdtool functions take an initialised `ee` and never call
+# ee.Initialize themselves. amdtool.auth exists for standalone use only.
+ee = ["earthengine-api>=0.1.370"]
+# Catchment delineation, mine polygons, NWIS lookups.
+geo = ["rasterio", "requests", "shapely"]
+dev = ["pytest>=7"]
+
+[project.urls]
+Repository = "https://github.com/abdulrahman-R-A-hussein/AMD-Detection-Tool"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/amdtool"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "ee: needs a live Earth Engine session (set AMDTOOL_EE_TESTS=1)",
+    "golden: reproduces a committed validation/ number from data/ (skipped when data/ is absent)",
+]

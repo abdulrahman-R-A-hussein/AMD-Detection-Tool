@@ -1,5 +1,11 @@
 """One place for Earth Engine authentication.
 
+**Since 2026-09-14 this is a thin wrapper over ``amdtool.auth``.** It passes the
+legacy key path and only ``$GEE_SERVICE_ACCOUNT_KEY``, so resolution here is
+unchanged; ``amdtool.auth`` used directly also accepts SpectraLab's
+``$GEE_SERVICE_ACCOUNT_JSON``. ``tests/test_auth.py`` checks every path below
+against this file as committed before the change.
+
 Replaces five identical copies of ``init_ee()`` - in gee_classify,
 catchment_delineation, catchment_dem, match_scenes and watershed_nap - each of
 which hard-coded a service-account key path inside a *sibling repository* on
@@ -18,41 +24,15 @@ Resolution order, first match wins:
   4. Otherwise a ``RuntimeError`` that says exactly what to set up.
 
 The key file's contents are never printed.
-
-``ee`` is imported inside ``init_ee`` rather than at module level, as the five
-originals did, so that modules importing this one still load in an
-environment without earthengine-api installed.
 """
 
-import json
 import os
 
+import _amdtool_path  # noqa: F401
+from amdtool import auth as _auth
+from amdtool.auth import ENV_KEY, ENV_PROJECT, SETUP_HELP  # noqa: F401
+
 LEGACY_KEY = r"D:\dev\VPCA+STEPWISE-REGRESSION\planty-gee-backend-b357c7b51077.json"
-
-ENV_KEY = "GEE_SERVICE_ACCOUNT_KEY"
-ENV_PROJECT = "GEE_PROJECT"
-
-SETUP_HELP = """\
-Set up ONE of the following, then re-run:
-
-  A) Personal account (simplest)
-       1. Register for Earth Engine and enable the Earth Engine API on a
-          Google Cloud project:  https://code.earthengine.google.com
-       2. pip install earthengine-api
-       3. earthengine authenticate
-       4. set GEE_PROJECT=<your-cloud-project-id>        (Windows cmd)
-          $env:GEE_PROJECT="<your-cloud-project-id>"     (PowerShell)
-          export GEE_PROJECT=<your-cloud-project-id>     (bash)
-
-  B) Service account (unattended runs)
-       1. In that Cloud project, create a service account and download a
-          JSON key.
-       2. Register the service account for Earth Engine access - this is a
-          separate step from creating it.
-       3. set GEE_SERVICE_ACCOUNT_KEY=<path-to-key.json>
-
-See docs/OPERATOR_GUIDE.md section 0.
-"""
 
 
 def resolve_credentials():
@@ -61,41 +41,12 @@ def resolve_credentials():
     Returns ``("service_account", key_path)`` or ``("user", project_id)``.
     Raises ``RuntimeError`` with setup instructions when nothing is configured.
     """
-    key = os.environ.get(ENV_KEY)
-    if key:
-        if not os.path.isfile(key):
-            raise RuntimeError(
-                "%s is set, but no file exists at %r.\n\n%s"
-                % (ENV_KEY, key, SETUP_HELP))
-        return "service_account", key
-    if os.path.isfile(LEGACY_KEY):
-        return "service_account", LEGACY_KEY
-    project = os.environ.get(ENV_PROJECT)
-    if project:
-        return "user", project
-    raise RuntimeError("No Earth Engine credentials found.\n\n" + SETUP_HELP)
+    return _auth.resolve_credentials(legacy_key=LEGACY_KEY, env_keys=(ENV_KEY,))
 
 
 def init_ee():
     """Initialise Earth Engine and return the ``ee`` module."""
-    mode, detail = resolve_credentials()
-    import ee
-    if mode == "service_account":
-        with open(detail, encoding="utf-8") as fh:
-            info = json.load(fh)
-        ee.Initialize(ee.ServiceAccountCredentials(info["client_email"], detail),
-                      project=info["project_id"])
-    else:
-        try:
-            ee.Initialize(project=detail)
-        except Exception as exc:                            # noqa: BLE001
-            raise RuntimeError(
-                "Earth Engine did not accept project %r with personal "
-                "credentials: %s\n\nRun `earthengine authenticate` once, and "
-                "check that the project has the Earth Engine API enabled and "
-                "is registered for Earth Engine.\n\n%s"
-                % (detail, exc, SETUP_HELP)) from exc
-    return ee
+    return _auth.init_ee(legacy_key=LEGACY_KEY, env_keys=(ENV_KEY,))
 
 
 if __name__ == "__main__":

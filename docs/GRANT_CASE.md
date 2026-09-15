@@ -42,7 +42,7 @@ and tests, rather than assumes, whether a drone adds anything.
 | Faithful replica of SIM 3466 | all six index formulas reproduce exactly | the published pamphlet |
 | Our own "improvements" were regressions | fixing them: worst-case leave-one-site-out Youden J **0.107 → 0.440** (4.1×), 3 sites | Rockwell's map — **replica fidelity, not accuracy** |
 | **Severity ranking** | `FerricIron1` vs dissolved Fe **rho +0.568**, n=75, within-region permutation **p=0.0004**, BH q=0.0072, 24% between-region variance | **measured chemistry** |
-| — sign consistency | positive in **all four** districts (+0.64 · +0.00 · +0.68 · +0.64) | measured chemistry |
+| — per district | positive in **three of four**: Central City +0.64 (n=20) · Ouray +0.68 (n=17) · Silverton +0.64 (n=15). **Leadville +0.004 (n=23): no relationship.** The raw report prints it as `+0.00` and flags `[ALL +]` because its check only tests ρ > 0 | measured chemistry |
 | — most robust form | vs **pH**, all four negative and tight: −0.30 · −0.40 · −0.24 · −0.27 | measured chemistry |
 | Catchment delineation | **6/6 within ±33%** of official USGS drainage areas (previous method 2/6) | NWIS published areas |
 | Coal-drainage vegetation signal | negative and **sign-consistent across three disjoint Pennsylvania sub-basins** (conductance −0.187, n=443, p=0.0002) | measured chemistry |

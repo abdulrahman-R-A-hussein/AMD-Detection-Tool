@@ -156,3 +156,75 @@ This matters positively for the blind-search test: it confirms Creede, Alma and
 Lake City never contributed a `FerricIron1` value at a source point, so they are
 genuinely independent of the index choice. Their only prior use was Arm A, which
 scored upstream mineral loadings, not source-point buffers.
+
+---
+
+## 7. `partial_spearman` could return a "correlation" far outside [−1, 1] *(added later the same day)*
+
+**Found by a unit test written for the `amdtool` refactor**, not by a reported
+number. The test constructed a degenerate case — `rank(x)` identical to
+`rank(z)` — and `partial_spearman` returned **11.97**.
+
+**Mechanism.** When `rank(z)` explains `rank(x)` or `rank(y)` exactly, least
+squares leaves residuals at floating-point noise level: tiny, but not exactly
+zero. The guard was `sx == 0 or sy == 0`, so it never fired, and the function
+returned noise divided by noise.
+
+**Impact on committed numbers: none — verified, not assumed.** Real residual
+spread sits many orders of magnitude above the degenerate floor. The fix (a
+tolerance relative to the rank spread, returning NaN) was checked by
+`tests/test_golden.py::test_cmd2_t1_table_reproduces_and_the_partial_guard_changes_nothing`,
+which rebuilds CMD2's T1 table from the raw join and asserts that:
+
+- the new guard returns the **identical** value to the old one at all five
+  covariates **and every per-watershed partial** — including near-collinear
+  Monday Creek (mine fraction vs sulfate +0.95), the one place a tolerance could
+  bite; and
+- every T1 line, **including each permutation p-value**, matches the committed
+  `report_cmd2_confound_2026-09-08.txt` exactly.
+
+**Status.** Fixed in `src/amdtool/stats.py`. `python/cmd_confound.py` keeps its
+old copy until the legacy scripts are converted to import from `amdtool`.
+
+---
+
+## 8. "Sign-consistent across four districts" hides a district with no relationship *(found writing the B2 golden tests)*
+
+**Evidence.** Rebuilt from `data/matched/seep_l8_*.csv` using `amdtool.stats.spearman`:
+source points at 60 m, `FerricIron1` p90 against dissolved iron. These are the
+same rows that give the pooled value.
+
+| district | ρ (Landsat 8) | n | ρ (Sentinel-2) |
+|---|---|---|---|
+| Central City | +0.643 | 20 | +0.578 |
+| **Leadville** | **+0.0035** | **23** | +0.245 |
+| Ouray | +0.684 | 17 | +0.478 |
+| Silverton | +0.637 | 15 | +0.696 |
+| **pooled** | **+0.568** | **75** | +0.549 |
+
+The pooled value and the per-district values reproduce the committed
+`report_seep_b2_l8_2026-08-14.txt` and `report_seep_b2_doseloro_2026-08-14.txt`
+exactly (`tests/test_golden_b2.py`).
+
+**Mechanism.** The committed LORO report prints Leadville as `lead=+0.00` and
+tags the row `[ALL +]`, because its sign check tests only ρ > 0. The original
+Arm B2 report was candid about it ("Leadville is the weak district … so the
+pooled +0.568 is carried by the other three"). The summaries written later
+carried the tag forward as **"sign-consistent across (all) four districts"**:
+in `README.md`, `CITATION.cff`, `PROJECT_OVERVIEW.md`, `docs/GRANT_CASE.md`
+(which even printed the +0.00), `docs/FIELD_CAMPAIGN.md`, and `amdtool`'s claim
+text. Literally true; misleading in substance. **Leadville, the district with
+the most source points, shows no relationship.**
+
+**Impact.** **No number changes.** The pooled ρ, its permutation p, and the
+negative leave-one-region-out R² all stand. The claim narrows: severity ranking
+holds in **three of four** districts, not four. All six places above now say so.
+Historical plan mirrors in `docs/plans/` keep their original wording, as
+records of what was believed at the time. `docs/FIELD_CAMPAIGN.md`'s power
+table also labelled 0.64 the "best-district value"; the best is Ouray at +0.68.
+
+**Caveat.** Each district has n = 15–23, so each per-district ρ is uncertain by
+roughly ±0.4. Leadville's +0.004 does not rule out a modest positive effect, and
+no single one of the three positives is individually precise. The honest
+statement is about **consistency**: the effect is not shown to be universal
+across districts. Say that, not that Leadville is proven null.

@@ -60,7 +60,7 @@ standard. **Full detail and provenance:
 |---|---|---|
 | **Land replica** | all six index formulas reproduce **exactly**; three of our own "improvements" were regressions, and fixing them took worst-case leave-one-site-out Youden J **0.107 → 0.440** | Rockwell's published map — **replica fidelity, not accuracy** |
 | **Detection of mine discharge** | **NULL.** All nine indices fail all three control tiers at n=86 confirmed source points; best case J **0.234** vs a pre-registered bar of **0.25** | measured USGS/EPA chemistry |
-| **Severity ranking** | `FerricIron1` vs dissolved Fe **rho +0.568** (n=75, within-region permutation p=0.0004), sign-consistent across four districts | measured chemistry ✅ |
+| **Severity ranking** | `FerricIron1` vs dissolved Fe **rho +0.568** (n=75, within-region permutation p=0.0004); positive in three of four districts (+0.64, +0.68, +0.64) and **≈0 in Leadville** (+0.004, n=23) | measured chemistry ✅ |
 | — its bound | leave-one-region-out R² is **negative for every** index × analyte pair → **ranks within a district, does not predict across districts** | measured chemistry |
 | **Spatial resolution** | **flat** 10–100 m (+0.494 / +0.526 / +0.493 / +0.523 / +0.517) — resolution is *not* the binding constraint in that range | measured chemistry |
 | **Coal/CMD vegetation signal** | negative and sign-consistent in two basins, but at a **basin-specific scale** — Ohio strengthens to 1 km, Pennsylvania collapses to +0.003 there | measured chemistry |

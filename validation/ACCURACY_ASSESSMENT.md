@@ -165,7 +165,7 @@ between-region and reversed sign when corrected).
 
 | | pooled | **LORO R²** | per-district rho | signs |
 |---|---|---|---|---|
-| vs dissolved Fe | +0.568 | **−0.538** | +0.64 · **+0.00** · +0.68 · +0.64 | all + |
+| vs dissolved Fe | +0.568 | **−0.538** | +0.64 · **+0.004** · +0.68 · +0.64 | all > 0, but **Leadville ≈ 0** |
 | vs pH | −0.554 | −0.882 | −0.30 · −0.40 · −0.24 · −0.27 | all − |
 
 **Leave-one-region-out R² is negative for every index × analyte pair tested**,
@@ -174,7 +174,8 @@ including the sign-consistent ones.
 > **`FerricIron1` RANKS severity within a district. It does NOT predict
 > concentration across districts.**
 
-Leadville is the weak district (**+0.00**). The most robust single relationship
+Leadville is the weak district: **+0.004, n=23, no relationship**, so the pooled
+value is carried by the other three (audit 2026-09-14 item 8). The most robust single relationship
 is **vs pH** — all four districts negative and tight in magnitude.
 
 **Citation hygiene:** **+0.568 is the Landsat 8 value. Sentinel-2 gives

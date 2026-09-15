@@ -26,7 +26,7 @@ retraction is the load-bearing update this file exists to carry forward.
 
 ---
 
-## TOOL STATE (what can actually be run, 2026-09-09)
+## TOOL STATE (what can actually be run, updated 2026-09-14)
 
 **The tool can now be pointed at any area of interest.** Before this it could
 not: the GEE tool accepted only its 30 hardcoded `studyAreas`, and the Python
@@ -42,6 +42,20 @@ pipeline needed edits to five hand-synced dicts.
 - **`docs/OPERATOR_GUIDE.md`** — what every layer means and what may/may not be
   concluded. **Supersedes** the Nov 2025 `earth-engine/*.md` guides, which
   document v2.x behaviour the code no longer has.
+- **`amdtool` package (2026-09-14).** Install with `pip install -e .` (`src/amdtool`).
+  It holds statistics, dose-response, imagery, WQP chemistry, the severity
+  report, the score raster, the blind search, auth and claim text. It never
+  prints, exits or authenticates on a host's behalf: a host passes in `ee`.
+  **Behaviour-neutral so far, proven:** 68 tests, including exact golden rebuilds
+  of CMD1, CMD2 T1, the CMD3 ladder, B2's J 0.234 and its ρ +0.568 / LORO lines.
+  `ee_auth.py` is now a wrapper; `seep_detect`, `cmd_detect`, `cmd_confound` and
+  `fetch_wqp` **still carry their own copies**. Gate:
+  `AMDTOOL_REFACTOR_GATE_2026-09-14.md`.
+- **SpectraLab "AMD severity report" module** — branch
+  `feature/amd-severity-module` of VPCA+STEPWISE-REGRESSION, **not released**.
+  Draw an AOI, choose a preset (metal mine / coal), and get a claim-bounded,
+  explicitly EXPLORATORY report: within-tile permutation, per-tile signs, CSVs
+  and a score raster. Guide: `docs/AMD_MODULE.md` in that repository.
 
 **⚠ Three defects were fixed that would have misled anyone testing a new area:**
 
@@ -118,7 +132,7 @@ honest fundable argument) · [`../docs/FIELD_CAMPAIGN.md`](../docs/FIELD_CAMPAIG
   against leaf-off satellite on the same stations.
 - **Why archival data could not settle sign consistency:** at ~20 source points
   per district, a true rho of 0.3 fails the four-district sign check about one
-  time in three — P(all 4 positive) = **0.681**. Leadville's +0.00 may be partly
+  time in three — P(all 4 positive) = **0.681**. Leadville's +0.004 may be partly
   sampling, not only heterogeneity.
 - **Archival iron tiers are uneven:** Ouray has **no** source point ≥10 mg/L
   dissolved Fe on record; Silverton has one; Central City has 14.
@@ -153,7 +167,7 @@ smoke test PASS (94.95%, its documented ceiling).
 ## AUDIT 2026-09-14 — found while scoping the next test
 
 → [`AUDIT_2026-09-14_ARMA_AND_TOOLING.md`](AUDIT_2026-09-14_ARMA_AND_TOOLING.md).
-All six verified directly. **None rescues a retracted claim.**
+All eight verified directly. **None rescues a retracted claim.**
 
 1. **Arm A computed σ thresholds per catchment** (`watershed_nap.py:165`) — the
    AOI-extent defect fixed in the Earth Engine tool at v3.1.0, so catchment size
@@ -173,6 +187,20 @@ All six verified directly. **None rescues a retracted claim.**
 6. **A `seep_detect` comment claims Creede and Alma were extracted; they never
    were.** That confirms those districts are independent of the index choice,
    which the blind-search test relies on.
+7. **`partial_spearman` could return a "correlation" of 11.97** when z explains
+   x's ranks exactly — its guard tested for residual spread of exactly zero.
+   Found by a unit test, fixed in `amdtool` with a relative tolerance.
+   **No committed number moved**: a golden test rebuilds CMD2's T1 table and
+   proves the new guard returns identical values at every covariate and every
+   watershed, and every line (permutation p included) matches the report.
+8. **"Sign-consistent across four districts" hid a zero.** `FerricIron1` vs
+   dissolved Fe (Landsat 8) is +0.64 / +0.68 / +0.64 in Central City, Ouray and
+   Silverton (n = 20, 17, 15), but **+0.004 in Leadville (n = 23)**. The report's
+   `[ALL +]` tests only ρ > 0. **No number changes.** The claim narrows to three
+   of four districts, corrected in README, CITATION.cff, PROJECT_OVERVIEW,
+   GRANT_CASE, FIELD_CAMPAIGN and `amdtool`. The caveat: per-district n is small
+   (about ±0.4), so the statement is "not shown to be universal", not "null in
+   Leadville".
 
 ---
 
@@ -215,9 +243,10 @@ All six verified directly. **None rescues a retracted claim.**
   p-value comes from permuting labels *within* region — i.e. it passes the exact
   test that destroyed the pooled sulfate claim. Pre-registered as H2 before
   extraction. **Leave-one-region-out, applied the same day, tempers it and the
-  tempered version is the one to cite:** the sign holds in **all four**
-  districts (Arm A's signs were incoherent — this is the check Arm A failed),
-  but it is **heterogeneous** (Leadville rho ≈ 0.00 vs +0.62/+0.64/+0.68) and
+  tempered version is the one to cite:** ρ is above zero in all four districts
+  (Arm A's signs were incoherent — this is the check Arm A failed), but it holds
+  in **three of four**: Leadville is **+0.004 (n=23)**, vs +0.64/+0.68/+0.64
+  (audit 2026-09-14 item 8), and
   **LORO R² is negative for every pair**. → **`FerricIron1` RANKS severity
   within a district; it does NOT predict concentration across districts.**
   The most robust single relationship is `FerricIron1` vs **pH**: all four

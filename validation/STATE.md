@@ -262,7 +262,8 @@ raw: [`report_b2_reproduction_2026-09-15.txt`](report_b2_reproduction_2026-09-15
 - **Arm B2 dose-response: the first ground-truth-validated POSITIVE in the
   water arm (2026-08-14).** At 86 chemically-confirmed AMD source points across
   4 regions, `FerricIron1` (red/blue) tracks measured **dissolved Fe at
-  rho = +0.568** (n=75, within-region permutation p = 0.0004, BH q = 0.0072 over
+  rho = +0.568** (n=75, within-region permutation p = 0.0004 at 5,000 draws, BH q = 0.0072, regenerated
+  from committed code on 2026-09-15 (`report_b2_dose_response_2026-09-15.txt`), over
   36 tests), and pH at −0.554. Only **24% between-region variance**, and the
   p-value comes from permuting labels *within* region — i.e. it passes the exact
   test that destroyed the pooled sulfate claim. Pre-registered as H2 before

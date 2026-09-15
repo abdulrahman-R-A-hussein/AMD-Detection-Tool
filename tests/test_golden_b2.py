@@ -116,6 +116,47 @@ def test_l8_dose_response_is_positive_in_all_four_districts_and_fails_loro():
                                 "FerricIron1     Iron_mgL_dissolved")
 
 
+REGIONS_ORDER = ("silverton_co", "leadville_co", "ouray_co", "central_city_co")
+
+
+@pytest.mark.parametrize("index,analyte,rho,n,p,q,between", [
+    ("FerricIron1", "Iron_mgL_dissolved", "+0.568", 75, "0.0004", "0.0072", "24"),
+    ("FerricIron1", "Iron_mgL_any", "+0.558", 82, "0.0004", "0.0072", "25"),
+    ("FerricIron2", "pH", "-0.488", 77, "0.0006", "0.0072", "46"),
+    ("FerricIron1", "pH", "-0.554", 77, "0.0034", "0.0302", "46"),
+    ("FerricIron2", "Iron_mgL_dissolved", "+0.427", 75, "0.0042", "0.0302", "24"),
+])
+def test_b2_dose_response_table_p_and_q_reproduce(index, analyte, rho, n, p, q, between):
+    """ARM_B2_SEEP_DETECTION_2026-08-14.md Part 2: 36 tests, within-district
+    permutation, 5,000 draws. Its p and q were in no committed raw output; this
+    regenerates them from committed code (python/b2_dose_response_regen.py)."""
+    from amdtool import dose_response
+
+    paths = [os.path.join(MATCHED, "seep_l8_%s.csv" % d) for d in REGIONS_ORDER]
+    if not all(os.path.isfile(x) for x in paths):
+        pytest.skip("data/matched/seep_l8_*.csv not present")
+    rows = [r for r in load_extracted(paths) if r["radius"] == 60 and r["tier"] == "target"]
+    res = _dose_family(rows, dose_response)
+    got = {(x.index, x.analyte): x for x in res.pairs}[(index, analyte)]
+    assert len(res.pairs) == 36
+    assert ("%+.3f" % got.rho, got.n, "%.4f" % got.p, "%.4f" % got.q, "%.0f" % got.between_pct) == \
+        (rho, n, p, q, between)
+
+
+_FAMILY_CACHE = {}
+
+
+def _dose_family(rows, dose_response):
+    if "res" not in _FAMILY_CACHE:
+        _FAMILY_CACHE["res"] = dose_response.analyse(
+            rows, ["IronSulfate", "FerricIron1", "FerricIron2", "FerrousIron", "ClaySulfateMica",
+                   "GreenNIR", "GreenNIRNorm", "NDVI_stress", "AMDclassFrac"],
+            ("Iron_mgL_dissolved", "Iron_mgL_any", "Sulfate_mgL", "pH"),
+            stat="p90", group_key="region", n_perm=5000, seed=SEED, min_n=10,
+            min_group_n=5, canopy_limit=None)
+    return _FAMILY_CACHE["res"]
+
+
 def test_l8_ferriciron1_vs_c1_committed_and_tie_corrected(legacy):
     """36% of these scores are tied (co-located in-stream stations share a buffer).
     The committed sweep reproduces the report's -0.018; the tie-corrected sweep

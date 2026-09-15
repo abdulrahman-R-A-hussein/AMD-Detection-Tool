@@ -77,13 +77,18 @@ tie-corrected rows listed there.
 | live re-extraction, Monday Creek, leaf-off, 30 m, `NDVI_stress` | **27 stations, 120 scenes, max abs diff 0.000** against the committed `cmdgeo_l8_monday_creek_oh.csv` (27 of 27 stations common), i.e. identical, not merely within 1e-12 |
 | CLI output | `amdtool` logs instead of printing; `python/_amdtool_path.py` routes that to stdout with the scripts' old prefix, so the retry lines still appear (`tests/test_cli_logging.py`, and seen in the live run) |
 
+## Closed 2026-09-15, after the wrapper conversion
+
+| gate item | result |
+|---|---|
+| B2's within-region permutation p = 0.0004 (quoted in README, CITATION.cff, GRANT_CASE, ACCURACY_ASSESSMENT) | **Regenerated exactly** from committed code. All five rows of ARM_B2's Part 2 table match (rho, n, p, q, between-region share), for the 36-test family at 5,000 within-district draws, seed 20260814, districts in REGIONS order. Script `python/b2_dose_response_regen.py` writes `report_b2_dose_response_2026-09-15.txt`; `tests/test_golden_b2.py` pins the rows. Until now these numbers existed only in the .md report. **Caveat:** p is a Monte Carlo estimate; at 10,000 draws the same pair gives p = 0.0002, q = 0.0036 |
+| land-arm J values vs the tied-score defect | **Unaffected.** `derive_thresholds`, `iron_criterion_search` and `iron_index_transfer` search only distinct cut values with `>`. `paper_faithful_test` scores fixed binary predictions, so "worst-case J = 0.000" for the v2.x multipliers simply means nothing was flagged |
+
 ## NOT yet passed — do not read as done
 
 | gate item | status |
 |---|---|
-| B2's within-region permutation p = 0.0004 quoted in README | **not re-derived** here |
-| SpectraLab UI end-to-end run | **not run**; the offline module test and full suite pass (SpectraLab `docs/WORKLOG.md`) |
-| land-arm J values ("worst-case J = 0.000" for the v2.x σ multipliers) | **not checked** for the tied-score defect (audit item 9); they come from different code |
+| SpectraLab UI end-to-end run | **not run**. The live module test passes against Earth Engine (SpectraLab `docs/WORKLOG.md`, 2026-09-15) |
 
 **Caveat.** Exact reproduction proves the refactor changed no computation on
 these inputs. It says nothing about whether those results are right; that is

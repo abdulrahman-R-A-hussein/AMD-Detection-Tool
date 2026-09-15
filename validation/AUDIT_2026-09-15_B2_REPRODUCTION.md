@@ -103,8 +103,10 @@ reproduction check equals the corrected values.
   separate from terrain-matched vegetated land (C2), not from nearby monitored
   water (C1).
 - The land-arm J values ("worst-case J = 0.000" for the v2.x σ multipliers, in
-  `REPLICA_AUDIT_2026-07-26.md` and `OPERATOR_GUIDE.md`) come from different code
-  and were **not checked**.
+  `REPLICA_AUDIT_2026-07-26.md` and `OPERATOR_GUIDE.md`) come from different code.
+  They were **checked the same day and are unaffected**: the land-arm threshold
+  searches evaluate only distinct cut values, and `paper_faithful_test` scores
+  fixed binary predictions.
 
 **Fix.** `amdtool.stats._worst_j_fast` now evaluates J only after the last
 member of a tie. That change is the one allowed difference for this function in

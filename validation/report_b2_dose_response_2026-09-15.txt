@@ -1,0 +1,88 @@
+================================================================================================
+ARM B2 DOSE-RESPONSE FAMILY - regenerated 2026-09-15 from committed code
+86 source points (L8, 60 m, p90); within-district permutation; BH over the family
+inputs, in order: seep_l8_silverton_co.csv, seep_l8_leadville_co.csv, seep_l8_ouray_co.csv, seep_l8_central_city_co.csv
+================================================================================================
+target rows: 86
+
+--- 5000 within-district permutations, seed 20260814; family = 36 tests ---
+  index           analyte                  rho    n   perm_p     BH_q  between  signs
+  FerricIron1     Iron_mgL_any          +0.558   82   0.0004   0.0072      25%  consistent
+  FerricIron1     Iron_mgL_dissolved    +0.568   75   0.0004   0.0072      24%  consistent
+  FerricIron2     pH                    -0.488   77   0.0006   0.0072      46%  consistent
+  FerricIron1     pH                    -0.554   77   0.0034   0.0302      46%  consistent
+  FerricIron2     Iron_mgL_dissolved    +0.427   75   0.0042   0.0302      24%  consistent
+  NDVI_stress     Sulfate_mgL           -0.416   63   0.0074   0.0444      22%  consistent
+  AMDclassFrac    pH                    -0.224   77   0.0132   0.0679      46%  consistent
+  AMDclassFrac    Iron_mgL_dissolved    +0.266   75   0.0170   0.0765      24%  consistent
+  FerricIron2     Iron_mgL_any          +0.339   82   0.0192   0.0768      25%  disagree
+  FerricIron1     Sulfate_mgL           +0.305   63   0.0526   0.1893      22%  disagree
+  AMDclassFrac    Iron_mgL_any          +0.204   82   0.0646   0.2114      25%  consistent
+  FerrousIron     Iron_mgL_dissolved    +0.271   75   0.0798   0.2394      24%  disagree
+  NDVI_stress     pH                    +0.232   77   0.1230   0.3405      46%  disagree
+  FerrousIron     pH                    -0.445   77   0.1576   0.4052      46%  consistent
+  GreenNIRNorm    Sulfate_mgL           -0.112   63   0.2242   0.5380      22%  disagree
+  GreenNIR        Sulfate_mgL           -0.112   63   0.2406   0.5412      22%  disagree
+  AMDclassFrac    Sulfate_mgL           +0.147   63   0.2935   0.5987      22%  disagree
+  IronSulfate     Sulfate_mgL           -0.100   63   0.2993   0.5987      22%  disagree
+  FerrousIron     Iron_mgL_any          +0.164   82   0.3301   0.6255      25%  disagree
+  ClaySulfateMica Sulfate_mgL           -0.088   63   0.3771   0.6788      22%  disagree
+  NDVI_stress     Iron_mgL_dissolved    -0.081   75   0.4379   0.7114      24%  disagree
+  GreenNIRNorm    Iron_mgL_any          -0.136   82   0.4453   0.7114      25%  disagree
+  GreenNIR        Iron_mgL_any          -0.136   82   0.4545   0.7114      25%  disagree
+  FerricIron2     Sulfate_mgL           +0.107   63   0.5201   0.7801      22%  disagree
+  IronSulfate     Iron_mgL_any          -0.087   82   0.5579   0.8034      25%  disagree
+  FerrousIron     Sulfate_mgL           +0.103   63   0.6159   0.8525      22%  disagree
+  GreenNIR        Iron_mgL_dissolved    -0.113   75   0.6531   0.8525      24%  disagree
+  GreenNIRNorm    Iron_mgL_dissolved    -0.113   75   0.6631   0.8525      24%  disagree
+  IronSulfate     Iron_mgL_dissolved    -0.057   75   0.7303   0.8977      24%  disagree
+  ClaySulfateMica Iron_mgL_any          -0.065   82   0.7712   0.8977      25%  consistent
+  NDVI_stress     Iron_mgL_any          -0.030   82   0.7730   0.8977      25%  disagree
+  ClaySulfateMica Iron_mgL_dissolved    -0.069   75   0.8266   0.9300      24%  disagree
+  GreenNIR        pH                    +0.242   77   0.9226   0.9773      46%  disagree
+  GreenNIRNorm    pH                    +0.242   77   0.9230   0.9773      46%  disagree
+  IronSulfate     pH                    +0.144   77   0.9786   0.9958      46%  disagree
+  ClaySulfateMica pH                    +0.160   77   0.9958   0.9958      46%  disagree
+
+--- 10000 within-district permutations, seed 20260814; family = 36 tests ---
+  index           analyte                  rho    n   perm_p     BH_q  between  signs
+  FerricIron1     Iron_mgL_any          +0.558   82   0.0001   0.0036      25%  consistent
+  FerricIron1     Iron_mgL_dissolved    +0.568   75   0.0002   0.0036      24%  consistent
+  FerricIron2     pH                    -0.488   77   0.0007   0.0084      46%  consistent
+  FerricIron1     pH                    -0.554   77   0.0019   0.0171      46%  consistent
+  FerricIron2     Iron_mgL_dissolved    +0.427   75   0.0043   0.0310      24%  consistent
+  NDVI_stress     Sulfate_mgL           -0.416   63   0.0053   0.0318      22%  consistent
+  AMDclassFrac    pH                    -0.224   77   0.0170   0.0764      46%  consistent
+  FerricIron2     Iron_mgL_any          +0.339   82   0.0176   0.0764      25%  disagree
+  AMDclassFrac    Iron_mgL_dissolved    +0.266   75   0.0191   0.0764      24%  consistent
+  FerricIron1     Sulfate_mgL           +0.305   63   0.0519   0.1868      22%  disagree
+  AMDclassFrac    Iron_mgL_any          +0.204   82   0.0682   0.2232      25%  consistent
+  FerrousIron     Iron_mgL_dissolved    +0.271   75   0.0788   0.2364      24%  disagree
+  NDVI_stress     pH                    +0.232   77   0.1224   0.3389      46%  disagree
+  FerrousIron     pH                    -0.445   77   0.1569   0.4034      46%  consistent
+  GreenNIRNorm    Sulfate_mgL           -0.112   63   0.2240   0.5298      22%  disagree
+  GreenNIR        Sulfate_mgL           -0.112   63   0.2355   0.5298      22%  disagree
+  AMDclassFrac    Sulfate_mgL           +0.147   63   0.3027   0.6135      22%  disagree
+  IronSulfate     Sulfate_mgL           -0.100   63   0.3068   0.6135      22%  disagree
+  FerrousIron     Iron_mgL_any          +0.164   82   0.3248   0.6153      25%  disagree
+  ClaySulfateMica Sulfate_mgL           -0.088   63   0.3853   0.6935      22%  disagree
+  NDVI_stress     Iron_mgL_dissolved    -0.081   75   0.4456   0.7174      24%  disagree
+  GreenNIRNorm    Iron_mgL_any          -0.136   82   0.4544   0.7174      25%  disagree
+  GreenNIR        Iron_mgL_any          -0.136   82   0.4584   0.7174      25%  disagree
+  FerricIron2     Sulfate_mgL           +0.107   63   0.5148   0.7723      22%  disagree
+  IronSulfate     Iron_mgL_any          -0.087   82   0.5596   0.8059      25%  disagree
+  FerrousIron     Sulfate_mgL           +0.103   63   0.6241   0.8403      22%  disagree
+  GreenNIR        Iron_mgL_dissolved    -0.113   75   0.6390   0.8403      24%  disagree
+  GreenNIRNorm    Iron_mgL_dissolved    -0.113   75   0.6535   0.8403      24%  disagree
+  IronSulfate     Iron_mgL_dissolved    -0.057   75   0.7356   0.9132      24%  disagree
+  NDVI_stress     Iron_mgL_any          -0.030   82   0.7665   0.9170      25%  disagree
+  ClaySulfateMica Iron_mgL_any          -0.065   82   0.7896   0.9170      25%  consistent
+  ClaySulfateMica Iron_mgL_dissolved    -0.069   75   0.8265   0.9298      24%  disagree
+  GreenNIR        pH                    +0.242   77   0.9234   0.9796      46%  disagree
+  GreenNIRNorm    pH                    +0.242   77   0.9252   0.9796      46%  disagree
+  IronSulfate     pH                    +0.144   77   0.9783   0.9978      46%  disagree
+  ClaySulfateMica pH                    +0.160   77   0.9978   0.9978      46%  disagree
+
+CAVEAT: a permutation p is a Monte Carlo estimate; compare the two runs.
+It tests LAND-SURFACE ferric precipitate at source points, never dissolved
+iron or sulfate directly. Sulfate has no VNIR absorption.

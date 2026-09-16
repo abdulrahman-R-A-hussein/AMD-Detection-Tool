@@ -1,6 +1,8 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-09-15 · **Current tag:** `v3.10.0` (tool: `v3.1.0`)
+**Last updated:** 2026-09-16 · **Current tag:** `v3.10.0` (tool: `v3.1.0`). Every commit since the tag is untagged, and **Zenodo has not been updated** (see OPEN → NEXT).
+
+**Start here after a break:** [`ROUND_SUMMARY_2026-09-16.md`](ROUND_SUMMARY_2026-09-16.md) (what was done and found) · [`../docs/HOW_TO_TEST.md`](../docs/HOW_TO_TEST.md) (test everything yourself)
 
 This file is the canonical "where are we right now". It is maintained under
 the logging rule in [`../CLAUDE.md`](../CLAUDE.md). It should be sufficient to
@@ -661,8 +663,35 @@ Both from [`ARM_A_CROSS_REGION_RETEST_2026-08-13.md`](ARM_A_CROSS_REGION_RETEST_
 
 Ordered by value.
 
-**Author actions first (not analysis):** publish the corrected Zenodo version;
-review `.private/EB2_DOCUMENTATION.md`; push. See "RECORD AND GRANT READINESS".
+### NEXT — as of 2026-09-16 (start here)
+
+**Author actions (not analysis):**
+1. **Zenodo — NOT updated yet.** The archive is still v3.10.0 (2026-09-13).
+   Everything since exists only on GitHub: the `amdtool` package, audits
+   2026-09-14/15, the blind-search result, and the narrowed severity claim.
+   Steps: `docs/HOW_TO_TEST.md` §E.
+2. **Run the SpectraLab AMD module in the UI.** It lives on branch
+   `feature/amd-severity-module`; it is **not released**, SpectraLab is **not
+   installed as an app**, and `SpectraLab-0.39.0.exe` does **not** contain it.
+   Steps: `docs/HOW_TO_TEST.md` §C. This is the one gate item still open.
+3. **Decide:** merge the branch and cut SpectraLab 0.40.0, or keep it on the
+   branch.
+4. Review `.private/EB2_DOCUMENTATION.md` (deliberately untouched).
+
+**Analysis, in value order:**
+
+5. **Field campaign — pre-register before the first field day** (design below).
+   H-DISC now tests the blind search's *negative* expectation, on the
+   registered 40-cluster frame.
+6. **Snow-masked blind-search sensitivity:** registered, not run.
+   `python python/blind_search.py --extract --snow-masked` takes about a day;
+   then re-run `--analyse`. The verdicts do not depend on it.
+7. The science leads from item 0 below: a PA disturbance covariate, a better
+   Ohio covariate, an Arm A re-run (DEM catchments, global de-duplication,
+   per-district σ), and geology labels fixed before any new region's sign is
+   seen.
+
+### Record of the round that led here
 
 **Blind-search test — REGISTERED 2026-09-14; RESULT 2026-09-15 (below).** → [`BLIND_SEARCH_PREREGISTRATION_2026-09-14.md`](BLIND_SEARCH_PREREGISTRATION_2026-09-14.md),
 with a site list fixed from station metadata only (321 rows, SHA-256
@@ -757,7 +786,10 @@ across Huff Run / Clearfield / Moshannon for the UAV comparison.
    reveals a relationship `hybas_12` was masking.
 3. ~~Arm B2 — precipitate/seep detection~~ **RUN 2026-08-14 on Landsat 8**
    (`python/seep_detect.py`). Detection null, dose-response positive — see
-   PROVEN above. **Remaining B2 work, in value order:**
+   PROVEN above. **All three follow-ups below were DONE in August 2026:** C3b
+   amendment 2026-08-15, leave-one-region-out 2026-08-14, and Sentinel-2 +
+   resolution ladder 2026-08-15/16. They were re-audited on 2026-09-15
+   (`AUDIT_2026-09-15_B2_REPRODUCTION.md`) and are kept here for the record:
    a. **C3b amendment (required).** The pre-registered C3 bare-ground tier is
       circular for vegetation-sensitive indices — it was defined by NDVI, so
       `NDVI_stress` separates from it by construction. Re-run with NLCD

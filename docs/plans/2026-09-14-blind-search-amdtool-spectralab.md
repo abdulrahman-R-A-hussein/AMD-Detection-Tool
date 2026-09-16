@@ -326,3 +326,34 @@ SpectraLab: its `docs/WORKLOG.md`; branch commit and push.
    rho equals the `amdtool` CLI on the same inputs.
 8. A `vpca` and a `stepwise` run still produce byte-identical attribution
    blocks.
+
+---
+
+## Outcome (recorded 2026-09-16)
+
+Full account: `validation/ROUND_SUMMARY_2026-09-16.md`.
+
+| part | status |
+|---|---|
+| D — log the defects | **done:** `AUDIT_2026-09-14_ARMA_AND_TOOLING.md` (items 1–8); later `AUDIT_2026-09-15_B2_REPRODUCTION.md` (items 9–11) |
+| B1 — pre-register the blind search | **done** in `ad05971`, before any landscape data |
+| A — `amdtool` | **done:** package + 207 tests; `seep_detect`, `cmd_detect`, `cmd_confound`, `fetch_wqp` and `ee_auth` are wrappers; gate in `AMDTOOL_REFACTOR_GATE_2026-09-14.md` |
+| B2/B3 — run the blind search | **done:** H-BS1 NO SIGNAL DETECTED, H-BS2 NOT BETTER THAN BARE GROUND (`ARM_BLIND_SEARCH_2026-09-15.md`); field frame drawn; **snow-masked sensitivity not run** |
+| C — SpectraLab module | **done on branch** `feature/amd-severity-module`; **not merged, not released, not installed as an app** |
+
+| verification item | status |
+|---|---|
+| 1. The A4 gate reproduces | **passed**, with one deliberate change: B2 detection tables differ only in the tie-corrected rows (audit item 9) |
+| 2. `pytest` and live tests | **207 pass.** The `AMDTOOL_EE_TESTS` live tests were **not written**. Live Earth Engine behaviour was checked instead by the Monday Creek re-extraction (max abs diff 0.000), `catchment_dem --self-test` 6/6, and the blind-search extraction |
+| 3. Registration ancestry | **passed:** `ad05971` is an ancestor of every result commit |
+| 4. Verdicts reported with power | **passed** |
+| 5. SpectraLab suite | **509 passed, 3 skipped.** Run with `.venv` python rather than `uv run`, because an extraction was using that venv |
+| 6. Science files untouched | **passed** |
+| 7. UI end-to-end | **not run; the author's step** (`docs/HOW_TO_TEST.md` §C). The live module test passed against Earth Engine instead |
+| 8. vpca/stepwise attribution unchanged | **passed** (`tests/test_manifest_attribution.py`) |
+
+**Deviations, each logged where it happened:**
+- No `amd` extra and no `[tool.uv.sources]` in SpectraLab's `pyproject.toml`.
+  Either would break `uv lock` on machines without the sibling repo, and the
+  bare PyPI name is not ours.
+- Preset overrides are allowed under Advanced, but always produce a warning.

@@ -1,6 +1,6 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-09-19 · **Current tag:** `v3.10.0` (tool: `v3.1.0`). Every commit since the tag is untagged. **v3.11.0 is prepared, not published.** **Zenodo's latest version is 1.5.5 (April 2026), whose description carries retracted claims** (see OPEN → NEXT).
+**Last updated:** 2026-09-19 · **Current tag:** `v3.10.0` (tool: **`v3.1.1`**, which turns the retracted in-water module OFF by default). Every commit since the tag is untagged. **v3.11.0 is prepared, not published.** **Zenodo's latest version is 1.5.5 (April 2026), whose description carries retracted claims** (see OPEN → NEXT).
 
 **Start here after a break:** [`ROUND_SUMMARY_2026-09-16.md`](ROUND_SUMMARY_2026-09-16.md) (what was done and found) · [`../docs/HOW_TO_TEST.md`](../docs/HOW_TO_TEST.md) (test everything yourself) · [`FIELD_CAMPAIGN_PREREGISTRATION_2026-09-19.md`](FIELD_CAMPAIGN_PREREGISTRATION_2026-09-19.md) (the field campaign, Ohio first)
 
@@ -721,6 +721,34 @@ Ordered by value.
    Ohio covariate, an Arm A re-run (DEM catchments, global de-duplication,
    per-district σ), and geology labels fixed before any new region's sign is
    seen.
+
+### ★ GEE TOOL SHIPPED THE RETRACTED WATER MODULE ON BY DEFAULT — FIXED
+(2026-09-19, tool v3.1.1)
+
+**A presentation defect, not a measurement.** No number in any report moves.
+Until today the tool opened with a **"🌊 Water Quality Classification"** layer
+drawn over water, reading **clean / moderate / severe contamination**, a ticked
+"Enable Water Quality Analysis" box, help text promising it *"detects
+sulfate/iron contamination in water bodies"*, and a legend pointing users to
+it. That capability is **retracted**: those indices ranked a chemically clean
+control lake highest (finding W1), and the water column is a measured null
+(Water Phase 2 B1 — no feature's CI excluded zero against iron n=17 or sulfate
+n=23, while turbidity was detectable at n=50).
+
+**Also dead code:** the internal-validation printout computed "Contaminated"
+and "Clean" water from land classes 20 and 21, removed in v2.4.0, so it printed
+0.00% every time while implying a water measurement.
+
+**Now:** module off and hidden on load; checkbox, layer and help text labelled
+RETRACTED; ticking the box prints the reason; the legend says in-water
+contamination is not a product of this tool; the dead printout is gone. **The
+land classification is untouched** — no index, threshold, σ rule or class
+cascade changed.
+
+**Not verified here:** a real run in the Code Editor; Earth Engine's UI cannot
+be driven from this machine. The parse check passed. **The author's
+paste-and-run is the check** (`docs/HOW_TO_TEST.md` §A).
+→ [`AUDIT_2026-09-19_GEE_DEFAULTS.md`](AUDIT_2026-09-19_GEE_DEFAULTS.md)
 
 ### Field-campaign registration, 2026-09-19 (no field data yet)
 

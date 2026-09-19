@@ -48,15 +48,17 @@ own `.venv` has no `ee` module.
    - **Preset:** choose one of the 30 entries.
    - **Custom AOI:** type latitude, longitude and a radius in km (0.3–200),
      then press **Set Custom AOI**.
-4. **Read the two layers that are on by default:**
+4. **Read the layer that is on by default:**
    - **🏔️ Land AMD Classification.** Transparent means *unclassified*, **not**
-     clean.
-   - **🌊 Water Quality Classification.** Blue = clean, orange = moderate,
-     red = severe. **Grey = INDETERMINATE (not measured), not clean.**
+     clean. This is the validated product.
 
-   The diagnostic layers are hidden in the Layers panel
-   (`docs/OPERATOR_GUIDE.md` §2).
-5. **Check the v3.1.0 fix yourself.** Keep one centre and set the radius to 8,
+   **Since v3.1.1 the in-water module is RETRACTED and ships OFF**, so no water
+   layer is drawn unless you tick its box. If you do, the Console prints why it
+   is retracted: its indices ranked a clean control lake highest, and iron and
+   sulfate were undetectable in the water column. Its classes are index levels,
+   never contamination. Every other diagnostic layer stays hidden in the Layers
+   panel (`docs/OPERATOR_GUIDE.md` §2).
+5. **Check the v3.1.0 radius fix yourself.** Keep one centre and set the radius to 8,
    then 12, then 20 km. The **σ cutoff panel** must print the **same cut** each
    time, because statistics come from a fixed 12 km circle.
 6. **The σ multipliers** sit under **Advanced: override** and are staged: a

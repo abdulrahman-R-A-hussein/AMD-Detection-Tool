@@ -13,6 +13,22 @@ Entries for v1.x record what was believed at the time. Several are
 "correctly displays contamination" entry, and the `AWEINSH > 0.20` water-mask
 "fix". See the v3.x entries and [`validation/STATE.md`](validation/STATE.md).
 
+## [3.1.1] - 2026-09-19 (Earth Engine tool)
+### Fixed
+- **The retracted in-water module shipped ON by default.** The tool opened with
+  a "🌊 Water Quality Classification" layer drawn over water, reading
+  clean / moderate / severe **contamination**, and the legend pointed users to
+  it. That is the capability this project retracted: those indices ranked a
+  chemically clean control lake highest (finding W1), and the water column is a
+  measured null (Water Phase 2, B1). It is now **off by default and hidden**,
+  the checkbox and layer are labelled RETRACTED, ticking the box prints why,
+  and the class names say index levels rather than contamination.
+- **The internal-validation printout counted land classes 20 and 21** as
+  "contaminated" and "clean" water. Those classes were removed in v2.4.0, so it
+  printed 0.00% every time while implying a water measurement.
+- The file header no longer claims the tool extends the USGS method "to
+  contaminated water bodies quality assessment".
+
 ## [3.11.0] - 2026-09-19
 ### Added
 - **`amdtool`**, the analysis pipeline as an importable package

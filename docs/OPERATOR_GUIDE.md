@@ -166,15 +166,26 @@ authoritative — an overlay entry can never shadow one.
 
 ## 2. What each layer shows
 
-15 layers. Only the first two are on by default.
+15 layers. **Since v3.1.1 only ONE is on by default: the land classification.** The in-water module is retracted and now ships off.
 
 ### Visible by default
 
 | Layer | What it is | How to read it |
 |---|---|---|
 | 🏔️ **Land AMD Classification** | 19-class integer raster | The main product. Class table in §3. Transparent = unclassified, **not** "clean". |
-| 🌊 **Water Quality Classification** | 4 states over water | Blue 0 = clean · Orange 1 = moderate · Red 2 = severe · **Grey 3 = INDETERMINATE** |
+### The in-water module — RETRACTED, off since v3.1.1
 
+| Layer | What it is | How to read it |
+|---|---|---|
+| 🌊 **Water index levels (RETRACTED - not validated)** | 4 states over water, **hidden unless you tick the box** | Index levels only: 0 low · 1 mid · 2 high · **3 = INDETERMINATE**. **None of these is a measurement of contamination.** |
+
+> **Why it is off.** Its indices ranked a chemically clean control lake
+> **highest** (finding W1), and the water column is a measured null: against
+> iron (n=17) and sulfate (n=23) no feature's confidence interval excluded
+> zero, while turbidity was detectable (Water Phase 2, B1). Sulfate has no VNIR
+> absorption at any concentration. Ticking the box prints that warning in the
+> Console.
+>
 > **Grey is not clean.** Class 3 means the water was too dark or too bright for
 > the ratio indices to be reliable (`brightness` outside 0.05–0.20), so it was
 > **not measured**. Pooling grey with blue is the single easiest way to

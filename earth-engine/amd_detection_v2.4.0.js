@@ -15,16 +15,22 @@
  * License: MIT
  * 
  * Description:
- * Automated detection and mapping of iron sulfate minerals, acid mine drainage (AMD),
- * and coal mine drainage (CMD) contamination using Landsat 8/9 and Sentinel-2 satellite
- * imagery. Extends USGS terrestrial mineral detection methodology to contaminated water bodies quality assessment.
+ * Automated mapping of iron sulfate minerals from Landsat 8/9 and Sentinel-2,
+ * reimplementing USGS SIM 3466. The land classification is the validated product.
+ *
+ * The in-water module is RETRACTED and OFF by default (v3.1.1). Its indices
+ * ranked a chemically clean control lake HIGHEST (finding W1), and the Ohio
+ * water column is a measured null (Water Phase 2, B1): no reflectance feature's
+ * confidence interval excluded zero against iron (n=17) or sulfate (n=23),
+ * while turbidity WAS detectable. Sulfate has no VNIR absorption at any
+ * concentration. See validation/STATE.md and validation/README.md.
  * 
  * Citation:
  * Hussein, A. R. A. (2025). Acid Mine Drainage Detection System: Advanced Remote 
  * Sensing for Environmental Monitoring. GitHub. https://github.com/coodawy/AMD-Detection-Tool
  */
 
-var TOOL_VERSION = 'v3.1.0';
+var TOOL_VERSION = 'v3.1.1';
 
 // =============================================================================
 // STUDY AREAS
@@ -717,7 +723,10 @@ var settings = {
   // ═══════════════════════════════════════════════════════════════════════
   
   // Water Quality Detection Settings
-  enableWaterQualityModule: true,  // Toggle entire module on/off
+  // v3.1.1: DEFAULT OFF. This module is retracted - it is kept for diagnostic
+  // work only, and nothing it prints or draws may be reported as a measurement
+  // of water contamination.
+  enableWaterQualityModule: false,  // Toggle entire module on/off
   
   // NIR Anomaly Detection (Critical for AMD water)
   // Clean water: NIR < 1%, Contaminated: NIR = 3-10%, Severe: > 10%
@@ -1485,11 +1494,13 @@ function updateDetection() {
     // indices to be reliable). Grey deliberately does NOT read as "clean" -
     // it means "not measured", and such pixels must not be counted as clean
     // water in any statistic or claim.
+    // v3.1.1: HIDDEN by default, and named for what it is. The class names
+    // below describe index levels, not measured contamination.
     Map.addLayer(waterQualityResult.classification, {
       min: 0,
       max: 3,
-      palette: ['1E90FF', 'FFA500', 'FF0000', '9E9E9E']  // clean, moderate, severe, indeterminate
-    }, '🌊 Water Quality Classification', true);  // VISIBLE by default
+      palette: ['1E90FF', 'FFA500', 'FF0000', '9E9E9E']  // low, mid, high index, indeterminate
+    }, '🌊 Water index levels (RETRACTED - not validated)', false);
     
     // ─────────────────────────────────────────────────────────────────────
     // WATER DIAGNOSTIC LAYERS (For validation - hidden by default)
@@ -1737,16 +1748,12 @@ function performInternalValidation() {
       print('   ✅ Iron sulfate percentage is reasonable');
     }
     
-    // Water classification
-    var waterPixels = (histogram['20'] || 0) + (histogram['21'] || 0);
-    var waterPercent = (waterPixels / totalPixels * 100).toFixed(2);
-    var contamPercent = ((histogram['20'] || 0) / totalPixels * 100).toFixed(2);
-    var cleanPercent = ((histogram['21'] || 0) / totalPixels * 100).toFixed(2);
-    
-    print('\n3️⃣  WATER CLASSIFICATION:');
-    print('   Total water: ' + waterPercent + '%');
-    print('   Contaminated: ' + contamPercent + '% (Class 20)');
-    print('   Clean: ' + cleanPercent + '% (Class 21)');
+    // v3.1.1: removed. This block counted land classes 20 and 21 as
+    // "contaminated" and "clean" water, but those classes no longer exist
+    // in the land raster (v2.4.0 removed them), so it printed 0.00% every
+    // time while implying a water measurement the tool does not make.
+    print('\nWATER: not classified by the land raster.');
+    print('   The in-water module is retracted and off by default (v3.1.1).');
   });
   
   // Test 2: Index value ranges
@@ -1944,8 +1951,10 @@ function calculateStats() {
           }
           
           if (settings.useAdvancedWaterDetection) {
-            statsText += '\n  Contaminated H2O: Iron > ' + 
-              settings.contaminatedWaterThreshold.toFixed(2) + ' in water';
+            // v3.1.1: named as the index cut it is. It is not a measurement of
+            // contamination, and the module it belongs to is retracted.
+            statsText += '\n  Iron-index cut over water (RETRACTED module): > ' +
+              settings.contaminatedWaterThreshold.toFixed(2);
           }
           
           statsPanel.setValue(statsText);
@@ -2995,17 +3004,26 @@ var waterQualityHeader = ui.Label({
 });
 
 var waterQualityHelp = ui.Label({
-  value: 'Separate module - detects sulfate/iron contamination in water bodies',
-  style: {fontSize: '8px', margin: '0 0 4px 0', color: '#666', fontStyle: 'italic'}
+  value: 'RETRACTED module. Its indices ranked a clean control lake highest, ' +
+         'and the water column is a measured null. Diagnostic use only - ' +
+         'never report its output as contamination.',
+  style: {fontSize: '8px', margin: '0 0 4px 0', color: '#B00020', fontStyle: 'italic'}
 });
 
-// Enable/disable water quality module
+// Enable/disable water quality module. v3.1.1: unchecked by default.
 var waterQualityCheckbox = ui.Checkbox({
-  label: 'Enable Water Quality Analysis',
-  value: true,
+  label: 'Water Quality Analysis (RETRACTED - experimental)',
+  value: false,
   style: {fontSize: '9px', margin: '0 0 8px 0', fontWeight: 'bold'},
   onChange: function(checked) {
     settings.enableWaterQualityModule = checked;
+    if (checked) {
+      print('WARNING: the in-water module is RETRACTED. Its indices ranked a ' +
+            'chemically clean control lake highest (finding W1), and iron and ' +
+            'sulfate were undetectable in the water column (Water Phase 2, B1). ' +
+            'Use it for diagnostics only; do not report its classes as ' +
+            'contamination.');
+    }
     updateDetection();
   }
 });
@@ -3473,10 +3491,14 @@ otherGrid.add(col3);
 otherGrid.add(col4);
 legendContent.add(otherGrid);
 
-// Water classes removed - see Water Quality Classification layer instead
+// Water classes were removed from the land raster. The separate in-water
+// module is retracted and off by default (v3.1.1), so the legend no longer
+// points anyone towards it as a contamination product.
 var waterNote = ui.Label({
-  value: '💡 Water contamination: See 🌊 Water Quality Classification layer',
-  style: {fontStyle: 'italic', margin: '8px 0 4px 0', fontSize: '10px', color: '666'}
+  value: '⚠ In-water contamination is NOT a product of this tool. That module ' +
+         'is retracted and off by default; the land classification is the ' +
+         'validated output.',
+  style: {fontStyle: 'italic', margin: '8px 0 4px 0', fontSize: '10px', color: 'B00020'}
 });
 legendContent.add(waterNote);
 
@@ -3519,6 +3541,8 @@ print('Acid Mine Drainage Detection System ' + TOOL_VERSION);
 print('Advanced Remote Sensing for Environmental Monitoring');
 print('═══════════════════════════════════════════════════════════════');
 print('Author: Abdulrahman Hussein | Kent State University');
+print('Land iron-sulfate mapping is the validated product. The in-water ' +
+      'contamination module is RETRACTED and OFF by default (v3.1.1).');
 print('Website: www.climtawy.com | ORCID: 0009-0003-0401-9219 | License: MIT');
 print('═══════════════════════════════════════════════════════════════');
 print(

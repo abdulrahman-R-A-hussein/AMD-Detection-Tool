@@ -1,6 +1,6 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-09-19 · **Current tag:** `v3.10.0` (tool: **`v3.1.1`**, which turns the retracted in-water module OFF by default). Every commit since the tag is untagged. **v3.11.0 is prepared, not published.** **Zenodo's latest version is 1.5.5 (April 2026), whose description carries retracted claims** (see OPEN → NEXT).
+**Last updated:** 2026-09-19 · **Current tag:** **`v3.11.1`** (tool: **`v3.1.1`**, which turns the retracted in-water module OFF by default). The tag is pushed; **the GitHub Release, which is what updates Zenodo, is still the author's step.** Every commit since the tag is untagged. **v3.11.0 is prepared, not published.** **Zenodo's latest version is 1.5.5 (April 2026), whose description carries retracted claims** (see OPEN → NEXT).
 
 **Start here after a break:** [`ROUND_SUMMARY_2026-09-16.md`](ROUND_SUMMARY_2026-09-16.md) (what was done and found) · [`../docs/HOW_TO_TEST.md`](../docs/HOW_TO_TEST.md) (test everything yourself) · [`FIELD_CAMPAIGN_PREREGISTRATION_2026-09-19.md`](FIELD_CAMPAIGN_PREREGISTRATION_2026-09-19.md) (the field campaign, Ohio first)
 
@@ -680,10 +680,14 @@ Ordered by value.
      version 1.5.5 as superseded. Details in `docs/HOW_TO_TEST.md` §E.
    - **Do this before GSA (11 Oct) and before citing the DOI in any
      application.**
-2. **Run the SpectraLab AMD module in the UI.** It lives on branch
-   `feature/amd-severity-module`; it is **not released**, SpectraLab is **not
-   installed as an app**, and `SpectraLab-0.39.0.exe` does **not** contain it.
-   Steps: `docs/HOW_TO_TEST.md` §C. This is the one gate item still open.
+2. ~~**Run the SpectraLab AMD module in the UI.**~~ **DONE 2026-09-19** — the
+   last open item of the refactor gate. A two-district AOI (Silverton + Ouray,
+   1,950 km²) ran end to end through the interface in 1 min 15 s: 39 stations,
+   134 scenes, report and both CSVs written. **It exposed one defect:** the
+   score raster was lost to Earth Engine's memory limit, now fixed and verified
+   live (30 m → 60 m → 120 m). The run's own statistics are **exploratory** and
+   enter no claim.
+   → [`UI_TEST_2026-09-19_SPECTRALAB_AMD.md`](UI_TEST_2026-09-19_SPECTRALAB_AMD.md)
 3. **Decide:** merge the branch and cut SpectraLab 0.40.0, or keep it on the
    branch. **Decision memo (2026-09-19):** SpectraLab
    `docs/RELEASE_DECISION_0.40.0.md` on the branch (`b8cf0e8`).

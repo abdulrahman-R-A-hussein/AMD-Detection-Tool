@@ -13,6 +13,21 @@ Entries for v1.x record what was believed at the time. Several are
 "correctly displays contamination" entry, and the `AWEINSH > 0.20` water-mask
 "fix". See the v3.x entries and [`validation/STATE.md`](validation/STATE.md).
 
+## [3.11.1] - 2026-09-19
+### Fixed
+- **A score raster could be lost to Earth Engine's memory limit.**
+  `raster.export_geotiff` coarsened its scale for the 32 MB request cap and
+  `export_png` halved its dimensions on a memory error, but `export_geotiff`
+  had no memory-error path. Found by the first two-district run through
+  SpectraLab's interface (1,950 km², 134 Landsat scenes): every statistic
+  succeeded and the raster was lost with a warning. It now doubles the scale and
+  retries, up to 16x the scale first requested, and reports the scale used — a
+  coarsened raster is display only. Verified live: 30 m → 60 m → 120 m, 1.3 MB.
+### Added
+- **The SpectraLab AMD module was driven end to end through its interface**
+  (`validation/UI_TEST_2026-09-19_SPECTRALAB_AMD.md`), closing the last open
+  item of the 2026-09-14 refactor gate. 212 tests.
+
 ## [3.1.1] - 2026-09-19 (Earth Engine tool)
 ### Fixed
 - **The retracted in-water module shipped ON by default.** The tool opened with

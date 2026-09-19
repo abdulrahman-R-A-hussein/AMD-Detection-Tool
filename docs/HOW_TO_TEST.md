@@ -271,10 +271,11 @@ git status --short validation
   tag, and the only GitHub Releases are 1.5.4 and 1.5.5.
 
 **Already prepared for you (2026-09-19):**
-- `CITATION.cff` is at `version: 3.11.0` and `date-released: 2026-09-19`, with
+- `CITATION.cff` is at `version: 3.11.1` and `date-released: 2026-09-19`, with
   the corrected abstract and the concept DOI.
 - The README badge and BibTeX match.
-- `CHANGELOG.md` has the `[3.11.0]` entry.
+- `CHANGELOG.md` has the `[3.11.1]`, `[3.11.0]` and Earth Engine tool
+  `[3.1.1]` entries.
 
 **Your steps:**
 
@@ -285,24 +286,27 @@ git status --short validation
    ```powershell
    cd D:\dev\Sulfate-Methos
    git pull
-   git tag -a v3.11.0 -m "v3.11.0"
-   git push origin v3.11.0
    ```
 
+   **The tags `v3.11.0` and `v3.11.1` are already pushed** (2026-09-19).
+   **Release `v3.11.1`**, the newer one: it adds the score-raster fix found by
+   the first UI run.
+
 3. **On GitHub:**
-   - go to **Releases → Draft a new release**, and choose tag `v3.11.0`;
-   - for the notes, paste the `[3.11.0]` section of `CHANGELOG.md`;
+   - go to **Releases → Draft a new release**, and choose tag `v3.11.1`;
+   - for the notes, paste the `[3.11.1]` and `[3.11.0]` sections of
+     `CHANGELOG.md`;
    - click **Publish release**.
 
    **This is the step that triggers Zenodo.**
 4. **Check Zenodo** a few minutes later: open
-   <https://doi.org/10.5281/zenodo.19424985>. It should show **version 3.11.0**,
+   <https://doi.org/10.5281/zenodo.19424985>. It should show **version 3.11.1**,
    with a description that begins *"An open reimplementation of the automated
    iron-sulfate mineral mapping method…"* (taken from `CITATION.cff`).
    - **If no new version appears within about 30 minutes,** the integration is
      off for this repository.
    - Upload by hand: open the record on zenodo.org, choose **New version**,
-     upload the release `.zip`, and set the version to 3.11.0.
+     upload the release `.zip`, and set the version to 3.11.1.
    - **Replace the description with the `CITATION.cff` abstract.** Zenodo
      pre-fills it from 1.5.5, which carries the retracted claims.
    - Then click **Publish**.

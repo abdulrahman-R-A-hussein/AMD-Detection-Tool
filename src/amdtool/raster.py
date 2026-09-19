@@ -21,6 +21,14 @@ MAX_PIXELS_PER_SIDE = 2500
 # Smallest PNG preview worth returning after halving on a memory error.
 MIN_PNG_DIMENSIONS = 256
 
+# A GeoTIFF small enough for the 32 MB request cap can still exceed Earth
+# Engine's MEMORY limit, because the limit is about computing the composite
+# behind it, not about the file. The first two-district run through SpectraLab
+# (2026-09-19: 1,950 km2, 134 Landsat scenes) failed this way at 30 m while the
+# statistics, computed per station buffer, had already succeeded. On that error
+# the scale is doubled, up to this multiple of the scale first requested.
+MAX_GEOTIFF_SCALE_FACTOR = 16
+
 # Display palette: low -> high. Display only; it cannot change any value.
 PALETTE = ["2c7bb6", "abd9e9", "ffffbf", "fdae61", "d7191c"]
 
@@ -65,12 +73,29 @@ def _write(path, content):
 
 
 def export_geotiff(ee, image, band, bbox, path, native_m, timeout=900):
-    """Write one band as a GeoTIFF (EPSG:4326). Returns {"path", "scale_m"}."""
+    """Write one band as a GeoTIFF (EPSG:4326). Returns {"path", "scale_m"}.
+
+    On Earth Engine's memory limit the scale is doubled and the request
+    retried, up to MAX_GEOTIFF_SCALE_FACTOR times the starting scale - the same
+    concession export_png makes with its dimensions. The scale actually used is
+    returned and must be reported: a coarsened raster is a display product, and
+    no statistic is ever computed from it.
+    """
     scale = download_scale(bbox, native_m)
-    url = image.select([band]).getDownloadURL({
-        "region": bbox.to_ee(ee), "scale": scale,
-        "format": "GEO_TIFF", "crs": "EPSG:4326"})
-    _write(path, _get(url, timeout))
+    ceiling = scale * MAX_GEOTIFF_SCALE_FACTOR
+    while True:
+        url = image.select([band]).getDownloadURL({
+            "region": bbox.to_ee(ee), "scale": scale,
+            "format": "GEO_TIFF", "crs": "EPSG:4326"})
+        try:
+            content = _get(url, timeout)
+            break
+        except RuntimeError as exc:
+            if "memory" not in str(exc).lower() or scale * 2 > ceiling:
+                raise
+            scale *= 2.0
+            log.info("raster memory limit - retrying at %d m", scale)
+    _write(path, content)
     return {"path": path, "scale_m": scale}
 
 

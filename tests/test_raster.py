@@ -15,6 +15,7 @@ MEMORY_ERROR = ("Earth Engine download failed: 400 b'{\"error\": {\"code\": 400,
 class FakeImage:
     def __init__(self):
         self.thumb_dims = []
+        self.tif_scales = []
 
     def select(self, bands):
         return self
@@ -24,7 +25,8 @@ class FakeImage:
         return "thumb%d" % params["dimensions"]
 
     def getDownloadURL(self, params):
-        return "tif"
+        self.tif_scales.append(params["scale"])
+        return "tif%d" % params["scale"]
 
 
 class FakeBBox:
@@ -100,4 +102,36 @@ def test_no_usable_range_means_no_preview(tmp_path, monkeypatch):
     monkeypatch.setattr(raster, "display_range", lambda *a, **k: None)
     out = tmp_path / "p.png"
     assert raster.export_png(None, FakeImage(), "FerricIron1", FakeBBox(), str(out), 30) is None
+    assert not out.exists()
+
+
+def test_geotiff_coarsens_on_a_memory_error(tmp_path, monkeypatch):
+    """The two-district SpectraLab run (2026-09-19) lost its raster this way."""
+    img = FakeImage()
+    start = raster.download_scale(FakeBBox(), 30.0)
+
+    def fake_get(url, timeout):
+        if url == "tif%d" % start:
+            raise RuntimeError(MEMORY_ERROR)
+        return b"GEOTIFF"
+
+    monkeypatch.setattr(raster, "_get", fake_get)
+    out = tmp_path / "score.tif"
+    got = raster.export_geotiff(None, img, "FerricIron1", FakeBBox(), str(out), 30.0)
+
+    assert got["scale_m"] == start * 2
+    assert img.tif_scales == [start, start * 2]
+    assert out.read_bytes() == b"GEOTIFF"
+
+
+def test_geotiff_gives_up_at_the_ceiling(tmp_path, monkeypatch):
+    img = FakeImage()
+    monkeypatch.setattr(raster, "_get",
+                        lambda url, timeout: (_ for _ in ()).throw(RuntimeError(MEMORY_ERROR)))
+    out = tmp_path / "score.tif"
+    with pytest.raises(RuntimeError):
+        raster.export_geotiff(None, img, "FerricIron1", FakeBBox(), str(out), 30.0)
+
+    start = raster.download_scale(FakeBBox(), 30.0)
+    assert img.tif_scales[-1] == start * raster.MAX_GEOTIFF_SCALE_FACTOR
     assert not out.exists()

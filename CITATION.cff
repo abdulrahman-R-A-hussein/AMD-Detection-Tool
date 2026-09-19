@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 type: software
 title: "Acid Mine Drainage (AMD) and Coal Mine Drainage (CMD) Detection System: a validated reimplementation of USGS SIM 3466, with its measured limits"
-version: 3.11.0
+version: 3.11.1
 date-released: 2026-09-19
 # Concept DOI: resolves to the newest Zenodo version. 10.5281/zenodo.19429983 is
 # version 1.5.5 (2026-04-05) only, whose description carries retracted claims.

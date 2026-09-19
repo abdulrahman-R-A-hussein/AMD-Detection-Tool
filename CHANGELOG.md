@@ -62,6 +62,8 @@ Entries for v1.x record what was believed at the time. Several are
   `10.5281/zenodo.19424985`. The retraction notice now names 1.5.5, and the
   blind-search result is in the abstract.
 ### Notes
+- **Includes Earth Engine tool v3.1.1** (its own entry above): the retracted
+  in-water module no longer ships switched on.
 - **Zenodo's latest archived version is 1.5.5 (2026-04-05).** Versions 2.x and
   3.x were git tags only, never GitHub Releases, so the Zenodo integration never
   archived them. Publishing a GitHub Release for this tag is the step that

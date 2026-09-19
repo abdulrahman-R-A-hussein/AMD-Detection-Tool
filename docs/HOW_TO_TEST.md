@@ -20,7 +20,8 @@ writing this guide, and the "expect" lines are copied from those runs.
 >   from source (§C).
 > - **The only thing installed** is the `amdtool` package, in
 >   `D:\dev\VPCA+STEPWISE-REGRESSION\.venv`.
-> - **Zenodo has not been updated** (§E).
+> - **Zenodo has not been updated.** Its latest version is 1.5.5 (April 2026),
+>   which carries retracted claims; v3.11.0 is prepared for you to publish (§E).
 
 All commands are for **PowerShell**. Set this once per window; every Python step
 below uses it:
@@ -256,32 +257,59 @@ git status --short validation
 
 ## E. Publishing the Zenodo update (when you are ready)
 
-Zenodo still archives **v3.10.0** (2026-09-13); everything since exists only on
-GitHub.
+**What Zenodo shows today (checked 2026-09-19):**
+- **The latest archived version is 1.5.5, published 2026-04-05.**
+  - Version DOI: `10.5281/zenodo.19429983`.
+  - Concept DOI, which always resolves to the newest version:
+    `10.5281/zenodo.19424985`.
+- **Its description still claims** validation against Muskingum Watershed
+  chemistry and names Ganau Pond. The project has retracted both.
+- **Nothing from v2.x or v3.x has ever reached Zenodo.** Those versions were git
+  tags only. Zenodo's GitHub integration archives a **GitHub Release**, not a
+  tag, and the only GitHub Releases are 1.5.4 and 1.5.5.
 
-1. **In `CITATION.cff`,** set `version: 3.11.0` and `date-released:` to the
-   release date.
-2. **Commit, tag and push:**
+**Already prepared for you (2026-09-19):**
+- `CITATION.cff` is at `version: 3.11.0` and `date-released: 2026-09-19`, with
+  the corrected abstract and the concept DOI.
+- The README badge and BibTeX match.
+- `CHANGELOG.md` has the `[3.11.0]` entry.
+
+**Your steps:**
+
+1. **If you publish on a later day,** change `date-released:` in `CITATION.cff`
+   to that day, then commit and push.
+2. **Tag and push the tag:**
 
    ```powershell
-   git add CITATION.cff
-   git commit -m "release: v3.11.0"
-   git tag v3.11.0
-   git push origin main --tags
+   cd D:\dev\Sulfate-Methos
+   git pull
+   git tag -a v3.11.0 -m "v3.11.0"
+   git push origin v3.11.0
    ```
 
-3. **On GitHub:** go to **Releases → Draft a new release**, choose tag
-   `v3.11.0`, and write notes. The round summary (`validation\ROUND_SUMMARY_2026-09-16.md`)
-   is ready-made material. Then **Publish**.
-4. **On Zenodo:**
-   - **If the GitHub–Zenodo integration is switched on** for this repository,
-     Zenodo archives the release automatically as a **new version** of the same
-     record.
-   - **If not,** open the record on zenodo.org (DOI `10.5281/zenodo.19429983`),
-     choose **New version**, upload the release `.zip`, update the version,
-     date and description, and **Publish**.
-5. **Afterwards,** if you want `CITATION.cff` to carry the new version's own
-   DOI, update its `doi:` line and commit.
+3. **On GitHub:**
+   - go to **Releases → Draft a new release**, and choose tag `v3.11.0`;
+   - for the notes, paste the `[3.11.0]` section of `CHANGELOG.md`;
+   - click **Publish release**.
+
+   **This is the step that triggers Zenodo.**
+4. **Check Zenodo** a few minutes later: open
+   <https://doi.org/10.5281/zenodo.19424985>. It should show **version 3.11.0**,
+   with a description that begins *"An open reimplementation of the automated
+   iron-sulfate mineral mapping method…"* (taken from `CITATION.cff`).
+   - **If no new version appears within about 30 minutes,** the integration is
+     off for this repository.
+   - Upload by hand: open the record on zenodo.org, choose **New version**,
+     upload the release `.zip`, and set the version to 3.11.0.
+   - **Replace the description with the `CITATION.cff` abstract.** Zenodo
+     pre-fills it from 1.5.5, which carries the retracted claims.
+   - Then click **Publish**.
+5. **Flag the old version.** Zenodo lets you edit a published record's
+   description, though not its files.
+   - Open version **1.5.5**, choose **Edit**, and make the first line: *"SUPERSEDED
+     — the validation claims in this version were retracted; see the latest
+     version, 10.5281/zenodo.19424985."*
+   - Then **Publish**. Do the same for any earlier version listed.
 6. **Tell the record.** In `validation\STATE.md` (OPEN → NEXT), mark the Zenodo
    item done.
 

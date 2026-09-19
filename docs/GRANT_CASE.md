@@ -211,7 +211,7 @@ monitoring of mine drainage — and it must be reported as prominently as a pass
 
 | they will find | address it by |
 |---|---|
-| **Zenodo DOI 10.5281/zenodo.19429983**, whose abstract (≤ v1.5.4) claims validation against Muskingum Watershed chemistry — the opposite of the measured null | **publish the corrected Zenodo version before submitting.** The corrected text is in `CITATION.cff`; a local edit does not change a minted DOI |
+| **Zenodo DOI 10.5281/zenodo.19429983**, whose latest archived version (1.5.5, April 2026; nothing later has reached Zenodo) claims validation against Muskingum Watershed chemistry — the opposite of the measured null | **publish the corrected Zenodo version before submitting.** The corrected text is in `CITATION.cff`; a local edit does not change a minted DOI |
 | The earlier ResearchGate item on "cryptic sulfate pollution" | cite it only alongside the retraction; do not reuse its claims |
 | An author-name inconsistency in an April 2026 release document | corrected in the repository; check that it did not propagate elsewhere |
 | Negative leave-one-region-out R² | state it first, in the results, before a reviewer finds it |

@@ -1,6 +1,6 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-09-19 · **Current tag:** `v3.10.0` (tool: `v3.1.0`). Every commit since the tag is untagged, and **Zenodo has not been updated** (see OPEN → NEXT).
+**Last updated:** 2026-09-19 · **Current tag:** `v3.10.0` (tool: `v3.1.0`). Every commit since the tag is untagged. **v3.11.0 is prepared, not published.** **Zenodo's latest version is 1.5.5 (April 2026), whose description carries retracted claims** (see OPEN → NEXT).
 
 **Start here after a break:** [`ROUND_SUMMARY_2026-09-16.md`](ROUND_SUMMARY_2026-09-16.md) (what was done and found) · [`../docs/HOW_TO_TEST.md`](../docs/HOW_TO_TEST.md) (test everything yourself) · [`FIELD_CAMPAIGN_PREREGISTRATION_2026-09-19.md`](FIELD_CAMPAIGN_PREREGISTRATION_2026-09-19.md) (the field campaign, Ohio first)
 
@@ -666,10 +666,20 @@ Ordered by value.
 ### NEXT — as of 2026-09-16 (start here)
 
 **Author actions (not analysis):**
-1. **Zenodo — NOT updated yet.** The archive is still v3.10.0 (2026-09-13).
-   Everything since exists only on GitHub: the `amdtool` package, audits
-   2026-09-14/15, the blind-search result, and the narrowed severity claim.
-   Steps: `docs/HOW_TO_TEST.md` §E.
+1. **Zenodo — NOT updated, and worse than recorded on 2026-09-16.**
+   - **The 2026-09-16 record was wrong.** It said the archive was v3.10.0.
+     Checked 2026-09-19: **Zenodo's latest version is 1.5.5
+     (2026-04-05)**. Its description still claims validation against
+     Muskingum chemistry and names Ganau Pond.
+   - **Why:** no v2.x or v3.x version was ever a GitHub **Release**; they were
+     tags only. Zenodo archives Releases.
+   - **v3.11.0 is prepared:** `CITATION.cff` (now citing the concept DOI
+     `10.5281/zenodo.19424985`), the README badge and BibTeX, and
+     `CHANGELOG.md`.
+   - **Your steps:** tag, publish a GitHub Release, check Zenodo, then flag
+     version 1.5.5 as superseded. Details in `docs/HOW_TO_TEST.md` §E.
+   - **Do this before GSA (11 Oct) and before citing the DOI in any
+     application.**
 2. **Run the SpectraLab AMD module in the UI.** It lives on branch
    `feature/amd-severity-module`; it is **not released**, SpectraLab is **not
    installed as an app**, and `SpectraLab-0.39.0.exe` does **not** contain it.
@@ -688,6 +698,8 @@ Ordered by value.
    - **Estimation only:** H-LIMIT and magnetism.
    - **Colorado severity, H-DET and H-DISC** are carried to a later
      registration.
+   - **Registration commit:** `f8f2d62`. File SHA-256 (LF):
+     `e328636978a993d9c3b31cea9d6dc78be8b1dcc5f4cb288f5929fcdf81e76d66`.
    - **Still to do before field day 1:** the station-list amendment (§10 of the
      registration), which holds the placed stations with a SHA-256, the drone
      camera, the cover-scoring protocol, and the lab.

@@ -21,8 +21,8 @@ next.
 | **Is SpectraLab installed on this PC as an app?** | **No.** It is not a `uv` tool and not on PATH. |
 | **Where is the AMD module?** | On branch **`feature/amd-severity-module`** of `D:\dev\VPCA+STEPWISE-REGRESSION` (pushed), which is checked out there. You run it from source ([`HOW_TO_TEST.md`](../docs/HOW_TO_TEST.md) §C). |
 | **What was installed?** | Only **`amdtool` 0.1.0**, *editable* from `D:\dev\Sulfate-Methos`, into `D:\dev\VPCA+STEPWISE-REGRESSION\.venv`. |
-| **AMD-Detection-Tool version** | Last tag **v3.10.0** (2026-09-13). Every commit of this round is on `main` and pushed, but **untagged**. |
-| **Zenodo** | **NOT updated.** The archive (DOI `10.5281/zenodo.19429983`, `CITATION.cff` 3.10.0) predates everything below. This is the author's action; steps in [`HOW_TO_TEST.md`](../docs/HOW_TO_TEST.md) §E. |
+| **AMD-Detection-Tool version** | Last tag **v3.10.0** (tag commit dated 2026-09-09; *corrected 2026-09-19, this row first said 2026-09-13*). Every commit of this round is on `main` and pushed, but **untagged**. |
+| **Zenodo** | **NOT updated.** ~~The archive (DOI `10.5281/zenodo.19429983`, `CITATION.cff` 3.10.0) predates everything below.~~ **Corrected 2026-09-19:** Zenodo's latest version is **1.5.5 (2026-04-05)**, not 3.10.0. No v2.x or v3.x version was ever a GitHub Release, so none was archived. Its description still carries the retracted Muskingum and Ganau claims. This is the author's action; steps in [`HOW_TO_TEST.md`](../docs/HOW_TO_TEST.md) §E. |
 | **Earth Engine tool** | Unchanged this round: `earth-engine/amd_detection_v2.4.0.js`, which reports **v3.1.0**. |
 
 ---

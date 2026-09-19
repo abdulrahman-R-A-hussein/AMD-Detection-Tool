@@ -2,10 +2,10 @@
 
 ### An open reimplementation of USGS SIM 3466 — and a pre-registered measurement of what it can and cannot do
 
-[![Version](https://img.shields.io/badge/version-3.10.0-blue.svg)](https://github.com/abdulrahman-R-A-hussein/AMD-Detection-Tool)
+[![Version](https://img.shields.io/badge/version-3.11.0-blue.svg)](https://github.com/abdulrahman-R-A-hussein/AMD-Detection-Tool)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Earth Engine](https://img.shields.io/badge/Google%20Earth%20Engine-Enabled-orange.svg)](https://earthengine.google.com/)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19429983.svg)](https://doi.org/10.5281/zenodo.19429983)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19424985.svg)](https://doi.org/10.5281/zenodo.19424985)
 
 Rockwell & Gnesda (2021, USGS SIM 3466) published a method for automated
 iron-sulfate mineral mapping from Landsat 8, and a result raster — but no code.
@@ -45,7 +45,7 @@ any concentration**, and none is possible. Any apparent signal is iron,
 turbidity, or colour that co-varies with sulfate.
 
 The earlier ResearchGate item *"Automating the Detection of Cryptic Sulfate
-Pollution"* and Zenodo versions ≤ 1.5.4 carry the retracted claims and should
+Pollution"* and Zenodo versions ≤ 1.5.5 carry the retracted claims and should
 be read with this notice attached.
 
 ---
@@ -162,9 +162,9 @@ commit is verifiable in git history.
 @software{hussein_amd_2026,
   author  = {Hussein, Abdulrahman},
   title   = {Acid Mine Drainage (AMD) and Coal Mine Drainage (CMD) Detection System},
-  version = {3.10.0},
+  version = {3.11.0},
   year    = {2026},
-  doi     = {10.5281/zenodo.19429983},
+  doi     = {10.5281/zenodo.19424985},
   url     = {https://github.com/abdulrahman-R-A-hussein/AMD-Detection-Tool}
 }
 ```

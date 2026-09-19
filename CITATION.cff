@@ -2,9 +2,11 @@ cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 type: software
 title: "Acid Mine Drainage (AMD) and Coal Mine Drainage (CMD) Detection System: a validated reimplementation of USGS SIM 3466, with its measured limits"
-version: 3.10.0
-date-released: 2026-09-13
-doi: 10.5281/zenodo.19429983
+version: 3.11.0
+date-released: 2026-09-19
+# Concept DOI: resolves to the newest Zenodo version. 10.5281/zenodo.19429983 is
+# version 1.5.5 (2026-04-05) only, whose description carries retracted claims.
+doi: 10.5281/zenodo.19424985
 authors:
   - family-names: "Hussein"
     given-names: "Abdulrahman"
@@ -30,7 +32,11 @@ abstract: >
   severity are both flat from 10 m to 100 m pixel size, so spatial resolution is not the binding
   constraint in that range. In Appalachian coal watersheds a vegetation index tracks measured sulfate
   and conductance negatively and sign-consistently, at a scale that differs between basins.
-  IMPORTANT - RETRACTIONS. Versions up to and including 1.5.4 claimed a validated in-water
+  A pre-registered blind search (2026-09-15) found no evidence that the index finds mine sources
+  it was not told about: no signal in districts never used to choose it, and no advantage over
+  bare ground where it was chosen.
+  IMPORTANT - RETRACTIONS. Versions up to and including 1.5.5 (the last version archived on
+  Zenodo before this one) claimed a validated in-water
   contamination-detection capability, including validation against Muskingum Watershed (Ohio)
   chemistry and detection of high-sulfate water at Ganau Pond, Iraq. Those claims are RETRACTED.
   The Ohio water column is a measured null; the Ganau result was circular, because the thresholds

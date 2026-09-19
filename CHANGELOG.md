@@ -13,6 +13,47 @@ Entries for v1.x record what was believed at the time. Several are
 "correctly displays contamination" entry, and the `AWEINSH > 0.20` water-mask
 "fix". See the v3.x entries and [`validation/STATE.md`](validation/STATE.md).
 
+## [3.11.0] - 2026-09-19
+### Added
+- **`amdtool`**, the analysis pipeline as an importable package
+  (`pip install -e .`). The `python/` scripts are now thin wrappers over it,
+  checked against the committed legacy code: 210 tests.
+- **Blind-search pre-registration** (2026-09-14), committed before any
+  landscape data, and its result (2026-09-15).
+- **Field-campaign pre-registration, Ohio first** (2026-09-19): Piedmont, then
+  Clendening, with Atwood as the sulfate control. Registered before any field
+  measurement.
+- `docs/HOW_TO_TEST.md`: step-by-step checks for the Earth Engine tool, the
+  Python pipeline and the SpectraLab module.
+- Audits of 2026-09-14 (items 1–8) and 2026-09-15 (items 9–11).
+### Findings
+- **Blind search: no evidence the tool finds mine sources it was not told
+  about.**
+  - H-BS1, in districts never used to choose the index: NO SIGNAL DETECTED
+    (4 of 32 sites, p = 0.074; power 0.54 at a threefold lift).
+  - H-BS2: NOT BETTER THAN BARE GROUND (McNemar p = 0.038 against a Holm
+    level of 0.025).
+- **Severity ranking narrowed to three of four districts** (Leadville
+  ρ +0.004, n = 23).
+### Fixed
+- **Worst-case Youden J was order-dependent under tied scores.** Six printed
+  values change; no verdict moves.
+- **A B2 report pooled a cloud-unfiltered composite** into its C2/C3 tiers.
+  Errata banners were added; the registrations are untouched.
+- **A 0-byte preview PNG** when Earth Engine hit its memory limit.
+### Changed
+- **`CITATION.cff` and `README.md`** now cite the Zenodo **concept** DOI
+  `10.5281/zenodo.19424985`. The retraction notice now names 1.5.5, and the
+  blind-search result is in the abstract.
+### Notes
+- **Zenodo's latest archived version is 1.5.5 (2026-04-05).** Versions 2.x and
+  3.x were git tags only, never GitHub Releases, so the Zenodo integration never
+  archived them. Publishing a GitHub Release for this tag is the step that
+  archives it (`docs/HOW_TO_TEST.md` §E).
+- **This is the first tag since v3.10.0**, which points at the CMD3 commit of
+  2026-09-09. The 2026-09-13 record corrections listed under [3.10.0] were
+  committed after that tag, so they are first tagged here.
+
 ## [3.10.0] - 2026-09-13
 ### Changed
 - Corrected the externally-facing record. `CITATION.cff`, `README.md`,

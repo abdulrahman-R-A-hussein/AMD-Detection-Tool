@@ -1,8 +1,8 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-09-16 · **Current tag:** `v3.10.0` (tool: `v3.1.0`). Every commit since the tag is untagged, and **Zenodo has not been updated** (see OPEN → NEXT).
+**Last updated:** 2026-09-19 · **Current tag:** `v3.10.0` (tool: `v3.1.0`). Every commit since the tag is untagged, and **Zenodo has not been updated** (see OPEN → NEXT).
 
-**Start here after a break:** [`ROUND_SUMMARY_2026-09-16.md`](ROUND_SUMMARY_2026-09-16.md) (what was done and found) · [`../docs/HOW_TO_TEST.md`](../docs/HOW_TO_TEST.md) (test everything yourself)
+**Start here after a break:** [`ROUND_SUMMARY_2026-09-16.md`](ROUND_SUMMARY_2026-09-16.md) (what was done and found) · [`../docs/HOW_TO_TEST.md`](../docs/HOW_TO_TEST.md) (test everything yourself) · [`FIELD_CAMPAIGN_PREREGISTRATION_2026-09-19.md`](FIELD_CAMPAIGN_PREREGISTRATION_2026-09-19.md) (the field campaign, Ohio first)
 
 This file is the canonical "where are we right now". It is maintained under
 the logging rule in [`../CLAUDE.md`](../CLAUDE.md). It should be sufficient to
@@ -680,16 +680,54 @@ Ordered by value.
 
 **Analysis, in value order:**
 
-5. **Field campaign — pre-register before the first field day** (design below).
-   H-DISC now tests the blind search's *negative* expectation, on the
-   registered 40-cluster frame.
-6. **Snow-masked blind-search sensitivity:** registered, not run.
-   `python python/blind_search.py --extract --snow-masked` takes about a day;
-   then re-run `--analyse`. The verdicts do not depend on it.
+5. **Field campaign — REGISTERED 2026-09-19, Ohio first.**
+   → [`FIELD_CAMPAIGN_PREREGISTRATION_2026-09-19.md`](FIELD_CAMPAIGN_PREREGISTRATION_2026-09-19.md).
+   - **Order:** Piedmont, then Clendening, then Atwood (the sulfate control),
+     sampling the **inflow streams**, not the open water.
+   - **Verdict tests:** H-RANK-OH, H-UAV-OH, H-PRECIP and H-CONF.
+   - **Estimation only:** H-LIMIT and magnetism.
+   - **Colorado severity, H-DET and H-DISC** are carried to a later
+     registration.
+   - **Still to do before field day 1:** the station-list amendment (§10 of the
+     registration), which holds the placed stations with a SHA-256, the drone
+     camera, the cover-scoring protocol, and the lab.
+6. **Snow-masked blind-search sensitivity: extraction STARTED 2026-09-19.**
+   - Log: `data/matched/blindsearch_snowmask_extract.log`.
+   - **Resume (skips finished districts):**
+     `D:/dev/VPCA+STEPWISE-REGRESSION/.venv/Scripts/python.exe python/blind_search.py --extract --snow-masked`.
+   - When all seven `data/matched/blindsearch_s2_*_snowmask.csv` exist, run
+     `--analyse`.
+   - The verdicts do not depend on it.
 7. The science leads from item 0 below: a PA disturbance covariate, a better
    Ohio covariate, an Arm A re-run (DEM catchments, global de-duplication,
    per-district σ), and geology labels fixed before any new region's sign is
    seen.
+
+### Field-campaign registration, 2026-09-19 (no field data yet)
+
+**Why Ohio first:** the author's lakes are near the lab, which the supervisor
+prefers; the drones are easy to take there; travel costs less. That reverses
+`FIELD_CAMPAIGN.md`'s "Dropped: Ohio reservoirs", but not its reason. **The lake
+water column stays a measured null and is not re-tested.**
+
+**Archival chemistry fetched before writing** (disclosed in §9 of the
+registration; `report_ohio_lakes_archive_2026-09-19.txt`):
+- **Clendening Lake** (never analysed before): in-lake sulfate median 310 mg/L
+  (n=25). Its 16 inflow stream stations span **12–1,370 mg/L**, with dissolved
+  Fe median **17 µg/L** (n=24).
+- **Piedmont's catchment:** 8 stream stations span **15–967 mg/L**, with
+  dissolved Fe median **11 µg/L** (n=16).
+- **pH** is 7.1–9.0 throughout. The iron has left the water, which is why the
+  drone test is scored against **measured precipitate cover**, not chemistry.
+
+**Out-of-sample test:** neither catchment was among CMD1–3's five Ohio
+watersheds. H-RANK-OH is therefore an out-of-sample test of the standing Ohio
+claim.
+
+**Power** (`report_field_power_2026-09-19.txt`):
+- **51 inflow stations per catchment** gives power 0.83 at |ρ| 0.40;
+- **42** is the minimum, 0.83 at the archival Ohio |ρ| 0.438;
+- the confound-adjusted |ρ| 0.246 would need 132, so it is estimate-only.
 
 ### Record of the round that led here
 

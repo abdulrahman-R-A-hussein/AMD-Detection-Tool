@@ -15,6 +15,37 @@ by Monte Carlo; at every closed-form n the simulated power was 0.82–0.87.
 
 ---
 
+## ⚠ September 2026: Ohio first. The registered campaign is not the design below
+
+**On 2026-09-19 the campaign order was reversed** and pre-registered in
+[`validation/FIELD_CAMPAIGN_PREREGISTRATION_2026-09-19.md`](../validation/FIELD_CAMPAIGN_PREREGISTRATION_2026-09-19.md):
+- **Piedmont Lake** first;
+- then **Clendening Lake** if possible;
+- **Atwood Lake** as the sulfate control if funded.
+
+They are close to the lab, which the supervisor prefers; the drones are easy to
+take there; and travel costs less.
+
+**This reverses "Dropped: Ohio reservoirs" (§2), but not the reason behind it.**
+The lake water column stays a measured null and is not re-tested. The Ohio
+campaign samples the **inflow streams**, and it tests:
+- the Ohio vegetation–sulfate claim, **out of sample** (neither catchment was
+  in CMD1–3);
+- whether waterline precipitate exists and is spectrally distinct;
+- whether a drone sees it where leaf-off satellite does not;
+- whether finding W3's lake difference is explained by water clarity.
+
+**What it gives up:**
+- **Colorado severity ranking,** the project's validated positive, is not
+  field-tested;
+- **H-DISC is not tested.** Both are carried to a later registration.
+
+Everything below remains the design for that later Colorado/Pennsylvania arm.
+The measurement protocol (§4) and the drone logic (§5) are reused by the Ohio
+registration, with the changes it states.
+
+---
+
 ## 0. What changed from the July 2026 design
 
 `validation/WATER_VALIDATION_REPORT_2026-07-25.md` §6 was sound on chemistry and

@@ -60,6 +60,7 @@ terrain, and does not transfer to forested neutral-pH coal drainage.**
 | 2026-09-15 | **Last traceability gaps closed** | Can B2's quoted dose-response p = 0.0004 be regenerated, and does the tied-score defect reach the land arm? | **The p is regenerated exactly; the land arm is unaffected.** The p and q in ARM_B2's Part 2 table existed only in that .md report. Committed code now reproduces all five rows (36 tests, 5,000 within-district draws, seed 20260814, districts in REGIONS order), and a test pins them. At 10,000 draws the same pair gives p = 0.0002, so 0.0004 is a Monte Carlo resolution, not a property of the data. The land-arm Youden searches use only distinct cuts, and the paper-faithful test scores binary predictions, so audit item 9 does not reach them. 207 tests | — |
 | 2026-09-15 | **Blind search — result** | Does the tool find mine sources it was not told about? | **No evidence that it does.** **H-BS1** (districts never used to choose the index): **NO SIGNAL DETECTED**. 4 of 32 sites flagged at a 5% budget, recall 0.125 [0.050, 0.281], p = 0.074, one site short of the registered bar. Power was 0.54 at a threefold lift, so a modest lift is not excluded. **H-BS2** (districts that chose the index): recall 0.280, p = 1e-7, but **NOT BETTER THAN BARE GROUND** — McNemar p = 0.038 against its Holm level of 0.025 (12 vs 4 discordant sites). Flagged ground is 1.2–4.4× enriched for NLCD barren land. Sensitivities are mixed and never verdicts. Discovery stays a MAY-NOT claim. The 40-cluster field frame is a sampling frame, not detections. The snow-masked sensitivity was not run | — |
 | 2026-09-16 | **Wrap-up** | What was done this round, what exists on this PC, and what is next? | Wrote `ROUND_SUMMARY_2026-09-16.md` and `docs/HOW_TO_TEST.md`, after re-running every offline command in the guide: 207 tests pass; the blind-search analysis and both B2 regeneration scripts reproduce their committed reports exactly; SpectraLab AMD tests 25 passed, 1 skipped by design. **Status recorded:** no SpectraLab release (still 0.39.0, and its exe lacks the AMD module); SpectraLab not installed as an app; `amdtool` installed editable in SpectraLab's `.venv` only; AMD-Detection-Tool untagged since v3.10.0; **Zenodo not updated**. STATE's OPEN section refreshed with a NEXT list | — |
+| 2026-09-19 | **Field campaign pre-registered — Ohio first** | Where will the author actually sample, and what can that test? | **The author will sample Piedmont Lake first, then Clendening, with Atwood as the sulfate control if funded.** The reasons: near the lab, the supervisor's preference, drone logistics, and cost. That reverses `FIELD_CAMPAIGN.md`'s "Dropped: Ohio reservoirs" but **not its reason**: the lake water column stays a measured null and no hypothesis re-tests it. **Cost, stated up front:** the validated positive (Colorado severity ranking) and H-DISC are not field-tested; both are carried to a later registration. **Checked before writing:** Clendening (never analysed) has in-lake sulfate 310 mg/L and inflows spanning 12–1,370 mg/L; Piedmont's inflows span 15–967 mg/L; stream dissolved Fe medians are 11–17 µg/L at pH 7.1–9.0, so the iron has left the water. **Two consequences:** (i) the drone test is scored against measured **precipitate cover**, not chemistry, a change from `FIELD_CAMPAIGN.md` §5.2 made before any field data; (ii) station placement is a geometric rule blind to chemistry, because that chemistry had been seen. Neither catchment was in CMD1–3, so H-RANK-OH is an out-of-sample test of the standing Ohio claim. **Powered for** the raw Ohio \|ρ\| 0.438 (42 stations; target 51), **not** for the confound-adjusted 0.246 (132). Verdict tables are ordered, first-true-row rules, exclusive by construction. `field_power.py` gained two Ohio anchors and a two-catchment column, every earlier number unchanged. **Also started:** the snow-masked blind-search extraction | — |
 
 ---
 
@@ -260,7 +261,9 @@ whatever the operator happened to be looking at.
   +0.519, → `NDVI_stress` −0.283) and carries ~42% of it.
 
 **MAY NOT claim**
-- Finding unknown sources in blind scene-wide search — **untested**.
+- Finding unknown sources in blind scene-wide search — **tested 2026-09-15 and not
+  supported**: NO SIGNAL DETECTED in districts never used to choose the index, and
+  NOT BETTER THAN BARE GROUND where it was chosen.
 - Optical **sulfate** detection at any concentration — sulfate has no VNIR
   absorption. Ever.
 - That resolution is the constraint — **refuted** for 10–100 m in Colorado.
@@ -301,9 +304,8 @@ whatever the operator happened to be looking at.
 2. ~~**Tighter / channel-masked sampling (Ohio).** The radius gradient has not
    bottomed out at 30 m.~~ **Superseded 2026-09-08.** It *had* bottomed out —
    the ladder is U-shaped and tightening further sampled the wrong end.
-2. **Blind-search test (Colorado).** The gap between "scores known points
-   correctly" and "finds unknown sites" is the difference between a severity
-   tool and a discovery tool.
+2. ~~**Blind-search test (Colorado).**~~ **DONE 2026-09-15:** no evidence the
+   tool finds sources it was not told about (`ARM_BLIND_SEARCH_2026-09-15.md`).
 3. **UAV comparison**, once (1) bounds what satellite geometry can do.
 4. Arm A DEM re-run; land-arm uncalibrated constants (`ferric1/2StdMult`,
    `ferrousStdMult` are 0.5 by assumption); departures D4–D6 unmeasured.

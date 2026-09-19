@@ -1,0 +1,66 @@
+OHIO FIELD LAKES - ARCHIVAL CHEMISTRY (Water Quality Portal), water samples only
+Iron fractions are never pooled. Units as reported; iron and manganese in ug/L.
+==============================================================================
+Piedmont Lake   stations with water results: 5   years 2013-2016
+  lake stations: 5
+    Sulfate                                  n=26   median=461       min=374      max=560       stations=3   mg/l
+    Specific conductance                     n=6    median=1009      min=914      max=1040      stations=1   us/cm @25c
+    pH                                       n=6    median=8.3       min=8.2      max=8.5       stations=1   std units
+    Iron                  Dissolved          n=3    median=4.4       min=4.3      max=8.2       stations=1   ug/l
+    Iron                  Total              n=19   median=201       min=50       max=1530      stations=2   ug/l
+    Manganese             Dissolved          n=6    median=1.64      min=1.16     max=3.79      stations=1   ug/l
+    Turbidity                                n=26   median=4.355     min=1.01     max=15.9      stations=3   ntru/ntu
+==============================================================================
+Piedmont Lake catchment   stations with water results: 15   years 2013-2023
+  lake stations: 5
+    Sulfate                                  n=26   median=461       min=374      max=560       stations=3   mg/l
+    Specific conductance                     n=6    median=1009      min=914      max=1040      stations=1   us/cm @25c
+    pH                                       n=6    median=8.3       min=8.2      max=8.5       stations=1   std units
+    Iron                  Dissolved          n=3    median=4.4       min=4.3      max=8.2       stations=1   ug/l
+    Iron                  Total              n=19   median=201       min=50       max=1530      stations=2   ug/l
+    Manganese             Dissolved          n=6    median=1.64      min=1.16     max=3.79      stations=1   ug/l
+    Turbidity                                n=26   median=4.355     min=1.01     max=15.9      stations=3   ntru/ntu
+  stream stations: 9
+    Sulfate                                  n=35   median=419       min=15.1     max=967       stations=8   mg/l
+    Specific conductance                     n=51   median=1080      min=150      max=1780      stations=8   umho/cm/us/cm/us/cm @25c
+    pH                                       n=35   median=8         min=7.6      max=8.99      stations=8   std units
+    Iron                  Dissolved          n=16   median=11.25     min=4.1      max=47.8      stations=3   ug/l
+    Iron                  Total              n=7    median=582       min=489      max=3410      stations=3   ug/l
+    Iron                  Total Recoverable  n=2    median=987.5     min=615      max=1360      stations=2   ug/l
+    Manganese             Dissolved          n=24   median=152       min=1.41     max=1400      stations=3   ug/l
+    Turbidity                                n=24   median=5.9       min=3.1      max=85        stations=3   fnu/ntru
+  other stations: 1
+    Sulfate                                  n=1    median=18        min=18       max=18        stations=1   mg/l
+    Specific conductance                     n=2    median=1368      min=1330     max=1405      stations=1   umho/cm
+    pH                                       n=1    median=7.84      min=7.84     max=7.84      stations=1   
+    Iron                  Total Recoverable  n=1    median=744       min=744      max=744       stations=1   ug/l
+==============================================================================
+Clendening Lake + catchment   stations with water results: 26   years 2013-2024
+  lake stations: 8
+    Sulfate                                  n=25   median=309.9     min=205      max=431       stations=6   mg/l
+    Specific conductance                     n=6    median=824.9     min=758      max=950       stations=4   umho/cm/us/cm @25c
+    pH                                       n=16   median=8.43      min=7.1      max=8.66      stations=5   std units
+    Iron                  Dissolved          n=1    median=11.9      min=11.9     max=11.9      stations=1   ug/l
+    Iron                  Total              n=17   median=111       min=54       max=357       stations=2   ug/l
+    Iron                  Total Recoverable  n=3    median=335       min=265      max=336       stations=2   ug/l
+    Manganese             Dissolved          n=1    median=3820      min=3820     max=3820      stations=1   ug/l
+    Turbidity                                n=25   median=5.03      min=1.25     max=103       stations=6   ntru/ntu
+  stream stations: 18
+    Sulfate                                  n=64   median=232.5     min=12.1     max=1370      stations=16  mg/l
+    Specific conductance                     n=90   median=398.5     min=124      max=2680      stations=16  umho/cm/us/cm/us/cm @25c
+    pH                                       n=56   median=8         min=7.07     max=8.99      stations=12  std units
+    Iron                  Dissolved          n=24   median=17.15     min=4.1      max=249       stations=5   ug/l
+    Iron                  Total              n=34   median=289       min=90       max=1690      stations=10  ug/l
+    Iron                  Total Recoverable  n=2    median=487       min=273      max=701       stations=1   ug/l
+    Manganese             Dissolved          n=30   median=61.25     min=9.95     max=1220      stations=6   ug/l
+    Turbidity                                n=30   median=7.65      min=1.6      max=51        stations=6   ntru
+==============================================================================
+Atwood Lake   stations with water results: 8   years 2013-2019
+  lake stations: 8
+    Sulfate                                  n=98   median=19        min=10.6     max=23.1      stations=6   mg/l
+    Specific conductance                     n=85   median=231.2     min=158.7    max=326.1     stations=6   umho/cm/us/cm @25c
+    pH                                       n=86   median=8.07      min=0        max=9.48      stations=6   std units
+    Iron                  Dissolved          n=4    median=18.1      min=5.6      max=37.1      stations=1   ug/l
+    Iron                  Total Recoverable  n=90   median=298       min=56       max=2750      stations=5   ug/l
+    Manganese             Dissolved          n=6    median=1.885     min=0.81     max=22.8      stations=1   ug/l
+    Turbidity                                n=285  median=11        min=1.55     max=62        stations=6   ntru/ntu

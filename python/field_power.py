@@ -19,6 +19,13 @@ Three questions, each tied to a result already measured in validation/:
      (precision) and sites with known sources (recall). How many visits to pin
      each proportion to a given 95% Wilson half-width?
 
+2026-09-19, Ohio-first campaign (validation/FIELD_CAMPAIGN_PREREGISTRATION_
+2026-09-19.md): two Ohio anchors added to (1) - the CMD2 Ohio values for
+NDVI_stress vs sulfate - and a two-catchment column added to (2), because the
+campaign has at most two mined catchments (Piedmont, Clendening). Every
+number printed before this change is unchanged: the new anchors draw from
+their own generator so the original stream is not shifted.
+
 Method: closed-form Fisher-z with the Bonett & Wright (2000) variance inflation
 for Spearman, CHECKED by Monte Carlo on bivariate normal data with the Pearson
 correlation set to 2*sin(pi*rho_s/6), which gives the requested Spearman rho.
@@ -38,6 +45,13 @@ from scipy import stats
 Z_ALPHA = stats.norm.ppf(0.975)   # two-sided 0.05
 POWER = 0.80
 Z_BETA = stats.norm.ppf(POWER)
+
+# Ohio NDVI_stress vs sulfate, validation/ARM_CMD2_CONFOUND_2026-09-08.md.
+# Magnitudes: the registered sign is negative, and power is symmetric in sign.
+OHIO_ANCHORS = {
+    0.438: "Ohio NDVI_stress vs sulfate at 1000 m (CMD2)",
+    0.246: "Ohio partial rho after mining extent (CMD2)",
+}
 
 
 def n_spearman(rho):
@@ -73,6 +87,11 @@ def sim_sign_positive(rho_s, n, reps, rng):
         if stats.spearmanr(x[:, 0], x[:, 1]).statistic > 0:
             pos += 1
     return pos / reps
+
+
+def p_all(p_one, k):
+    """P(all k independent groups estimate the same sign), given P(one does)."""
+    return p_one ** k
 
 
 def wilson_halfwidth(p, n):
@@ -111,17 +130,25 @@ def main(argv=None):
         pw = sim_power(rho, n, a.reps, rng)
         print("   %.3f  %5d           %.3f                        %s"
               % (rho, n, pw, why))
+    # Ohio anchors (CMD2, 2026-09-08). A separate generator keeps every number
+    # above byte-identical to the report printed before these were added.
+    ohio_rng = np.random.default_rng(a.seed + 1)
+    for rho, why in OHIO_ANCHORS.items():
+        n = n_spearman(rho)
+        pw = sim_power(rho, n, a.reps, ohio_rng)
+        print("   %.3f  %5d           %.3f                        %s"
+              % (rho, n, pw, why))
 
     # ---- 2. sign consistency ------------------------------------------------
     print("\n2. SIGN CONSISTENCY - P(all k districts estimate a positive rho)")
     print("   per-district probability simulated; all-k = product (districts "
           "independent)")
-    print("   true rho   n/district   P(one +)   P(all 3 +)   P(all 4 +)")
+    print("   true rho   n/district   P(one +)   P(all 2 +)   P(all 3 +)   P(all 4 +)")
     for rho in (0.20, 0.30, 0.50):
         for n in (10, 20, 30, 50):
             p1 = sim_sign_positive(rho, n, a.reps, rng)
-            print("   %.2f       %3d          %.3f      %.3f        %.3f"
-                  % (rho, n, p1, p1 ** 3, p1 ** 4))
+            print("   %.2f       %3d          %.3f      %.3f        %.3f        %.3f"
+                  % (rho, n, p1, p_all(p1, 2), p_all(p1, 3), p_all(p1, 4)))
 
     # ---- 3. discovery -------------------------------------------------------
     print("\n3. DISCOVERY - field visits to estimate precision or recall")

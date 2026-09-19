@@ -685,7 +685,14 @@ Ordered by value.
    installed as an app**, and `SpectraLab-0.39.0.exe` does **not** contain it.
    Steps: `docs/HOW_TO_TEST.md` §C. This is the one gate item still open.
 3. **Decide:** merge the branch and cut SpectraLab 0.40.0, or keep it on the
-   branch.
+   branch. **Decision memo (2026-09-19):** SpectraLab
+   `docs/RELEASE_DECISION_0.40.0.md` on the branch (`b8cf0e8`).
+   - **Branch health:** 3 ahead of `main` and 0 behind; the full suite gives
+     509 passed, 4 skipped.
+   - **The blocker:** how `amdtool` gets into a released build. The exe
+     preflight does not list it, so a build without it succeeds silently.
+   - **Recommended:** an `amd` extra pinned to AMD-Detection-Tool `v3.11.0`.
+     That means **publishing v3.11.0 (item 1) first.**
 4. Review `.private/EB2_DOCUMENTATION.md` (deliberately untouched).
 
 **Analysis, in value order:**

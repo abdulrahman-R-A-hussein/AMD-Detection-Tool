@@ -210,3 +210,19 @@ avoid ice: about Nov 1 – Dec 15 and Mar 15 – Apr 15.
 5. **Reply:** a plain-language summary listing what is still yours to do: tag,
    release and Zenodo; the UI test; the merge decision; station coordinates,
    permits and lab choice.
+
+---
+
+## Outcome (2026-09-19)
+
+| part | status |
+|---|---|
+| 1. Field pre-registration | **Done**, commit `f8f2d62`, pushed. `validation/FIELD_CAMPAIGN_PREREGISTRATION_2026-09-19.md` (SHA-256 `e3286369…6d66`); `field_power.py` extended with every earlier number unchanged; 210 tests. The Clendening and Piedmont-catchment fetch changed the drone test's outcome to precipitate cover, before any field data |
+| 2. Snow-masked run | **Started** in the background; resume command in STATE NEXT item 6. The result is not in yet |
+| 3. Zenodo prep | **Done**, commit `0a79e9c`. **Found:** Zenodo holds **1.5.5**, not 3.10.0, and its description carries retracted claims. The 2026-09-16 record was corrected in place. The tag, Release and Zenodo check remain the author's |
+| 4. SpectraLab memo | **Done**, SpectraLab `b8cf0e8` on the branch. Blocker: `amdtool` packaging; recommends an extra pinned to `v3.11.0` |
+
+**Deviations from the plan:**
+- **Release notes** went into `CHANGELOG.md` `[3.11.0]`, the repo's existing
+  convention, not a new `docs/releases/v3.11.0.md`.
+- **No `.zenodo.json` exists,** so there was nothing to bump.

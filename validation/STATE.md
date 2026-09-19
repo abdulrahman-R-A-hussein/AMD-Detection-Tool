@@ -688,16 +688,28 @@ Ordered by value.
    live (30 m → 60 m → 120 m). The run's own statistics are **exploratory** and
    enter no claim.
    → [`UI_TEST_2026-09-19_SPECTRALAB_AMD.md`](UI_TEST_2026-09-19_SPECTRALAB_AMD.md)
-3. **Decide:** merge the branch and cut SpectraLab 0.40.0, or keep it on the
-   branch. **Decision memo (2026-09-19):** SpectraLab
-   `docs/RELEASE_DECISION_0.40.0.md` on the branch (`b8cf0e8`).
-   - **Branch health:** 3 ahead of `main` and 0 behind; the full suite gives
-     509 passed, 4 skipped.
-   - **The blocker:** how `amdtool` gets into a released build. The exe
-     preflight does not list it, so a build without it succeeds silently.
-   - **Recommended:** an `amd` extra pinned to AMD-Detection-Tool `v3.11.0`.
-     That means **publishing v3.11.0 (item 1) first.**
-4. Review `.private/EB2_DOCUMENTATION.md` (deliberately untouched).
+3. ~~**Decide:** merge the branch and cut SpectraLab 0.40.0.~~ **DONE
+   2026-09-19 — SpectraLab 0.40.0 is merged, built as a wheel, and installed.**
+   - **Merged** to `main` (fast-forward) and tagged `v0.40.0` (`8a8924e`).
+   - **Wheel:** `releases/spectralab-0.40.0-py3-none-any.whl`, SHA-256
+     `94fc7791…4342ac`.
+   - **Installed** as a `uv` tool: the `spectralab` command is v0.40.0, its
+     modules are `amd`, `stepwise`, `vpca`, and `amdtool` comes from the pinned
+     tag rather than the editable checkout.
+   - **Packaging fix that made a release honest:** an `amd` extra pinning
+     `amdtool @ git+…@v3.11.1`, and `amdtool` added to `build_exe.py`'s
+     `_REQUIRED_AT_RUNTIME` — a build without it used to succeed silently.
+   - **⚠ The exe is NOT built.** Drive **D: reached 0 bytes free** and
+     PyInstaller failed with `No space left on device`. Nothing of the author's
+     was deleted. `SpectraLab-0.39.0.exe` therefore remains the newest exe and
+     **does not contain the AMD module**. Build it after freeing a few GB:
+     `uv run --extra desktop --with pyinstaller python scripts/build_exe.py`,
+     then record its SHA-256 in `RELEASES.md`.
+4. **⚠ DISK: drive D: is full** (0 bytes free at 2026-09-19; `D:\dev` alone is
+   300 GB, of which `Drones-Mosaicking-Project` is 234 GB). This blocked the exe
+   build and briefly blocked `git commit` itself. Earth Engine downloads and the
+   snow-masked extraction write here. **Free space before the next long run.**
+5. Review `.private/EB2_DOCUMENTATION.md` (deliberately untouched).
 
 **Analysis, in value order:**
 

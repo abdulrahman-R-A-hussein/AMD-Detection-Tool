@@ -699,16 +699,15 @@ Ordered by value.
    - **Packaging fix that made a release honest:** an `amd` extra pinning
      `amdtool @ git+…@v3.11.1`, and `amdtool` added to `build_exe.py`'s
      `_REQUIRED_AT_RUNTIME` — a build without it used to succeed silently.
-   - **⚠ The exe is NOT built.** Drive **D: reached 0 bytes free** and
-     PyInstaller failed with `No space left on device`. Nothing of the author's
-     was deleted. `SpectraLab-0.39.0.exe` therefore remains the newest exe and
-     **does not contain the AMD module**. Build it after freeing a few GB:
-     `uv run --extra desktop --with pyinstaller python scripts/build_exe.py`,
-     then record its SHA-256 in `RELEASES.md`.
-4. **⚠ DISK: drive D: is full** (0 bytes free at 2026-09-19; `D:\dev` alone is
-   300 GB, of which `Drones-Mosaicking-Project` is 234 GB). This blocked the exe
-   build and briefly blocked `git commit` itself. Earth Engine downloads and the
-   snow-masked extraction write here. **Free space before the next long run.**
+   - **The exe is built and verified (2026-09-20).** The author freed disk
+     space (13.9 GB); the build then succeeded: `SpectraLab-0.40.0.exe`, 159 MB,
+     SHA-256 `b14327dff4…a6b91`. **Run once and checked, not just built**: it
+     serves on load, reports v0.40.0 in its own UI, and the module picker
+     includes "AMD severity report" — confirming the packaging fix actually
+     bundles `amdtool` into a frozen build.
+4. ~~**⚠ DISK: drive D: is full.**~~ **Freed by the author 2026-09-20**
+   (13.9 GB free when the exe built). `D:\dev\Drones-Mosaicking-Project` was
+   the largest consumer at 234 GB; watch it before the next long GEE run.
 5. Review `.private/EB2_DOCUMENTATION.md` (deliberately untouched).
 
 **Analysis, in value order:**

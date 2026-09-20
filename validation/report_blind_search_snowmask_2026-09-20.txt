@@ -1,0 +1,87 @@
+============================================================================================
+BLIND-SEARCH TEST - pre-registered (validation\BLIND_SEARCH_PREREGISTRATION_2026-09-14.md)
+registration first committed in ad05971; site list SHA-256 verified 6ee8aec0a6a2
+score FerricIron1 p90 @60 m (S2, 20 m) | baseline -NDVI mean | primary budget 5%
+============================================================================================
+
+--- LANDSCAPE SAMPLE AND CUTOFFS ---
+  district          valid dropped  FerricIron1 cut 1/5/10%     -NDVI cut 1/5/10%         
+  alma_co            1993       7   2.0005  1.8124  1.7459    0.0598 -0.0255 -0.0664
+  central_city_co    2000       0   1.8307  1.7190  1.6809   -0.1062 -0.2686 -0.3728
+  creede_co          2000       0   1.8550  1.7425  1.6955   -0.0992 -0.1665 -0.2010
+  lake_city_co       2000       0   1.9461  1.8114  1.7610   -0.0222 -0.1030 -0.1795
+  leadville_co       2000       0   1.9694  1.8731  1.8349    0.0264 -0.0596 -0.1476
+  ouray_co           2000       0   2.0661  1.7867  1.7284    0.0428 -0.0421 -0.1042
+  silverton_co       2000       0   2.3303  1.9218  1.8244    0.0564  0.0034 -0.0307
+
+--- PRIMARY - 5% budget, sites with >=1 mine-type station, max score, unscoreable = not flagged ---
+  H-BS1  n=32  flagged=4   recall=0.125 [0.050, 0.281]  binomial p=0.0738 | baseline flagged=2  b=3 c=1  McNemar p=0.3125  unscoreable=0
+  H-BS2  n=50  flagged=14  recall=0.280 [0.175, 0.417]  binomial p=0.0000 | baseline flagged=6  b=12 c=4  McNemar p=0.0384  unscoreable=0
+
+--- VERDICTS (registration section 7) ---
+  H-BS1  Holm level 0.050       binomial rejected=False -> NO SIGNAL DETECTED
+         power at this n and level: r=0.15:0.54  r=0.20:0.80  r=0.30:0.98
+         alma_co          n=6   flagged=2   recall=0.333 [0.097, 0.700]  baseline=0
+         creede_co        n=5   flagged=1   recall=0.200 [0.036, 0.624]  baseline=1
+         lake_city_co     n=21  flagged=1   recall=0.048 [0.008, 0.227]  baseline=1
+  H-BS2  Holm level 0.025       binomial rejected=True  -> NOT BETTER THAN BARE GROUND
+         power at this n and level: r=0.15:0.64  r=0.20:0.90  r=0.30:1.00
+         central_city_co  n=9   flagged=4   recall=0.444 [0.189, 0.733]  baseline=2
+         leadville_co     n=12  flagged=2   recall=0.167 [0.047, 0.448]  baseline=1
+         ouray_co         n=6   flagged=2   recall=0.333 [0.097, 0.700]  baseline=2
+         silverton_co     n=23  flagged=6   recall=0.261 [0.125, 0.465]  baseline=1
+
+============================================================================================
+SECONDARY AND SENSITIVITY - reported, never verdicts
+============================================================================================
+
+--- budget 1% ---
+  H-BS1  n=32  flagged=1   recall=0.031 [0.006, 0.157]  binomial p=0.2750 | baseline flagged=1  b=1 c=1  McNemar p=0.7500  unscoreable=0
+  H-BS2  n=50  flagged=4   recall=0.080 [0.032, 0.188]  binomial p=0.0016 | baseline flagged=2  b=4 c=2  McNemar p=0.3438  unscoreable=0
+
+--- budget 10% ---
+  H-BS1  n=32  flagged=5   recall=0.156 [0.069, 0.318]  binomial p=0.2115 | baseline flagged=3  b=4 c=2  McNemar p=0.3438  unscoreable=0
+  H-BS2  n=50  flagged=21  recall=0.420 [0.294, 0.558]  binomial p=0.0000 | baseline flagged=8  b=19 c=6  McNemar p=0.0073  unscoreable=0
+
+--- all sites including spring-only ---
+  H-BS1  n=33  flagged=4   recall=0.121 [0.048, 0.273]  binomial p=0.0808 | baseline flagged=2  b=3 c=1  McNemar p=0.3125  unscoreable=0
+  H-BS2  n=93  flagged=20  recall=0.215 [0.144, 0.309]  binomial p=0.0000 | baseline flagged=7  b=17 c=4  McNemar p=0.0036  unscoreable=0
+
+--- median site score ---
+  H-BS1  n=32  flagged=2   recall=0.062 [0.017, 0.201]  binomial p=0.4800 | baseline flagged=2  b=2 c=2  McNemar p=0.6875  unscoreable=0
+  H-BS2  n=50  flagged=13  recall=0.260 [0.159, 0.396]  binomial p=0.0000 | baseline flagged=6  b=11 c=4  McNemar p=0.0592  unscoreable=0
+
+--- unscoreable sites excluded ---
+  H-BS1  n=32  flagged=4   recall=0.125 [0.050, 0.281]  binomial p=0.0738 | baseline flagged=2  b=3 c=1  McNemar p=0.3125  unscoreable=0
+  H-BS2  n=50  flagged=14  recall=0.280 [0.175, 0.417]  binomial p=0.0000 | baseline flagged=6  b=12 c=4  McNemar p=0.0384  unscoreable=0
+
+--- link distance 100 m - the same registered stations, re-clustered ---
+  H-BS1  n=41  flagged=4   recall=0.098 [0.039, 0.225]  binomial p=0.1474 | baseline flagged=3  b=3 c=2  McNemar p=0.5000  unscoreable=0
+  H-BS2  n=55  flagged=15  recall=0.273 [0.173, 0.402]  binomial p=0.0000 | baseline flagged=6  b=13 c=4  McNemar p=0.0245  unscoreable=0
+
+--- link distance 500 m - the same registered stations, re-clustered ---
+  H-BS1  n=20  flagged=4   recall=0.200 [0.081, 0.416]  binomial p=0.0159 | baseline flagged=2  b=2 c=0  McNemar p=0.2500  unscoreable=0
+  H-BS2  n=42  flagged=13  recall=0.310 [0.191, 0.460]  binomial p=0.0000 | baseline flagged=4  b=11 c=2  McNemar p=0.0112  unscoreable=0
+
+--- station-level recall (5%) ---
+  H-BS1  stations flagged 5 / 72  recall=0.069
+  H-BS2  stations flagged 28 / 103  recall=0.272
+
+--- NLCD barren (class 31) share of flagged landscape points (5%) ---
+  alma_co          flagged=100  barren share=0.160  (landscape overall 0.115)
+  central_city_co  flagged=100  barren share=0.040  (landscape overall 0.009)
+  creede_co        flagged=100  barren share=0.060  (landscape overall 0.051)
+  lake_city_co     flagged=100  barren share=0.280  (landscape overall 0.121)
+  leadville_co     flagged=100  barren share=0.080  (landscape overall 0.052)
+  ouray_co         flagged=100  barren share=0.170  (landscape overall 0.120)
+  silverton_co     flagged=100  barren share=0.380  (landscape overall 0.221)
+
+--- snow-masked composite (SCL 11) ---
+  H-BS1  n=32  flagged=3   recall=0.094 [0.032, 0.242]  binomial p=0.2139
+  H-BS2  n=50  flagged=12  recall=0.240 [0.143, 0.374]  binomial p=0.0000
+
+--- TERTIARY T-86 - in-sample for index choice; NOT evidence of discovery ---
+  T-86   n=37  flagged=9   recall=0.243 [0.134, 0.401]  binomial p=0.0001  baseline=6
+
+Recall on KNOWN sources only. Precision on unrecorded ground cannot be
+measured from the archive, and agency-monitored sources are a biased sample.

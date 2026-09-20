@@ -1,6 +1,6 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-09-19 · **Current tag:** **`v3.11.1`** (tool: **`v3.1.1`**, which turns the retracted in-water module OFF by default). The tag is pushed; **the GitHub Release, which is what updates Zenodo, is still the author's step.** Every commit since the tag is untagged. **v3.11.0 is prepared, not published.** **Zenodo's latest version is 1.5.5 (April 2026), whose description carries retracted claims** (see OPEN → NEXT).
+**Last updated:** 2026-09-20 · **Current tag:** **`v3.11.1`** (tool: **`v3.1.1`**, which turns the retracted in-water module OFF by default). The tag is pushed; **the GitHub Release, which is what updates Zenodo, is still the author's step.** Every commit since the tag is untagged. **v3.11.0 is prepared, not published.** **Zenodo's latest version is 1.5.5 (April 2026), whose description carries retracted claims** (see OPEN → NEXT).
 
 **Start here after a break:** [`ROUND_SUMMARY_2026-09-16.md`](ROUND_SUMMARY_2026-09-16.md) (what was done and found) · [`../docs/HOW_TO_TEST.md`](../docs/HOW_TO_TEST.md) (test everything yourself) · [`FIELD_CAMPAIGN_PREREGISTRATION_2026-09-19.md`](FIELD_CAMPAIGN_PREREGISTRATION_2026-09-19.md) (the field campaign, Ohio first)
 
@@ -726,13 +726,20 @@ Ordered by value.
    - **Still to do before field day 1:** the station-list amendment (§10 of the
      registration), which holds the placed stations with a SHA-256, the drone
      camera, the cover-scoring protocol, and the lab.
-6. **Snow-masked blind-search sensitivity: extraction STARTED 2026-09-19.**
-   - Log: `data/matched/blindsearch_snowmask_extract.log`.
-   - **Resume (skips finished districts):**
-     `D:/dev/VPCA+STEPWISE-REGRESSION/.venv/Scripts/python.exe python/blind_search.py --extract --snow-masked`.
-   - When all seven `data/matched/blindsearch_s2_*_snowmask.csv` exist, run
-     `--analyse`.
-   - The verdicts do not depend on it.
+6. ~~**Snow-masked blind-search sensitivity.**~~ **DONE 2026-09-20 — the last
+   registered analysis is run, and neither verdict moves.**
+   - **H-BS1:** 3 of 32 (was 4), recall **0.094** [0.032, 0.242], p = 0.2139 —
+     still NO SIGNAL DETECTED, and further from its bar.
+   - **H-BS2:** 12 of 50 (was 14), recall **0.240** [0.143, 0.374]. Its
+     bare-ground verdict is untouched: this sensitivity reports recall only.
+   - **Masking snow does not rescue discovery** — recall falls slightly in both,
+     the one direction that could have overturned anything.
+   - **Reproducibility:** every other line of the 2026-09-15 report regenerated
+     **byte-for-byte** five days later.
+   - **Ouray needed a re-extraction** after `EEException: Computation timed
+     out`, under the rule committed before any result (`724acc8`).
+   → [`ARM_BLIND_SEARCH_2026-09-15.md`](ARM_BLIND_SEARCH_2026-09-15.md) addendum,
+   [`report_blind_search_snowmask_2026-09-20.txt`](report_blind_search_snowmask_2026-09-20.txt)
 7. The science leads from item 0 below: a PA disturbance covariate, a better
    Ohio covariate, an Arm A re-run (DEM catchments, global de-duplication,
    per-district σ), and geology labels fixed before any new region's sign is

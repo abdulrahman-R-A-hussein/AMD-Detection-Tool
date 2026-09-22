@@ -1,6 +1,6 @@
 # PROJECT STATE — read this first
 
-**Last updated:** 2026-09-20 · **Current tag:** **`v3.11.1`** (tool: **`v3.1.1`**, which turns the retracted in-water module OFF by default). The tag is pushed; **the GitHub Release, which is what updates Zenodo, is still the author's step.** Every commit since the tag is untagged. **v3.11.0 is prepared, not published.** **Zenodo's latest version is 1.5.5 (April 2026), whose description carries retracted claims** (see OPEN → NEXT).
+**Last updated:** 2026-09-22 · **Current tag:** **`v3.11.1`** (tool: **`v3.1.1`**, which turns the retracted in-water module OFF by default). The tag is pushed; **the GitHub Release, which is what updates Zenodo, is still the author's step.** Every commit since the tag is untagged. **v3.11.0 is prepared, not published.** **Zenodo's latest version is 1.5.5 (April 2026), whose description carries retracted claims** (see OPEN → NEXT).
 
 **Start here after a break:** [`ROUND_SUMMARY_2026-09-16.md`](ROUND_SUMMARY_2026-09-16.md) (what was done and found) · [`../docs/HOW_TO_TEST.md`](../docs/HOW_TO_TEST.md) (test everything yourself) · [`FIELD_CAMPAIGN_PREREGISTRATION_2026-09-19.md`](FIELD_CAMPAIGN_PREREGISTRATION_2026-09-19.md) (the field campaign, Ohio first)
 
@@ -666,6 +666,17 @@ Ordered by value.
 ### NEXT — as of 2026-09-16 (start here)
 
 **Author actions (not analysis):**
+
+0. **★ GSA CONNECTS 2026 TALK — 11 October, 2:10 PM, CCC 110 (abstract #15510).**
+   A 14-slide deck, eight figures, speaker notes and a Q&A sheet were built
+   2026-09-22 and live in `D:\dev\phd\GSA-2026-Talk\`. The figures regenerate
+   from this repo: `python/make_talk_figures.py` and `python/make_talk_map.py`.
+   The talk reports the satellite arm only, states the detection and discovery
+   nulls, and shows Leadville failing.
+   → [`../docs/plans/2026-09-22-gsa-talk.md`](../docs/plans/2026-09-22-gsa-talk.md)
+   **This makes item 1 urgent: the DOI on the title slide must not resolve to a
+   record carrying retracted claims while the author is standing next to it.**
+
 1. **Zenodo — NOT updated, and worse than recorded on 2026-09-16.**
    - **The 2026-09-16 record was wrong.** It said the archive was v3.10.0.
      Checked 2026-09-19: **Zenodo's latest version is 1.5.5
